@@ -20,7 +20,6 @@
         <activity android:name=".view.LoginActivity"/>
         <activity android:name=".MainActivity"/>
         <activity android:name=".view.RegisterActivity"/>
-
         <activity android:name=".view.HomeCustomerActivity"/>
         <activity android:name=".view.HomeAdminActivity"/>
     </application>
