@@ -7,7 +7,7 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
-    <com.denzcoskun.imageslider.ImageSlider
+    <!--<com.denzcoskun.imageslider.ImageSlider
         android:id="@+id/slider"
         android:layout_width="match_parent"
         android:layout_height="200dp"
@@ -16,6 +16,6 @@
         app:delay="0"
         app:error_image="@drawable/background_gry"
         app:period="1000"
-        app:placeholder="@drawable/background_gry"/>
+        app:placeholder="@drawable/background_gry"/>-->
 
 </LinearLayout>
