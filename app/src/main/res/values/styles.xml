@@ -110,4 +110,15 @@
         <item name="android:background">#ffffff</item>
     </style>
 
+    <style name="TransparentView">
+        <item name="background">@android:color/transparent</item>
+    </style>
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+
+
+
+
+
 </resources>

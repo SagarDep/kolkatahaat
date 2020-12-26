@@ -4,6 +4,47 @@
     <string name="login_email_hint">Email</string>
     <string name="login_password_hint">Password</string>
 
+    <!--  Login  -->
+    <string name="str_err_msg_user_email">Please Enter Valid Email Address</string>
+    <string name="str_err_msg_user_password">Please Enter Valid Password</string>
+    <string name="str_err_msg_user_user_name">Please Enter Valid Name</string>
+    <string name="str_err_msg_user_user_mobile">Please Enter Valid Mobile No.</string>
+
+
+    <!--Admin Add Product-->
+    <string name="str_add_product_name">Enter Product Name</string>
+    <string name="str_add_product_packing">Choose Product Packing</string>
+    <string name="str_add_product_price">Enter Product Price</string>
+    <string name="str_add_product_delivery_charge">Enter Product Delivery Charge</string>
+    <string name="str_add_product">Add Product</string>
+
+    <string-array name="product_category">
+        <item>Eatable</item>
+        <item>Puja Items</item>
+        <item>Clothing</item>
+    </string-array>
+
+    <string name="menu_home">Home</string>
+    <string name="menu_gallery">Gallery</string>
+    <string name="menu_slideshow">Slideshow</string>
+    <string name="menu_tools">Tools</string>
+    <string name="menu_share">Share</string>
+    <string name="menu_send">Send</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <string name="MODEL">list</string>
+    <string name="position">position</string>
+    <!--
+    drawer ==> https://achmadprogrammer.medium.com/android-navigation-drawer-like-gmail-with-fragment-d198a2d972c9
+    drawer git link==> https://github.com/achmadqomarudin/Navigation-Drawer-with-Fragment
+    -->
+
+
+    <string name="common_no_internet">No internet connection</string>
+    <string name="str_alert">Alert!</string>
+    <string name="ok">Ok</string>
 
     <string name="str_category_name">choose a category name</string>
     <string-array name="country_arrays">

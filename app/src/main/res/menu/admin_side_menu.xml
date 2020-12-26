@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_home"
+            app:actionViewClass="android.widget.TextView"
+            android:icon="@mipmap/ic_launcher"
+            android:title="@string/menu_home" />
+        <item
+            android:id="@+id/nav_gallery"
+            app:actionViewClass="android.widget.TextView"
+            android:icon="@mipmap/ic_launcher"
+            android:title="@string/menu_gallery" />
+        <item
+            android:id="@+id/nav_slideshow"
+            app:actionViewClass="android.widget.TextView"
+            android:icon="@mipmap/ic_launcher"
+            android:title="@string/menu_slideshow" />
+        <!--<item
+            android:id="@+id/nav_tools"
+            app:actionViewClass="android.widget.TextView"
+            android:icon="@mipmap/ic_launcher"
+            android:title="@string/menu_tools" />-->
+    </group>
+
+    <!--<item android:title="Communicate">
+        <menu>
+            <item
+                android:id="@+id/nav_share"
+                app:actionViewClass="android.widget.TextView"
+                android:icon="@mipmap/ic_launcher"
+                android:title="@string/menu_share" />
+            <item
+                android:id="@+id/nav_send"
+                app:actionViewClass="android.widget.TextView"
+                android:icon="@mipmap/ic_launcher"
+                android:title="@string/menu_send" />
+        </menu>
+    </item>-->
+    <group
+        android:id="@+id/menu_bottom"
+        android:checkableBehavior="single">
+
+        <item
+            android:id="@+id/menu_about"
+            app:actionViewClass="android.widget.TextView"
+            android:icon="@mipmap/ic_launcher"
+            android:title="About" />
+        <item
+            android:id="@+id/menu_logout"
+            app:actionViewClass="android.widget.TextView"
+            android:icon="@mipmap/ic_launcher"
+            android:title="Logout" />
+    </group>
+</menu>

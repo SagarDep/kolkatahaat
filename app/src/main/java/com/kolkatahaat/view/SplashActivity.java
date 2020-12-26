@@ -19,7 +19,7 @@ public class SplashActivity extends AppCompatActivity {
     protected boolean _active = true;
     protected int _splashTime = 3000; // time to display the splash screen in ms
     private String FCMToken;
-    private TextView txtVersionName;
+    // private TextView txtVersionName;
     private TextView txtCopyRight;
 
     @Override
@@ -29,13 +29,9 @@ public class SplashActivity extends AppCompatActivity {
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_splash);
 
-
-
-        txtVersionName = (TextView)findViewById(R.id.txt_version_number);
-
-
-            String versionName = "1.2.3";
-            txtVersionName.setText(getString(R.string.app_name)+" "+versionName);
+        //txtVersionName = (TextView)findViewById(R.id.txt_version_number);
+        String versionName = "1.2.3";
+        //txtVersionName.setText(getString(R.string.app_name)+" "+versionName);
 
         Thread splashTread = new Thread() {
             @Override
@@ -51,12 +47,9 @@ public class SplashActivity extends AppCompatActivity {
                 } catch (Exception e) {
 
                 } finally {
-
-                        Intent m_intent = new Intent(SplashActivity.this, MainActivity.class);
-                        m_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |Intent.FLAG_ACTIVITY_NEW_TASK);
-                        startActivity(m_intent);
-                        finish();
-
+                    Intent m_intent = new Intent(SplashActivity.this, MainActivity.class);
+                    m_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(m_intent);
                     finish();
                 }
             }

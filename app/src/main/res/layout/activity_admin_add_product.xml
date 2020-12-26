@@ -7,7 +7,7 @@
     android:layout_gravity="center"
     android:focusableInTouchMode="true"
     android:gravity="center"
-    tools:context="com.kolkatahaat.view.admin.AddProductActivity">
+    tools:context="com.kolkatahaat.view.admin.AdminAddProductActivity">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -41,20 +41,19 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:id="@+id/thumbnail"
+                        android:id="@+id/imgProduct"
                         android:layout_width="200dp"
                         android:layout_height="200dp"
                         android:layout_gravity="center"
-                        android:layout_marginRight="16dp"
-                        android:scaleType="centerCrop" />
+                        android:scaleType="centerCrop"
+                        android:src="@mipmap/ic_launcher"/>
 
                     <Button
-                        android:id="@+id/crButton"
+                        android:id="@+id/btnChoose"
                         style="@style/Widget.AppCompat.Button.Colored"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="@dimen/loginViewsMargin"
+                        android:layout_gravity="center"
                         android:gravity="center"
                         android:text="Choose" />
                 </LinearLayout>
@@ -66,43 +65,48 @@
                     android:orientation="vertical">
 
                     <com.google.android.material.textfield.TextInputLayout
-                        android:id="@+id/textItemName"
-                        style="@style/parent"
-                        android:layout_marginTop="@dimen/loginViewsMargin">
-
-                        <com.google.android.material.textfield.TextInputEditText
-                            android:id="@+id/editItemName"
-                            style="@style/modifiedEditText"
-                            android:hint="Name"
-                            android:inputType="textPersonName"
-                            android:maxLines="1" />
-                    </com.google.android.material.textfield.TextInputLayout>
-
-                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/textInputItemCategory"
                         style="@style/CustomDropDownTilStyle"
                         android:layout_margin="8dp"
                         android:hint="@string/str_category_name">
 
                         <androidx.appcompat.widget.AppCompatAutoCompleteTextView
-                            android:id="@+id/animal_actv"
+                            android:id="@+id/autoCompleteCategory"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:focusable="false"
                             android:inputType="none" />
                     </com.google.android.material.textfield.TextInputLayout>
 
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/textInputItemName"
+                        style="@style/parent"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:hint="@string/str_add_product_name">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/editTextItemName"
+                            style="@style/modifiedEditText"
+                            android:inputType="textEmailAddress"
+                            android:maxLines="1"
+                            android:hint="@string/str_add_product_name"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
 
                     <LinearLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="fill_parent"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center"
+                        android:gravity="center"
+                        android:layout_marginTop="@dimen/_10sdp"
                         android:orientation="horizontal">
 
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="fill_parent"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1">
 
                             <com.google.android.material.textfield.TextInputLayout
+                                android:id="@+id/textInputItemPacking"
                                 style="@style/CustomDropDownTilStyle"
                                 android:layout_margin="8dp"
                                 android:hint="@string/str_category_name">
@@ -118,37 +122,48 @@
 
                         <LinearLayout
                             android:layout_width="0dp"
-                            android:layout_height="fill_parent"
+                            android:layout_height="wrap_content"
                             android:layout_weight="1">
 
                             <com.google.android.material.textfield.TextInputLayout
-                                android:id="@+id/textInputPrice"
+                                android:id="@+id/textInputItemPrice"
                                 style="@style/parent"
-                                android:layout_marginTop="@dimen/loginViewsMargin">
-
+                                android:hint="@string/str_add_product_price">
                                 <com.google.android.material.textfield.TextInputEditText
-                                    android:id="@+id/editTextPrice"
+                                    android:id="@+id/editTextItemPrice"
                                     style="@style/modifiedEditText"
-                                    android:hint="@string/login_email_hint"
                                     android:inputType="textEmailAddress"
-                                    android:maxLines="1" />
+                                    android:maxLines="1"
+                                    android:hint="@string/str_add_product_price"/>
                             </com.google.android.material.textfield.TextInputLayout>
+
                         </LinearLayout>
 
                     </LinearLayout>
 
-
-                    <Button
-                        android:id="@+id/cirRegisterButton"
-                        style="@style/Widget.AppCompat.Button.Colored"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_marginTop="@dimen/loginViewsMargin"
-                        android:text="Register" />
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/textInputItemDeliveryChrg"
+                        style="@style/parent"
+                        android:layout_marginTop="@dimen/_10sdp"
+                        android:hint="@string/str_add_product_delivery_charge">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/editTextItemDeliveryChrg"
+                            style="@style/modifiedEditText"
+                            android:inputType="textEmailAddress"
+                            android:maxLines="1"
+                            android:hint="@string/str_add_product_delivery_charge"/>
+                    </com.google.android.material.textfield.TextInputLayout>
 
                 </LinearLayout>
 
+                <Button
+                    android:id="@+id/btnAppProduct"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/loginViewsMargin"
+                    android:text="@string/str_add_product" />
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
