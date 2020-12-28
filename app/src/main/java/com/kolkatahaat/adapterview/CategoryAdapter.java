@@ -138,7 +138,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
 
             super(itemView);
             textView = (TextView) itemView.findViewById(R.id.txtCategoryName);
-            imgArrow = (ImageView) itemView.findViewById(R.id.imgArrow);
+            //imgArrow = (ImageView) itemView.findViewById(R.id.imgArrow);
             rlContent = (LinearLayout) itemView.findViewById(R.id.rlContent);
             viewDashed = itemView.findViewById(R.id.viewDashed);
             tvDesignation = (TextView) itemView.findViewById(R.id.txtCategoryDes);

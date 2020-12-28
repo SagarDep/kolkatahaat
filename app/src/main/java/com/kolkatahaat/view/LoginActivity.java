@@ -1,5 +1,6 @@
 package com.kolkatahaat.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
@@ -43,7 +44,7 @@ public class LoginActivity extends AppCompatActivity {
     TextView txtForgotPassword;
     Button btnLogin;
     TextView txtNewRegister;
-    TextView txtInfo;
+    //TextView txtInfo;
 
     ProgressBar progressBar;
 
@@ -65,19 +66,45 @@ public class LoginActivity extends AppCompatActivity {
 
         textInputEmail = findViewById(R.id.textInputEmail);
         editTextEmail = findViewById(R.id.editTextEmail);
-        textInputPassword = findViewById(R.id.textInputPassword);
 
+        textInputPassword = findViewById(R.id.textInputPassword);
         editTextPassword = findViewById(R.id.editTextPassword);
+
         txtForgotPassword = findViewById(R.id.txtForgotPassword);
 
         btnLogin = findViewById(R.id.btnLogin);
         txtNewRegister = findViewById(R.id.txtNewRegister);
-        txtInfo = findViewById(R.id.txtInfo);
+        //txtInfo = findViewById(R.id.txtInfo);
 
         progressBar = findViewById(R.id.progressBar);
+
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!validateEmail() && !validatePassword()) {
+                    return;
+                }
+                else if(validateEmail() && validatePassword()) {
+                    if (NetUtils.isNetworkAvailable(LoginActivity.this)) {
+                        userLogin();
+                    }  else {
+                        Utility.displayDialog(LoginActivity.this, getString(R.string.common_no_internet), false);
+                    }
+                }
+
+            }
+        });
+
+        txtNewRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
-    public void chekcValidation(){
+    /*public void chekcValidation(){
         Utility.hideSoftKeyboard(LoginActivity.this);
         if (TextUtils.isEmpty(editTextEmail.getText().toString())) {
             textInputEmail.setError(getResources().getString(R.string.str_err_msg_user_email));
@@ -97,5 +124,51 @@ public class LoginActivity extends AppCompatActivity {
             }
             //return false;
         }
+    }*/
+
+
+
+    public boolean validateEmail(){
+        if (TextUtils.isEmpty(editTextEmail.getText().toString().trim())) {
+            textInputEmail.setError("Invalid Email address, ex: abc@example.com");
+            textInputEmail.requestFocus();
+            return false;
+        } else {
+            //
+            String emailId = editTextEmail.getText().toString().trim();
+            Boolean  isValid = android.util.Patterns.EMAIL_ADDRESS.matcher(emailId).matches();
+            if (!isValid) {
+                //email.setError("Invalid Email address, ex: abc@example.com");
+                textInputEmail.setError(getResources().getString(R.string.str_err_msg_user_email));
+                textInputEmail.requestFocus();
+                return false;
+            } else {
+                textInputEmail.setErrorEnabled(false);
+            }
+        }
+        return true;
     }
+
+    private boolean validatePassword() {
+        if (TextUtils.isEmpty(editTextPassword.getText().toString().trim())) {
+            textInputPassword.setError("Password is required");
+            textInputPassword.requestFocus();
+            return false;
+        } else if(editTextPassword.getText().toString().trim().length() < 10){
+            textInputPassword.setError("Password can't be less than 10 digit");
+            textInputPassword.requestFocus();
+            return false;
+        }
+        else {
+            textInputPassword.setErrorEnabled(false);
+        }
+        return true;
+    }
+
+
+
+    public void userLogin(){
+
+    }
+
 }

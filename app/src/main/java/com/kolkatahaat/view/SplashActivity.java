@@ -47,7 +47,7 @@ public class SplashActivity extends AppCompatActivity {
                 } catch (Exception e) {
 
                 } finally {
-                    Intent m_intent = new Intent(SplashActivity.this, MainActivity.class);
+                    Intent m_intent = new Intent(SplashActivity.this, RegisterActivity.class);
                     m_intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
                     startActivity(m_intent);
                     finish();

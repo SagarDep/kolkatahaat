@@ -1,5 +1,6 @@
 package com.kolkatahaat.view;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
@@ -22,6 +23,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.kolkatahaat.model.Users;
 import com.kolkatahaat.R;
@@ -44,6 +46,9 @@ public class RegisterActivity extends AppCompatActivity {
     private TextInputLayout textInputName;
     private TextInputEditText editTextName;
 
+    private TextInputLayout textInputAddress;
+    private TextInputEditText editTextAddress;
+
     private TextInputLayout textInputEmail;
     private TextInputEditText editTextEmail;
 
@@ -54,7 +59,7 @@ public class RegisterActivity extends AppCompatActivity {
     private TextInputEditText editTextPassword;
     private Button btnRegister;
     private TextView txtLogin;
-    private TextView txtInfo;
+    //private TextView txtInfo;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -73,6 +78,9 @@ public class RegisterActivity extends AppCompatActivity {
         textInputName = findViewById(R.id.textInputName);
         editTextName = findViewById(R.id.editTextName);
 
+        textInputAddress = findViewById(R.id.textInputAddress);
+        editTextAddress = findViewById(R.id.editTextAddress);
+
         textInputEmail = findViewById(R.id.textInputEmail);
         editTextEmail = findViewById(R.id.editTextEmail);
 
@@ -84,66 +92,175 @@ public class RegisterActivity extends AppCompatActivity {
 
         btnRegister = findViewById(R.id.btnRegister);
         txtLogin = findViewById(R.id.txtLogin);
-        txtInfo = findViewById(R.id.txtInfo);
+        //txtInfo = findViewById(R.id.txtInfo);
+
+        btnRegister.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!validateUserName() && !validateAddress() && !validateEmail() && !validateMobile() && !validatePassword()) {
+                    return;
+                }
+                else if(validateUserName() && !validateAddress() && validateEmail() && validateMobile() && validatePassword()) {
+                    userRegister();
+                }
+
+            }
+        });
+
+        txtLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
 
-    public void chekcValidation(){
+   /* public boolean chekcValidation(){
         Utility.hideSoftKeyboard(RegisterActivity.this);
-        if (TextUtils.isEmpty(editTextName.getText().toString())) {
+        if (TextUtils.isEmpty(editTextName.getText().toString().trim())) {
             textInputName.setError(getResources().getString(R.string.str_err_msg_user_user_name));
+            return false;
             //return true;
-        } else if (TextUtils.isEmpty(editTextEmail.getText().toString())) {
+        } else if (TextUtils.isEmpty(editTextEmail.getText().toString().trim())) {
             textInputEmail.setError(getResources().getString(R.string.str_err_msg_user_email));
-            //return true;
-        } else if (TextUtils.isEmpty(editTextMobile.getText().toString())) {
+            return false;
+        } else if (TextUtils.isEmpty(editTextMobile.getText().toString().trim())) {
             textInputMobile.setError(getResources().getString(R.string.str_err_msg_user_user_mobile));
-            //return true;
-        } else if (TextUtils.isEmpty(editTextPassword.getText().toString())) {
+            return false;
+        } else if (TextUtils.isEmpty(editTextPassword.getText().toString().trim())) {
             textInputPassword.setError(getResources().getString(R.string.str_err_msg_user_password));
-            //return true;
+            return false;
         } else {
-            if (NetUtils.isNetworkAvailable(RegisterActivity.this)) {
-               final String name = editTextName.getText().toString().trim();
-               final String email = editTextEmail.getText().toString().trim();
-               final String mobile = editTextMobile.getText().toString().trim();
-               final String password = editTextPassword.getText().toString().trim();
+            pass.setErrorEnabled(false);
+        }
+        return true;
+    }*/
 
-                fireAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull Task<AuthResult> task) {
-                        if(task.isSuccessful()){
 
-                            Users users = new Users();
-                            users.setUserId(task.getResult().getUser().getUid());
-                            users.setUserName(name);
-                            users.setUserEmail(email);
-                            users.setUserMobile(mobile);
-                            users.setUserPassword(password);
-                            users.setUserToken("Add Firebase Device Token");
+    private boolean validateUserName() {
+        if (TextUtils.isEmpty(editTextName.getText().toString().trim())) {
+            textInputName.setError("Required Field!");
+            textInputName.requestFocus();
+            return false;
+        } else {
+            textInputName.setErrorEnabled(false);
+        }
+        return true;
+    }
 
-                            fireReference.set(users).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    Log.d(TAG, "onSuccess: user Profile is created for "+ aVoid);
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                    Log.d(TAG, "onFailure: " + e.toString());
-                                }
-                            });
+    private boolean validateAddress() {
+        if (TextUtils.isEmpty(editTextAddress.getText().toString().trim())) {
+            textInputAddress.setError("Required Field!");
+            textInputAddress.requestFocus();
+            return false;
+        } else {
+            textInputAddress.setErrorEnabled(false);
+        }
+        return true;
+    }
 
-                        } else {
-                            Toast.makeText(RegisterActivity.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                            //progressBar.setVisibility(View.GONE);
-                        }
-                    }
-                });
-
+    public boolean validateEmail(){
+        if (TextUtils.isEmpty(editTextEmail.getText().toString().trim())) {
+            textInputEmail.setError("Invalid Email address, ex: abc@example.com");
+            textInputEmail.requestFocus();
+            return false;
+        } else {
+            //
+            String emailId = editTextEmail.getText().toString().trim();
+            Boolean  isValid = android.util.Patterns.EMAIL_ADDRESS.matcher(emailId).matches();
+            if (!isValid) {
+                //email.setError("Invalid Email address, ex: abc@example.com");
+                textInputEmail.setError(getResources().getString(R.string.str_err_msg_user_email));
+                textInputEmail.requestFocus();
+                return false;
             } else {
-                Utility.displayDialog(RegisterActivity.this, getString(R.string.common_no_internet), false);
+                textInputEmail.setErrorEnabled(false);
             }
         }
+        return true;
     }
+
+    private boolean validateMobile() {
+        if (TextUtils.isEmpty(editTextMobile.getText().toString().trim())) {
+            textInputMobile.setError("Required Field!");
+            textInputMobile.requestFocus();
+            return false;
+        } else if(editTextMobile.getText().toString().trim().length() < 6){
+            textInputMobile.setError("Mobile can't be less than 6 digit");
+            textInputMobile.requestFocus();
+            return false;
+        } else {
+            textInputMobile.setErrorEnabled(false);
+        }
+        return true;
+    }
+
+    private boolean validatePassword() {
+        if (TextUtils.isEmpty(editTextPassword.getText().toString().trim())) {
+            textInputPassword.setError("Password is required");
+            textInputPassword.requestFocus();
+            return false;
+        } else if(editTextPassword.getText().toString().trim().length() < 10){
+            textInputPassword.setError("Password can't be less than 10 digit");
+            textInputPassword.requestFocus();
+            return false;
+        }
+        else {
+            textInputPassword.setErrorEnabled(false);
+        }
+        return true;
+    }
+
+    public void userRegister(){
+        if (NetUtils.isNetworkAvailable(RegisterActivity.this)) {
+
+            final String name = editTextName.getText().toString().trim();
+            final String email = editTextEmail.getText().toString().trim();
+            final String mobile = editTextMobile.getText().toString().trim();
+            final String password = editTextPassword.getText().toString().trim();
+
+            fireAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if(task.isSuccessful()){
+                        final FieldValue productCreatedDate = FieldValue.serverTimestamp();
+
+                        Users users = new Users();
+                        users.setUserId(task.getResult().getUser().getUid());
+                        users.setUserName(name);
+                        users.setUserEmail(email);
+                        users.setUserMobile(mobile);
+                        users.setUserPassword(password);
+                        users.setUserToken("Add Firebase Device Token");
+                        users.setUserCreatedDate(productCreatedDate);
+
+                        fireReference.set(users).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void aVoid) {
+                                Log.d(TAG, "onSuccess: user Profile is created for "+ aVoid);
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.d(TAG, "onFailure: " + e.toString());
+                            }
+                        });
+
+                    } else {
+                        Toast.makeText(RegisterActivity.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                        //progressBar.setVisibility(View.GONE);
+                        Log.e("==============>",task.getException().getMessage());
+                        Utility.displayDialog(RegisterActivity.this, task.getException().getMessage(), false);
+
+                    }
+                }
+            });
+
+        } else {
+            Utility.displayDialog(RegisterActivity.this, getString(R.string.common_no_internet), false);
+        }
+    }
+
 }

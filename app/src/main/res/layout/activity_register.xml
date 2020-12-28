@@ -44,8 +44,29 @@
                             style="@style/modifiedEditText"
                             android:inputType="textPersonName"
                             android:maxLines="1"
-                            android:hint="Name"/>
+                            android:hint="Name"
+                            android:imeOptions="actionNext"
+                            android:lines="1"
+                            android:singleLine="true"/>
 
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/textInputAddress"
+                        style="@style/parent"
+                        android:layout_marginTop="@dimen/loginViewsMargin">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/editTextAddress"
+                            style="@style/modifiedEditText"
+                            android:lines="3"
+                            android:maxLines="5"
+                            android:minLines="3"
+                            android:inputType="textMultiLine"
+                            android:gravity="center|left|top"
+                             android:hint="@string/login_email_hint"
+                            android:imeOptions="actionNext"
+                            android:text="nehakaneriya94@gmail.com"
+                            android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -57,7 +78,11 @@
                             style="@style/modifiedEditText"
                             android:inputType="textEmailAddress"
                             android:maxLines="1"
-                            android:hint="@string/login_email_hint"/>
+                            android:hint="@string/login_email_hint"
+                            android:imeOptions="actionNext"
+                            android:lines="1"
+                            android:text="nehakaneriya94@gmail.com"
+                            android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
@@ -69,19 +94,28 @@
                             style="@style/modifiedEditText"
                             android:inputType="phone"
                             android:maxLines="1"
-                            android:hint="Mobile Number"/>
+                            android:hint="Mobile Number"
+                            android:imeOptions="actionNext"
+                            android:maxLength="10"
+                            android:lines="1"
+                            android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/textInputPassword"
                         style="@style/parent"
+                        app:passwordToggleEnabled="true"
                         android:layout_marginTop="@dimen/loginViewsMargin">
                         <com.google.android.material.textfield.TextInputEditText
                             android:id="@+id/editTextPassword"
                             style="@style/modifiedEditText"
                             android:hint="@string/login_password_hint"
                             android:maxLines="1"
-                            android:inputType="textPassword"/>
+                            android:inputType="textPassword"
+                            android:maxLength="10"
+                            android:imeOptions="actionDone"
+                            android:lines="1"
+                            android:singleLine="true"/>
                     </com.google.android.material.textfield.TextInputLayout>
 
                     <Button
@@ -109,7 +143,7 @@
         </LinearLayout>
     </ScrollView>
 
-    <TextView
+    <!--<TextView
         android:id="@+id/txtInfo"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
@@ -117,5 +151,5 @@
         android:layout_height="wrap_content"
         android:gravity="center"
         android:text="onLoginClick"
-        android:adjustViewBounds="false"/>
+        android:adjustViewBounds="false"/>-->
 </RelativeLayout>

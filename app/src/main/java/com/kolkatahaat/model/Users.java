@@ -1,5 +1,7 @@
 package com.kolkatahaat.model;
 
+import com.google.firebase.firestore.FieldValue;
+
 public class Users {
     private String userId;
     private String userName;
@@ -7,7 +9,7 @@ public class Users {
     private String userMobile;
     private String userPassword;
     private String userToken;
-    private String userCreatedDate;
+    private FieldValue userCreatedDate;
 
 
     public Users(){
@@ -62,11 +64,11 @@ public class Users {
         this.userToken = userToken;
     }
 
-    public String getUserCreatedDate() {
+    public FieldValue getUserCreatedDate() {
         return userCreatedDate;
     }
 
-    public void setUserCreatedDate(String userCreatedDate) {
+    public void setUserCreatedDate(FieldValue userCreatedDate) {
         this.userCreatedDate = userCreatedDate;
     }
 }
