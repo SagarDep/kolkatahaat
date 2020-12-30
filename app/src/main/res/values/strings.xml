@@ -2,6 +2,7 @@
     <string name="app_name">KolkataHaat</string>
 
     <string name="login_email_hint">Email</string>
+    <string name="login_address_hint">Address</string>
     <string name="login_password_hint">Password</string>
 
     <!--  Login  -->

@@ -100,7 +100,7 @@ public class RegisterActivity extends AppCompatActivity {
                 if (!validateUserName() && !validateAddress() && !validateEmail() && !validateMobile() && !validatePassword()) {
                     return;
                 }
-                else if(validateUserName() && !validateAddress() && validateEmail() && validateMobile() && validatePassword()) {
+                else if(validateUserName() && validateAddress() && validateEmail() && validateMobile() && validatePassword()) {
                     userRegister();
                 }
 
@@ -228,12 +228,14 @@ public class RegisterActivity extends AppCompatActivity {
                         final FieldValue productCreatedDate = FieldValue.serverTimestamp();
 
                         Users users = new Users();
-                        users.setUserId(task.getResult().getUser().getUid());
+                        users.setUserId(fireReference.getId());
+                        users.setUserUId(task.getResult().getUser().getUid());
                         users.setUserName(name);
                         users.setUserEmail(email);
                         users.setUserMobile(mobile);
                         users.setUserPassword(password);
                         users.setUserToken("Add Firebase Device Token");
+                        users.setUserType(1);
                         users.setUserCreatedDate(productCreatedDate);
 
                         fireReference.set(users).addOnSuccessListener(new OnSuccessListener<Void>() {

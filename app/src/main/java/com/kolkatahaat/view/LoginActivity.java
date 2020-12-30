@@ -22,6 +22,8 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.kolkatahaat.R;
 import com.kolkatahaat.utills.NetUtils;
 import com.kolkatahaat.utills.Utility;
@@ -86,7 +88,9 @@ public class LoginActivity extends AppCompatActivity {
                 }
                 else if(validateEmail() && validatePassword()) {
                     if (NetUtils.isNetworkAvailable(LoginActivity.this)) {
-                        userLogin();
+                        String email = editTextEmail.getText().toString().trim();
+                        String password = editTextPassword.getText().toString().trim();
+                        userLogin(email, password);
                     }  else {
                         Utility.displayDialog(LoginActivity.this, getString(R.string.common_no_internet), false);
                     }
@@ -167,7 +171,7 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-    public void userLogin(){
+    public void userLogin(String email, String password){
 
     }
 

@@ -4,11 +4,13 @@ import com.google.firebase.firestore.FieldValue;
 
 public class Users {
     private String userId;
+    private String userUId;
     private String userName;
     private String userEmail;
     private String userMobile;
     private String userPassword;
     private String userToken;
+    private int userType;
     private FieldValue userCreatedDate;
 
 
@@ -22,6 +24,14 @@ public class Users {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getUserUId() {
+        return userUId;
+    }
+
+    public void setUserUId(String userUId) {
+        this.userUId = userUId;
     }
 
     public String getUserName() {
@@ -62,6 +72,14 @@ public class Users {
 
     public void setUserToken(String userToken) {
         this.userToken = userToken;
+    }
+
+    public int getUserType() {
+        return userType;
+    }
+
+    public void setUserType(int userType) {
+        this.userType = userType;
     }
 
     public FieldValue getUserCreatedDate() {

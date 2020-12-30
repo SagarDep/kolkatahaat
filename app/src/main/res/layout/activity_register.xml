@@ -63,7 +63,7 @@
                             android:minLines="3"
                             android:inputType="textMultiLine"
                             android:gravity="center|left|top"
-                             android:hint="@string/login_email_hint"
+                             android:hint="@string/login_address_hint"
                             android:imeOptions="actionNext"
                             android:text="nehakaneriya94@gmail.com"
                             android:singleLine="true"/>

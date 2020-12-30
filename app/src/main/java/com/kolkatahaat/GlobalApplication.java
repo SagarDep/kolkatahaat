@@ -6,6 +6,8 @@ import androidx.appcompat.app.AppCompatDelegate;
 import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
 
+import com.google.firebase.FirebaseApp;
+
 public class GlobalApplication extends MultiDexApplication {
 
     private static GlobalApplication instance;
@@ -28,6 +30,8 @@ public class GlobalApplication extends MultiDexApplication {
     public void onCreate() {
         super.onCreate();
         instance = this;
+
+        FirebaseApp.initializeApp(this);
 
         this.setAppContext(getApplicationContext());
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);

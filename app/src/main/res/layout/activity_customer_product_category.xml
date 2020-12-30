@@ -17,7 +17,12 @@
         app:error_image="@drawable/background_gry"
         app:period="1000"
         app:placeholder="@drawable/background_gry"/>-->
+    <com.denzcoskun.imageslider.ImageSlider
+        android:layout_width="match_parent"
+        android:id="@+id/slider"
 
+        android:layout_height="210dp">
+    </com.denzcoskun.imageslider.ImageSlider>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/mRecyclerView"
         android:layout_width="match_parent"
