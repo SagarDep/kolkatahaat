@@ -22,10 +22,11 @@
     <color name="colorAccent">#D81B60</color>
 
 
-
+    <color name="colorRed">#FF0000</color>
     <color name="colorWhite">#ffffff</color>
     <color name="colorRect">#80ffffff</color>
     <color name="colorBlack">#000000</color>
+    <color name="colorLightGray">#F6F6F6</color>
     <color name="colorGray">#b1afaf</color>
     <color name="colorGrayDark">#434145</color>
     <color name="colorAppGreen">#2bce82</color>

@@ -11,16 +11,21 @@ android {
         versionCode 1
         versionName "1.0"
         multiDexEnabled true
+        vectorDrawables.useSupportLibrary = true
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
+            buildConfigField "String", "SERVER_KEY", '"AAAAChB7Pz4:APA91bH5jOVnTRLrbN1-oYlDEm5VSyh3-NiTCFG_kGa7IenMD2hHGNWwOeN0xpy58DMR7v5yM7k3M9SE9JPCwi58UUZRP3Ph_sjdhAkOgADLtvyv0eKWy3A5eSWT4LAk8HdApRsrGD_Y"'
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
-
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
@@ -30,8 +35,11 @@ dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     testImplementation 'junit:junit:4.12'
 
-    implementation "androidx.recyclerview:recyclerview:1.1.0"
+    implementation 'androidx.recyclerview:recyclerview:1.1.0'
     implementation 'com.google.android.material:material:1.0.0'
+
+    implementation 'de.hdodenhof:circleimageview:3.1.0'
+    implementation 'com.github.bumptech.glide:glide:4.7.1'
 
 
 
@@ -41,15 +49,21 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth'
     implementation 'com.google.firebase:firebase-core'
     implementation 'com.google.firebase:firebase-firestore'
+    implementation 'com.google.firebase:firebase-storage'
+    implementation 'com.google.firebase:firebase-messaging'
 
 
     //ssp for font
     implementation 'com.intuit.sdp:sdp-android:1.0.6'
     implementation 'com.intuit.ssp:ssp-android:1.0.6'
 
+    implementation 'com.google.code.gson:gson:2.8.5'
 
-    implementation 'com.github.denzcoskun:ImageSlideshow:0.0.7'
+    //implementation 'com.github.denzcoskun:ImageSlideshow:0.0.7'
     //https://medium.com/@devendrac706/android-image-slider-with-indicator-example-a3513ac77ff7
+
+    implementation "com.github.firdausmaulan:GlideSlider:1.5.1"
+    //https://jitpack.io/p/firdausmaulan/glideslider
 
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'

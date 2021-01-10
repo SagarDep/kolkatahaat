@@ -112,7 +112,6 @@
                             android:hint="@string/login_password_hint"
                             android:maxLines="1"
                             android:inputType="textPassword"
-                            android:maxLength="10"
                             android:imeOptions="actionDone"
                             android:lines="1"
                             android:singleLine="true"/>

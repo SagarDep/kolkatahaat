@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_product"
+            android:icon="@mipmap/ic_launcher"
+            android:title="@string/menu_product"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/nav_users_list"
+            android:icon="@mipmap/ic_launcher"
+            android:title="@string/menu_users_list"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/nav_users_orders"
+            android:icon="@mipmap/ic_launcher"
+            android:title="@string/menu_users_orders"
+            app:showAsAction="never" />
+        <item
+            android:id="@+id/nav_about_us"
+            android:icon="@mipmap/ic_launcher"
+            android:title="@string/menu_about_us"
+            app:showAsAction="never" />
+
+    </group>
+
+    <item android:title="">
+        <menu>
+            <item
+                android:id="@+id/nav_profile"
+                android:icon="@mipmap/ic_launcher"
+                android:title="@string/menu_profile"
+                app:showAsAction="never" />
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@mipmap/ic_launcher"
+                android:title="@string/menu_logout"
+                app:showAsAction="never" />
+        </menu>
+    </item>
+    <!-- <group
+         android:id="@+id/menu_bottom"
+         android:checkableBehavior="single">
+
+         <item
+             android:id="@+id/menu_about"
+
+             android:icon="@mipmap/ic_launcher"
+             android:title="About" />
+         <item
+             android:id="@+id/menu_logout"
+              android:icon="@mipmap/ic_launcher"
+             android:title="Logout" />
+     </group>-->
+</menu>

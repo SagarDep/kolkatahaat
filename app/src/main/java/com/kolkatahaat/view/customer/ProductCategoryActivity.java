@@ -1,6 +1,7 @@
 package com.kolkatahaat.view.customer;
 
 import android.os.Bundle;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,6 +25,7 @@ public class ProductCategoryActivity extends AppCompatActivity {
         setContentView(R.layout.activity_customer_product_category);
 
         recyclerView = findViewById(R.id.mRecyclerView);
+        recyclerView.setVisibility(View.VISIBLE);
         categoryAdapter = new CategoryAdapter(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         recyclerView.setAdapter(categoryAdapter);

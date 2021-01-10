@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_gravity="center"
+    android:gravity="center"
+    android:background="@drawable/background_dialog"
+    android:padding="10dp"
+    tools:context=".view.admin.fragments.AddQuantityDialog">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/_16sdp"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:textSize="@dimen/_18sdp"
+        android:textStyle="bold"
+        android:text="Add quantity and price" />
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="10dp"
+        android:orientation="vertical">
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputItemQuantity"
+            style="@style/TextInputLayoutAppearance"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:hint="@string/str_add_product_quantity">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextItemQuantity"
+                style="@style/modifiedEditText"
+                android:inputType="textEmailAddress"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+
+
+
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/textInputItemPrice"
+            style="@style/TextInputLayoutAppearance"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:hint="@string/str_add_product_price">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/editTextItemPrice"
+                style="@style/modifiedEditText"
+                android:inputType="number|numberDecimal"
+                android:ems="10"
+                android:maxLines="1" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical|right"
+        android:layout_marginTop="@dimen/_20sdp"
+        android:layout_marginStart="@dimen/_10sdp"
+        android:layout_marginEnd="@dimen/_10sdp"
+        android:weightSum="2"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btnOk"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:layout_marginRight="@dimen/_10sdp"
+            android:text="OK" />
+
+        <Button
+            android:id="@+id/btnCancel"
+            style="@style/Widget.AppCompat.Button.Colored"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center_horizontal"
+            android:layout_weight="1"
+            android:layout_marginLeft="@dimen/_10sdp"
+            android:text="Cancel" />
+    </LinearLayout>
+
+
+</LinearLayout>

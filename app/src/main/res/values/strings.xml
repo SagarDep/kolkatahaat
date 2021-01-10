@@ -4,6 +4,7 @@
     <string name="login_email_hint">Email</string>
     <string name="login_address_hint">Address</string>
     <string name="login_password_hint">Password</string>
+    <string name="login_one_time_code">Enter Code</string>
 
     <!--  Login  -->
     <string name="str_err_msg_user_email">Please Enter Valid Email Address</string>
@@ -20,17 +21,27 @@
     <string name="str_add_product">Add Product</string>
 
     <string-array name="product_category">
+        <item>Select</item>
         <item>Eatable</item>
         <item>Puja Items</item>
         <item>Clothing</item>
     </string-array>
 
-    <string name="menu_home">Home</string>
-    <string name="menu_gallery">Gallery</string>
-    <string name="menu_slideshow">Slideshow</string>
-    <string name="menu_tools">Tools</string>
-    <string name="menu_share">Share</string>
+    <string name="menu_str_eatable">Eatable</string>
+    <string name="menu_str_puja_items">Puja Items</string>
+    <string name="menu_str_clothing">Clothing</string>
+
+    <string name="menu_product">Products</string>
+    <string name="menu_users_list">Users List</string>
+    <string name="menu_users_orders">All Orders</string>
+    <string name="menu_about_us">About Us</string>
+    <string name="menu_profile">Profile</string>
+    <string name="str_title_profile">Edit Profile</string>
+    <string name="menu_logout">Logout</string>
+
     <string name="menu_send">Send</string>
+
+    <string name="menu_notification">Notification</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -42,12 +53,17 @@
     drawer git link==> https://github.com/achmadqomarudin/Navigation-Drawer-with-Fragment
     -->
 
+    <string name="countericon">CounterIcon</string>
+    <string name="countertextview">CounterTextView</string>
+
 
     <string name="common_no_internet">No internet connection</string>
     <string name="str_alert">Alert!</string>
     <string name="ok">Ok</string>
+    <string name="str_add">Add Product</string>
 
     <string name="str_category_name">choose a category name</string>
+    <string name="str_add_product_quantity">Enter Quantity Ex. 500gm or 1kg</string>
     <string-array name="country_arrays">
         <item>Malaysia</item>
         <item>United States</item>
@@ -58,4 +74,7 @@
         <item>New Zealand</item>
         <item>India</item>
     </string-array>
+    <string name="notification_channel_id">default</string>
+
+
 </resources>

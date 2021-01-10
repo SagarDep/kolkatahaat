@@ -6,6 +6,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:name=".GlobalApplication"
@@ -30,7 +31,34 @@
         <activity android:name=".view.RegisterActivity"/>
         <activity android:name=".view.HomeCustomerActivity"/>
         <activity android:name=".view.HomeAdminActivity"/>
-        <activity android:name=".view.ProfileActivity"/>
+        <activity android:name=".fragments.EditProfileFragment"/>
+        <activity android:name=".view.admin.AdminAddProductActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".view.customer.ProductListActivity"/>
+        <activity android:name=".view.ForgotPasswordActivity"/>
+        <activity android:name=".view.customer.ProductPurchaseActivity"/>
+        <activity android:name=".view.customer.ProductCartDetailsActivity"/>
+
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/notification_channel_id" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/ic_cart" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorAccent" />
+
+        <service
+            android:name="com.kolkatahaat.service.FirebaseIDService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

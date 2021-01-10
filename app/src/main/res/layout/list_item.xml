@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:ellipsize="end"
+    android:maxLines="1"
+    android:text="dsfgdsjkl"
+    android:textSize="@dimen/_14sdp"
+    android:paddingTop="@dimen/_10sdp"
+    android:paddingBottom="@dimen/_10sdp"
+    android:textAppearance="?attr/textAppearanceSubtitle1"
+    style="?attr/spinnerDropDownItemStyle"
+    android:textColor="@color/colorAccent"
+    android:singleLine="true"
+    android:background="@drawable/abc_spinner_mtrl_am_alpha"
+    android:backgroundTint="@color/colorBlack"
+    />

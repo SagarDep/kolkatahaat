@@ -64,7 +64,7 @@
         android:fitsSystemWindows="true"
         android:background="@android:color/white"
         app:headerLayout="@layout/nav_header_admin_main"
-        app:menu="@menu/admin_side_menu"
+        app:menu="@menu/customer_side_menu"
         app:itemBackground="@drawable/drawer_selected_item"/>
     <!--style="@style/Widget.Custom.NavigationView"-->
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -44,6 +44,7 @@
                     android:id="@+id/editTextEmail"
                     style="@style/modifiedEditText"
                     android:hint="@string/login_email_hint"
+                    android:text="nehakaneriya94@gmail.com"
                     android:inputType="textEmailAddress"
                     android:maxLines="1" />
             </com.google.android.material.textfield.TextInputLayout>

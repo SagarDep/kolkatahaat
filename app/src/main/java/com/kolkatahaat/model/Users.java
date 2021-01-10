@@ -8,10 +8,11 @@ public class Users {
     private String userName;
     private String userEmail;
     private String userMobile;
-    private String userPassword;
+    private String userAddress;
     private String userToken;
     private int userType;
-    private FieldValue userCreatedDate;
+    private Object userCreatedDate;
+    private Object userUpdateDate;
 
 
     public Users(){
@@ -58,12 +59,13 @@ public class Users {
         this.userMobile = userMobile;
     }
 
-    public String getUserPassword() {
-        return userPassword;
+
+    public String getUserAddress() {
+        return userAddress;
     }
 
-    public void setUserPassword(String userPassword) {
-        this.userPassword = userPassword;
+    public void setUserAddress(String userAddress) {
+        this.userAddress = userAddress;
     }
 
     public String getUserToken() {
@@ -82,11 +84,19 @@ public class Users {
         this.userType = userType;
     }
 
-    public FieldValue getUserCreatedDate() {
+    public Object getUserCreatedDate() {
         return userCreatedDate;
     }
 
-    public void setUserCreatedDate(FieldValue userCreatedDate) {
+    public void setUserCreatedDate(Object userCreatedDate) {
         this.userCreatedDate = userCreatedDate;
+    }
+
+    public Object getUserUpdateDate() {
+        return userUpdateDate;
+    }
+
+    public void setUserUpdateDate(Object userUpdateDate) {
+        this.userUpdateDate = userUpdateDate;
     }
 }

@@ -1,16 +1,21 @@
 package com.kolkatahaat.model;
 
-import com.google.firebase.firestore.FieldValue;
+
+import java.util.ArrayList;
 
 public class Product {
     private String productId;
     private String productImg;
     private String productCategory;
     private String productName;
-    private String productPacking;
-    private String productPrice;
+
+    /*private String productPacking;
+    private String productPrice;*/
+
+    private ArrayList<QuantityPrice> productQuantityPrice;
+
     private String productDeliveryChange;
-    private FieldValue productCreatedDate;
+    private Object productCreatedDate;
 
     public Product(){
 
@@ -50,7 +55,20 @@ public class Product {
         this.productName = productName;
     }
 
-    public String getProductPacking() {
+
+
+    public ArrayList<QuantityPrice> getProductQuantityPrice() {
+        return productQuantityPrice;
+    }
+
+    public void setProductQuantityPrice(ArrayList<QuantityPrice> productQuantityPrice) {
+        this.productQuantityPrice = productQuantityPrice;
+    }
+
+
+
+
+    /*public String getProductPacking() {
         return productPacking;
     }
 
@@ -64,7 +82,8 @@ public class Product {
 
     public void setProductPrice(String productPrice) {
         this.productPrice = productPrice;
-    }
+    }*/
+
 
     public String getProductDeliveryChange() {
         return productDeliveryChange;
@@ -74,11 +93,11 @@ public class Product {
         this.productDeliveryChange = productDeliveryChange;
     }
 
-    public FieldValue getProductCreatedDate() {
+    public Object getProductCreatedDate() {
         return productCreatedDate;
     }
 
-    public void setProductCreatedDate(FieldValue productCreatedDate) {
+    public void setProductCreatedDate(Object productCreatedDate) {
         this.productCreatedDate = productCreatedDate;
     }
 }

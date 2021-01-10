@@ -202,10 +202,6 @@ public class RegisterActivity extends AppCompatActivity {
             textInputPassword.setError("Password is required");
             textInputPassword.requestFocus();
             return false;
-        } else if(editTextPassword.getText().toString().trim().length() < 10){
-            textInputPassword.setError("Password can't be less than 10 digit");
-            textInputPassword.requestFocus();
-            return false;
         }
         else {
             textInputPassword.setErrorEnabled(false);
@@ -220,6 +216,7 @@ public class RegisterActivity extends AppCompatActivity {
             final String email = editTextEmail.getText().toString().trim();
             final String mobile = editTextMobile.getText().toString().trim();
             final String password = editTextPassword.getText().toString().trim();
+            final String address = editTextAddress.getText().toString().trim();
 
             fireAuth.createUserWithEmailAndPassword(email,password).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
                 @Override
@@ -233,10 +230,13 @@ public class RegisterActivity extends AppCompatActivity {
                         users.setUserName(name);
                         users.setUserEmail(email);
                         users.setUserMobile(mobile);
-                        users.setUserPassword(password);
+                        users.setUserAddress(address);
                         users.setUserToken("Add Firebase Device Token");
                         users.setUserType(1);
                         users.setUserCreatedDate(productCreatedDate);
+                        users.setUserUpdateDate(productCreatedDate);
+
+                        fireReference = fireStore.collection("users").document(task.getResult().getUser().getUid());
 
                         fireReference.set(users).addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override

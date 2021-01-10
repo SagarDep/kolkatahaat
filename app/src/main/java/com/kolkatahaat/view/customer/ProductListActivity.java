@@ -1,83 +1,88 @@
 package com.kolkatahaat.view.customer;
 
-import android.net.Uri;
 import android.os.Bundle;
-import android.widget.FrameLayout;
+import android.view.MotionEvent;
+import android.view.View;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.kolkatahaat.R;
 import com.kolkatahaat.adapterview.CustomerSamplePagerAdapter;
+import com.kolkatahaat.view.customer.fragments.ClothingFragment;
+import com.kolkatahaat.view.customer.fragments.EatableFragment;
+import com.kolkatahaat.view.customer.fragments.PujaItemsFragment;
 
 public class ProductListActivity extends AppCompatActivity {
 
-    public static FragmentManager fragmentManager;
-    private ViewPager viewpager;
-    private TabLayout sliding_tabs;
-    private int indicatorWidth;
+    private Toolbar toolbar;
+    private TabLayout tabLayout;
+
+    private EatableFragment eatableFragment;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_product_list);
 
-        viewpager = findViewById(R.id.viewpager);
-        sliding_tabs = findViewById(R.id.sliding_tabs);
-        fragmentManager=getSupportFragmentManager();
+        toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
+        tabLayout = findViewById(R.id.tab_layout);
 
-        bindViewPagerAdapter(viewpager);
-        bindViewPagerTabs(sliding_tabs, viewpager);
-        tabSettings();
-    }
+        eatableFragment = new EatableFragment();
+        loadFragment(eatableFragment);
 
-    public void bindViewPagerAdapter(final ViewPager view) {
-        final CustomerSamplePagerAdapter adapter = new CustomerSamplePagerAdapter(view.getContext(), fragmentManager);
-        view.setAdapter(adapter);
-    }
-
-    public void bindViewPagerTabs(final TabLayout view, final ViewPager pagerView) {
-        view.setupWithViewPager(pagerView, true);
-
-    }
-
-    private void tabSettings() {
-
-        sliding_tabs.post(new Runnable() {
+        tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
-            public void run() {
-                indicatorWidth = sliding_tabs.getWidth() / sliding_tabs.getTabCount();
-                /*FrameLayout.LayoutParams indicatorParams = (FrameLayout.LayoutParams) indicator.getLayoutParams();
-                indicatorParams.width = indicatorWidth;
-                indicator.setLayoutParams(indicatorParams);*/
+            public void onTabSelected(TabLayout.Tab tab) {
+                Fragment fragment = null;
+
+                switch (tab.getPosition()) {
+                    case 0:
+                        fragment = new EatableFragment();
+                        break;
+
+                    case 1:
+                        fragment = new PujaItemsFragment();
+                        break;
+
+                    case 2:
+                        fragment = new ClothingFragment();
+                        break;
+                }
+
+               /* FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+                ft.replace(R.id.content_frame, fragment);
+                ft.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+                ft.commit();*/
+                loadFragment(fragment);
             }
-        });
-
-        viewpager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetP
-            ) {
-                /*FrameLayout.LayoutParams params = (FrameLayout.LayoutParams) indicator.getLayoutParams();
-                float translationOffset = (positionOffset + position) * indicatorWidth;
-                params.leftMargin = (int) translationOffset;
-                indicator.setLayoutParams(params);*/
+            public void onTabUnselected(TabLayout.Tab tab) {
             }
-
             @Override
-            public void onPageSelected(int position) {
-
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int i) {
-
+            public void onTabReselected(TabLayout.Tab tab) {
             }
         });
     }
 
-   
+
+    private boolean loadFragment(Fragment fragment) {
+        if (fragment != null) {
+            FragmentTransaction fts = getSupportFragmentManager().beginTransaction();
+            fts.replace(R.id.content_frame, fragment);
+            fts.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN);
+            fts.commit();
+            return true;
+        }
+        return false;
+    }
 }
