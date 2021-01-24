@@ -1,10 +1,13 @@
 package com.kolkatahaat.view.admin.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -14,15 +17,28 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
+import com.google.firebase.auth.EmailAuthProvider;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.kolkatahaat.R;
 import com.kolkatahaat.adapterview.UsersListAdapter;
 import com.kolkatahaat.interfaces.RecyclerViewClickListener;
+import com.kolkatahaat.interfaces.RecyclerViewRemoveClickListener;
+import com.kolkatahaat.model.Product;
 import com.kolkatahaat.model.Users;
+import com.kolkatahaat.utills.NetUtils;
+import com.kolkatahaat.utills.Utility;
+import com.kolkatahaat.view.admin.AdminEditCustomerProfileActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,14 +48,18 @@ public class AdminAllUserListFragment extends Fragment {
     private static final String TAG = AdminAllUserListFragment.class.getSimpleName();
 
     private FirebaseFirestore fireStore;
+    private FirebaseAuth fireAuth;
     private CollectionReference collectReference;
 
     private RecyclerView mRecyclerView;
     private UsersListAdapter mAdapter;
     private List<Users> messages;
 
+    private ProgressBar progressBar;
+
     public AdminAllUserListFragment() {
         fireStore = FirebaseFirestore.getInstance();
+        fireAuth = FirebaseAuth.getInstance();
         collectReference = fireStore.collection("users");
         messages = new ArrayList<>();
     }
@@ -50,6 +70,7 @@ public class AdminAllUserListFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_users_list, container, false);
 
+        progressBar = view.findViewById(R.id.progressBar);
         mRecyclerView = view.findViewById(R.id.mRecyclerView);
 
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(getActivity());
@@ -64,22 +85,38 @@ public class AdminAllUserListFragment extends Fragment {
                 for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
                     Users note = documentSnapshot.toObject(Users.class);
                     messages.add(note);
-
-
                 }
 
 
-                RecyclerViewClickListener listener = new RecyclerViewClickListener() {
+                RecyclerViewRemoveClickListener listener = new RecyclerViewRemoveClickListener() {
                     @Override
                     public void onClick(View view, int position) {
-                        Toast.makeText(getContext(), "Position " + messages.get(position).getUserName(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getContext(), "Position " + messages.get(position).getUserUId(), Toast.LENGTH_SHORT).show();
+                        if(!TextUtils.isEmpty(messages.get(position).getUserUId()) && messages.get(position).getUserUId() != null && messages.get(position).getUserUId() != "") {
+                            Intent intent = new Intent(getActivity(), AdminEditCustomerProfileActivity.class);
+                            intent.putExtra("EXTRA_EDIT_USER_ID", messages.get(position).getUserUId());
+                            getActivity().startActivity(intent);
+                        }
+                    }
 
-                        //  Intent intent = new Intent(getActivity(), AdminAddProductActivity.class);
-                        //    startActivity(intent);
+                    @Override
+                    public void onRemoveItem(View view, int position) {
+                        //Toast.makeText(getContext(), "Position " + messages.get(position).getUserUId(), Toast.LENGTH_SHORT).show();
+                        if (NetUtils.isNetworkAvailable(getActivity())) {
+                            if (messages.size() != 0  && messages != null) {
+                                userRemove(messages, position);
+                            } else {
+                                Utility.displayDialog(getActivity(), getString(R.string.common_no_user_available), false);
+                            }
+                        } else {
+                            Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
+                        }
                     }
                 };
                 mAdapter = new UsersListAdapter(getActivity(), messages, listener);
                 mRecyclerView.setAdapter(mAdapter);
+                mRecyclerView.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
             }
         });
         return view;
@@ -94,10 +131,40 @@ public class AdminAllUserListFragment extends Fragment {
         }
     }
 
-    /*public List<Product> loadNotes() {
-        final List<Product> arrayList = new ArrayList<>();
 
-        return arrayList;
-    }*/
+    public void userRemove(final List<Users> messages, final int position){
+        final FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        AuthCredential credential = EmailAuthProvider
+                .getCredential(messages.get(position).getUserEmail(), messages.get(position).getUserPassword());
 
+        user.reauthenticate(credential).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                user.delete().addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()) {
+                            Log.d(TAG, "User account deleted.");
+
+                            DocumentReference fireRefe = fireStore.collection("users").document(messages.get(position).getUserUId());
+                            fireRefe.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    Log.d("TAG", "DocumentSnapshot successfully deleted!");
+                                    messages.remove(position);
+                                    mAdapter.notifyDataSetChanged();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    Log.w("TAG", "Error deleting document", e);
+                                }
+                            });
+
+                        }
+                    }
+                });
+            }
+        });
+    }
 }

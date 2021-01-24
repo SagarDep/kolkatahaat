@@ -5,7 +5,7 @@
     android:background="@android:color/white"
     android:orientation="vertical">
 
-    <com.kolkatahaat.utills.TextViewRegular
+    <!--<com.kolkatahaat.utills.TextViewRegular
         android:id="@+id/txt_label"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -14,7 +14,7 @@
         android:gravity="center"
         android:text="@string/app_name"
         android:textColor="@color/colorPrimaryDark"
-        android:textSize="20sp" />
+        android:textSize="20sp" />-->
 
     <ImageView
         android:id="@+id/cl_logo"
@@ -23,17 +23,7 @@
         android:layout_above="@+id/txt_label"
         android:layout_centerInParent="true"
         android:layout_marginTop="10dp"
-        android:src="@mipmap/ic_launcher" />
-
-    <!--<com.kolkatahaat.utills.TextViewRegular
-        android:id="@+id/txt_version_number"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/txt_label"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="10dp"
-        android:text="version_number"
-        android:textColor="@android:color/darker_gray" />-->
+        android:src="@drawable/app_logo" />
 
     <com.kolkatahaat.utills.TextViewRegular
         android:id="@+id/copy_right"
@@ -43,5 +33,5 @@
         android:layout_centerHorizontal="true"
         android:clickable="true"
         android:linksClickable="true"
-        android:text="copy_right" />
+        android:text="" />
 </RelativeLayout>

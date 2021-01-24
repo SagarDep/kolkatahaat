@@ -26,20 +26,14 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import com.google.firebase.iid.FirebaseInstanceId;
 import com.google.firebase.iid.InstanceIdResult;
-import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.Gson;
 import com.kolkatahaat.R;
 import com.kolkatahaat.model.Users;
 import com.kolkatahaat.utills.NetUtils;
 import com.kolkatahaat.utills.SharedPrefsUtils;
 import com.kolkatahaat.utills.Utility;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -58,7 +52,7 @@ public class LoginActivity extends AppCompatActivity {
     TextView txtForgotPassword;
     Button btnLogin;
     TextView txtNewRegister;
-    //TextView txtInfo;
+
 
     ProgressBar progressBar;
 
@@ -101,6 +95,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (NetUtils.isNetworkAvailable(LoginActivity.this)) {
                         String email = editTextEmail.getText().toString().trim();
                         String password = editTextPassword.getText().toString().trim();
+                        progressBar.setVisibility(View.VISIBLE);
                         userLogin(email, password);
                     } else {
                         Utility.displayDialog(LoginActivity.this, getString(R.string.common_no_internet), false);
@@ -122,33 +117,14 @@ public class LoginActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(LoginActivity.this, ForgotPasswordActivity.class);
+                //intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                finish();
             }
         });
     }
-
-    /*public void chekcValidation(){
-        Utility.hideSoftKeyboard(LoginActivity.this);
-        if (TextUtils.isEmpty(editTextEmail.getText().toString())) {
-            textInputEmail.setError(getResources().getString(R.string.str_err_msg_user_email));
-            //return true;
-        } else if (TextUtils.isEmpty(editTextPassword.getText().toString())) {
-            txtForgotPassword.setError(getResources().getString(R.string.str_err_msg_user_password));
-            //return true;
-        } else {
-            if (NetUtils.isNetworkAvailable(LoginActivity.this)) {
-                String email = editTextEmail.getText().toString().trim();
-                String password = editTextPassword.getText().toString().trim();
-
-                progressBar.setVisibility(View.VISIBLE);
-
-            } else {
-                Utility.displayDialog(LoginActivity.this, getString(R.string.common_no_internet), false);
-            }
-            //return false;
-        }
-    }*/
-
 
     public boolean validateEmail() {
         if (TextUtils.isEmpty(editTextEmail.getText().toString().trim())) {
@@ -185,30 +161,21 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        /*FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
             @Override
             public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                if (!task.isSuccessful()) {
-                    token = task.getException().getMessage();
-                    Log.w("FCM TOKEN Failed", task.getException());
-                } else {
-                    token = task.getResult().getToken();
-                    Log.i("FCM TOKEN", token);
+                final FirebaseUser user = fireAuth.getCurrentUser();
+                if(user != null) {
+                    if (!task.isSuccessful()) {
+                        String token = task.getException().getMessage();
+                        Log.w("FCM TOKEN Failed", task.getException());
+                        fireStore.collection("users").document(user.getUid()).update("userToken", token);
+                    } else {
+                        String token = task.getResult().getToken();
+                        fireStore.collection("users").document(user.getUid()).update("userToken", token);
+                        Log.i("FCM TOKEN", token);
+                    }
                 }
-            }
-        });*/
-
-
-        FirebaseMessaging.getInstance().getToken().addOnCompleteListener(new OnCompleteListener<String>() {
-            @Override
-            public void onComplete(@NonNull Task<String> task) {
-                if (!task.isSuccessful()) {
-                    Log.w(TAG, "Fetching FCM registration token failed", task.getException());
-                            return;
-                }
-                // Get new FCM registration token
-                String token = task.getResult();
-                Log.e(TAG, "token"+ token);
             }
         });
     }
@@ -226,6 +193,7 @@ public class LoginActivity extends AppCompatActivity {
                             //Users userIfo = user.getUid();
 
                             Log.e(TAG, user.getUid());
+                            progressBar.setVisibility(View.GONE);
                             fireStore.collection("users").document(user.getUid()).get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
                                 @Override
                                 public void onSuccess(DocumentSnapshot documentSnapshot) {
@@ -237,15 +205,35 @@ public class LoginActivity extends AppCompatActivity {
                                         String json = gson.toJson(users);
                                         SharedPrefsUtils.saveToPrefs(LoginActivity.this, SharedPrefsUtils.USER_DETAIL, json);
 
+                                        FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                                final FirebaseUser user = fireAuth.getCurrentUser();
+                                                if (!task.isSuccessful()) {
+                                                    String token = task.getException().getMessage();
+                                                    Log.w("FCM TOKEN Failed", task.getException());
+                                                    fireStore.collection("users").document(user.getUid()).update("userToken",token);
+                                                } else {
+                                                    String token = task.getResult().getToken();
+                                                    fireStore.collection("users").document(user.getUid()).update("userToken",token);
+                                                    Log.i("FCM TOKEN", token);
+                                                }
+                                            }
+                                        });
+
                                         Object userDetial = SharedPrefsUtils.getFromPrefs(LoginActivity.this, SharedPrefsUtils.USER_DETAIL, "");
                                         Users obj = gson.fromJson(String.valueOf(userDetial), Users.class);
-                                        if(obj.getUserId() != "" && obj.getUserEmail() != "" && obj.getUserType() == 1){
-                                            Intent intent = new Intent(LoginActivity.this,HomeAdminActivity.class);
-                                            startActivity(intent);
+                                        if (obj.getUserId() != "" && obj.getUserEmail() != "" && obj.getUserType() == 1) {
+                                            Intent intent = new Intent(LoginActivity.this, HomeAdminActivity.class);
+                                            //intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);                                            startActivity(intent);
                                             finish();
-                                        } else if(obj.getUserId() != "" && obj.getUserEmail() != "" && obj.getUserType() == 2){
-                                            Intent intent = new Intent(LoginActivity.this,HomeCustomerActivity.class);
-                                            startActivity(intent);
+                                        } else if (obj.getUserId() != "" && obj.getUserEmail() != "" && obj.getUserType() == 2) {
+                                            Intent intent = new Intent(LoginActivity.this, HomeCustomerActivity.class);
+                                            //intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);                                            startActivity(intent);
                                             finish();
                                         }
                                     } else {
@@ -257,6 +245,7 @@ public class LoginActivity extends AppCompatActivity {
 
                         } else {
                             // If sign in fails, display a message to the user.
+                            progressBar.setVisibility(View.GONE);
                             Log.w(TAG, "signInWithEmail:failure", task.getException());
                             Toast.makeText(LoginActivity.this, "Authentication failed.",
                                     Toast.LENGTH_SHORT).show();

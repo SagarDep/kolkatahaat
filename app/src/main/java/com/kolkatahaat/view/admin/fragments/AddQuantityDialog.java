@@ -36,11 +36,7 @@ public class AddQuantityDialog extends DialogFragment {
     private AdminQuantityDialogListener mListener;
 
     public AddQuantityDialog() {
-        // Empty constructor is required for DialogFragment
-        // Make sure not to add arguments to the constructor
-        // Use `newInstance` instead as shown below
     }
-    //dialog_admin_add_quantity
 
 
     @NonNull

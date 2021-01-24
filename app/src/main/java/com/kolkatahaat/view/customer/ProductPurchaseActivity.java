@@ -23,8 +23,10 @@ import androidx.appcompat.widget.Toolbar;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.chip.Chip;
 import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -103,7 +105,7 @@ public class ProductPurchaseActivity extends AppCompatActivity {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         imgProduct = findViewById(R.id.imgProduct);
         txtProductName = findViewById(R.id.txtProductName);
@@ -121,7 +123,7 @@ public class ProductPurchaseActivity extends AppCompatActivity {
                 //CartCounterActionView.setCountStep(ProductPurchaseActivity.this, 1);
 
                 Intent intent = new Intent(ProductPurchaseActivity.this, ProductCartDetailsActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent,1);
             }
         });
 
@@ -143,6 +145,21 @@ public class ProductPurchaseActivity extends AppCompatActivity {
     }
 
     @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            case R.id.action_addcart:
+                Intent intent = new Intent(ProductPurchaseActivity.this, ProductCartDetailsActivity.class);
+                startActivityForResult(intent,1);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem itemData = menu.findItem(R.id.action_addcart);
         //actionView = itemData.getActionView() as CartCounterActionView
@@ -154,17 +171,6 @@ public class ProductPurchaseActivity extends AppCompatActivity {
         return super.onPrepareOptionsMenu(menu);
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        if (R.id.action_addcart == item.getItemId()) {
-            Intent intent = new Intent(ProductPurchaseActivity.this, ProductCartDetailsActivity.class);
-            startActivity(intent);
-            return true;
-        } else {
-            return super.onOptionsItemSelected(item);
-
-        }
-    }
 
     private void getProductDetails(String mProductIde) {
         fireReference = fireStore.collection("products").document(mProductIde);
@@ -185,6 +191,18 @@ public class ProductPurchaseActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 1) {
+            if(resultCode == RESULT_OK) {
+                String strPurchase = data.getStringExtra("purchase");
+                if(strPurchase.equals("success")){
+
+                }
+            }
+        }
+    }
 
     public void setProductData(Product mSelectProduct) {
         Glide.with(ProductPurchaseActivity.this).load(mSelectProduct.getProductImg())
@@ -193,10 +211,10 @@ public class ProductPurchaseActivity extends AppCompatActivity {
                 .into(imgProduct);
         txtProductName.setText(mSelectProduct.getProductName());
         txtProductDelivery.setText(mSelectProduct.getProductDeliveryChange());
-        setTag(mSelectProduct.getProductQuantityPrice());
+        //setTag(mSelectProduct.getProductQuantityPrice());
     }
 
-    public void setTag(final ArrayList<QuantityPrice> tagList) {
+    /*public void setTag(final ArrayList<QuantityPrice> tagList) {
         for (int index = 0; index < tagList.size(); index++) {
             final String tagName = tagList.get(index).getQuantityName();
             //final Chip chip = new Chip(this);
@@ -231,9 +249,9 @@ public class ProductPurchaseActivity extends AppCompatActivity {
             chipGroup.addView(chip);
         }
         chipGroup.invalidate();
-    }
+    }*/
 
-    public ArrayList<QuantityPrice> getCheckedChipIds() {
+    /*public ArrayList<QuantityPrice> getCheckedChipIds() {
         ArrayList<QuantityPrice> mQuantityPrices = new ArrayList<>();
         for (int i = 0; i < chipGroup.getChildCount(); i++) {
             Chip chip = (Chip) chipGroup.getChildAt(i);
@@ -246,30 +264,23 @@ public class ProductPurchaseActivity extends AppCompatActivity {
                 mQuantityPrices.add(quantityPrice);
             }
         }
-        /*for (int i=0; i < chipGroup.getChildCount();i++){
-            Chip chip = (Chip) chipGroup.getChildAt(i);
-            //Log.i("outside if ", i+ " chip = " + chip.getText().toString());
-            if (chip.isChecked()){
-                Log.i("inside if ", i+ " chip = " + chip.getText().toString());
-                //textView.setText(chip.getText().toString());
-            }
-        }*/
+
         return mQuantityPrices;
-    }
+    }*/
 
 
     private void uploadProduct() {
 
         if (NetUtils.isNetworkAvailable(ProductPurchaseActivity.this)) {
 
-            if (getCheckedChipIds().size() != 0) {
+            //if (getCheckedChipIds().size() != 0) {
                 final FieldValue productCreatedDate = FieldValue.serverTimestamp();
 
                 ordersItem.setProductId(selectProduct.getProductId());
                 ordersItem.setProductImg(selectProduct.getProductImg());
                 ordersItem.setProductCategory(selectProduct.getProductCategory());
                 ordersItem.setProductName(selectProduct.getProductName());
-                ordersItem.setProductQuantityPrice(getCheckedChipIds());
+                //ordersItem.setProductQuantityPrice(getCheckedChipIds());
                 ordersItem.setProductDeliveryChange(selectProduct.getProductDeliveryChange());
                 ordersItem.setProductItemTotal(txtProductTotal.getText().toString().trim());
                 ordersItem.setProductTotalAmount(Float.valueOf(txtProductTotal.getText().toString().trim()) +
@@ -281,18 +292,20 @@ public class ProductPurchaseActivity extends AppCompatActivity {
 
                 DocumentReference fireRefe = fireStore.collection("orders").document(user.getUid());
                 //collectReference = fireStore.collection("orders").document(user.getUid()).collection(fireReference.getId());
-                CollectionReference firee = fireRefe.collection(fireRefe.getId());
-
-                firee.add(ordersItem).addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                //CollectionReference firee = fireRefe.collection(fireRefe.getId());
+                DocumentReference firee = fireRefe.collection(fireRefe.getId()).document();
+                ordersItem.setDocId(firee.getId());
+                ordersItem.setUuId(user.getUid());
+                firee.set(ordersItem).addOnCompleteListener(new OnCompleteListener<Void>() {
                     @Override
-                    public void onSuccess(DocumentReference documentReference) {
+                    public void onComplete(@NonNull Task<Void> task) {
                         getProductDetails();
                     }
                 });
 
-            } else {
+            /*} else {
                 Utility.displayDialog(ProductPurchaseActivity.this, "Please try again", false);
-            }
+            }*/
 
         } else {
             Utility.displayDialog(ProductPurchaseActivity.this, getString(R.string.common_no_internet), false);

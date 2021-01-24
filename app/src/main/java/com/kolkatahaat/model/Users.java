@@ -9,6 +9,7 @@ public class Users {
     private String userEmail;
     private String userMobile;
     private String userAddress;
+    private String userPassword;
     private String userToken;
     private int userType;
     private Object userCreatedDate;
@@ -66,6 +67,14 @@ public class Users {
 
     public void setUserAddress(String userAddress) {
         this.userAddress = userAddress;
+    }
+
+    public String getUserPassword() {
+        return userPassword;
+    }
+
+    public void setUserPassword(String userPassword) {
+        this.userPassword = userPassword;
     }
 
     public String getUserToken() {

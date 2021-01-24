@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -21,6 +22,9 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
@@ -30,6 +34,7 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
@@ -50,7 +55,7 @@ import java.util.UUID;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class AdminAddProductActivity extends AppCompatActivity implements AdminQuantityDialogListener {
+public class AdminAddProductActivity extends AppCompatActivity {// implements AdminQuantityDialogListener {
 
     public final String TAG = AdminAddProductActivity.this.getClass().getSimpleName();
 
@@ -64,6 +69,8 @@ public class AdminAddProductActivity extends AppCompatActivity implements AdminQ
     private Uri filePath;
     private final int PICK_IMAGE_REQUEST = 22;
 
+    private String mAdminProductId = "";
+    private boolean mAdminProductEdit = false;
 
     private Toolbar toolbar;
     private CircleImageView imgProduct;
@@ -75,15 +82,21 @@ public class AdminAddProductActivity extends AppCompatActivity implements AdminQ
     private TextInputLayout textInputItemName;
     private TextInputEditText editTextItemName;
 
-    private TextView txtAddQuantityPrice;
-    private ChipGroup chipGroup;
+    //private TextView txtAddQuantityPrice;
+    //private ChipGroup chipGroup;
+
+    private TextInputLayout textInputItemQuantity;
+    private TextInputEditText editTextItemQuantity;
+
+    private TextInputLayout textInputItemPrice;
+    private TextInputEditText editTextItemPrice;
 
     private TextInputLayout textInputItemDeliveryChrg;
     private TextInputEditText editTextItemDeliveryChrg;
 
     private Button btnAppProduct;
 
-    private ArrayList<QuantityPrice> priceArrayList;
+    //private ArrayList<QuantityPrice> priceArrayList;
 
     private Bitmap bitmap;
 
@@ -99,32 +112,53 @@ public class AdminAddProductActivity extends AppCompatActivity implements AdminQ
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference();
 
+        Intent intent = getIntent();
+        if (intent.hasExtra("EXTRA_ADMIN_PRODUCT_ID")) {
+            mAdminProductId = getIntent().getStringExtra("EXTRA_ADMIN_PRODUCT_ID");
+            mAdminProductEdit = getIntent().getBooleanExtra("EXTRA_ADMIN_PRODUCT_EDIT", false);
+        }
+
         init();
-        setupAutoCompleteView();
+
+        if(mAdminProductEdit){
+
+            getProductDetials();
+        } else {
+            setupAutoCompleteView();
+        }
     }
+
 
     public void init() {
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         imgProduct = findViewById(R.id.imgProduct);
         btnChoose = findViewById(R.id.btnChoose);
 
         spinnerCategory = findViewById(R.id.spinnerCategory);
 
-        txtAddQuantityPrice = findViewById(R.id.txtAddQuantityPrice);
-        chipGroup = findViewById(R.id.chipGroup);
+        //txtAddQuantityPrice = findViewById(R.id.txtAddQuantityPrice);
+        //chipGroup = findViewById(R.id.chipGroup);
+
+        textInputItemQuantity = findViewById(R.id.textInputItemQuantity);
+        editTextItemQuantity= findViewById(R.id.editTextItemQuantity);
+
+        textInputItemPrice= findViewById(R.id.textInputItemPrice);
+        editTextItemPrice= findViewById(R.id.editTextItemPrice);
 
         textInputItemName = findViewById(R.id.textInputItemName);
         editTextItemName = findViewById(R.id.editTextItemName);
+
 
         textInputItemDeliveryChrg = findViewById(R.id.textInputItemDeliveryChrg);
         editTextItemDeliveryChrg = findViewById(R.id.editTextItemDeliveryChrg);
 
         btnAppProduct = findViewById(R.id.btnAppProduct);
 
-        priceArrayList = new ArrayList<>();
+        //priceArrayList = new ArrayList<>();
 
         btnChoose.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,24 +171,36 @@ public class AdminAddProductActivity extends AppCompatActivity implements AdminQ
         btnAppProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!validateItemName() && !validateDeliveryChr() && !chekcValidation()) {
+                if (!validateItemName() && !validateQuantity() && !validatePrice() && !validateDeliveryChr() && !chekcValidation()) {
                     return;
                 }
-                else if(validateItemName() && validateDeliveryChr() && chekcValidation()) {
+                else if(validateItemName() && validateQuantity() && validatePrice() && validateDeliveryChr() && chekcValidation()) {
                     uploadImage();
                 }
             }
         });
 
-        txtAddQuantityPrice.setOnClickListener(new View.OnClickListener() {
+        /*txtAddQuantityPrice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 AddQuantityDialog dialog = new AddQuantityDialog();
                 dialog.show(getSupportFragmentManager(), "TransparentDialogFragment");
             }
-        });
+        });*/
     }
 
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     private void setupAutoCompleteView() {
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -183,7 +229,7 @@ public class AdminAddProductActivity extends AppCompatActivity implements AdminQ
     }
 
 
-    @Override
+    /*@Override
     public void onDialogPositive(String quantityName, float price) {
         if (quantityName != null && quantityName.length() != 0 && price != 0.0f && price != 0) {
             chipGroup.removeAllViews();
@@ -193,21 +239,19 @@ public class AdminAddProductActivity extends AppCompatActivity implements AdminQ
             quantityPrice.setPrice(price);
             priceArrayList.add(quantityPrice);
 
-            /*for (int i = 0; i < priceArrayList.size(); i++){
-                Log.e("this is my array",  ""+ priceArrayList.get(i).getQuantityName());
-            }*/
+
 
             setTag(priceArrayList);
         } else {
             Toast.makeText(this, "Please enter valid QuantityName and price ", Toast.LENGTH_SHORT).show();
         }
-    }
+    }*/
 
-    @Override
+    /*@Override
     public void onDialogNegative(Object object) {
         Toast.makeText(this, "Custom negative Dialog " + getString(R.string.app_name), Toast.LENGTH_SHORT).show();
 
-    }
+    }*/
 
 
     private void chooseImage() {
@@ -271,7 +315,7 @@ public class AdminAddProductActivity extends AppCompatActivity implements AdminQ
     }
 
 
-    public void setTag(final ArrayList<QuantityPrice> tagList) {
+    /*public void setTag(final ArrayList<QuantityPrice> tagList) {
         for (int index = 0; index < tagList.size(); index++) {
             final String tagName = tagList.get(index).getQuantityName();
             final Chip chip = new Chip(this);
@@ -300,15 +344,12 @@ public class AdminAddProductActivity extends AppCompatActivity implements AdminQ
                     }
                     priceArrayList.remove(userToRemove);
 
-                    /*for (int i = 0; i < priceArrayList.size(); i++){
-                        Log.e("this is my array",  ""+ priceArrayList.get(i).getQuantityName());
-                    }*/
                 }
             });
             chipGroup.addView(chip);
         }
         chipGroup.invalidate();
-    }
+    }*/
 
 
     @Override
@@ -338,15 +379,38 @@ public class AdminAddProductActivity extends AppCompatActivity implements AdminQ
         return true;
     }
 
+    private boolean validateQuantity() {
+        if (TextUtils.isEmpty(editTextItemQuantity.getText().toString().trim())) {
+            textInputItemQuantity.setError("Please Enter Valid Quantity Name!");
+            textInputItemQuantity.requestFocus();
+            return false;
+        } else {
+            textInputItemQuantity.setErrorEnabled(false);
+        }
+        return true;
+    }
+
+
+    private boolean validatePrice() {
+        if (TextUtils.isEmpty(editTextItemPrice.getText().toString().trim())) {
+            textInputItemPrice.setError("Please Enter Valid Price!");
+            textInputItemPrice.requestFocus();
+            return false;
+        } else {
+            textInputItemPrice.setErrorEnabled(false);
+        }
+        return true;
+    }
+
     public boolean chekcValidation() {
         Utility.hideSoftKeyboard(AdminAddProductActivity.this);
         if (bitmap == null) {
             Utility.displayDialog(AdminAddProductActivity.this, "Please choose your product image", false);
             return false;
-        } else if (priceArrayList == null || priceArrayList.size() == 0 || priceArrayList.isEmpty()) {
+        }/* else if (priceArrayList == null || priceArrayList.size() == 0 || priceArrayList.isEmpty()) {
             Utility.displayDialog(AdminAddProductActivity.this, "Please add your product package size and price", false);
             return false;
-        } else if (spinnerCategory.getSelectedItem() == "Select" || spinnerCategory.getSelectedItem().equals("Select") || strCategoryName == null || strCategoryName.isEmpty()) {
+        }*/ else if (spinnerCategory.getSelectedItem() == "Select" || spinnerCategory.getSelectedItem().equals("Select") || strCategoryName == null || strCategoryName.isEmpty()) {
             Utility.displayDialog(AdminAddProductActivity.this, "Please select your product category", false);
             return false;
         } else {
@@ -363,8 +427,8 @@ public class AdminAddProductActivity extends AppCompatActivity implements AdminQ
                 //final String productImg = UploadUrl;
                 final String productName = editTextItemName.getText().toString().trim();
 
-               /* final String productPacking = editTextPassword.getText().toString().trim();
-                final String productPrice = editTextItemPrice.getText().toString().trim();*/
+                final String productPacking = editTextItemQuantity.getText().toString().trim();
+                final String productPrice = editTextItemPrice.getText().toString().trim();
 
                 final String productDeliveryChange = editTextItemDeliveryChrg.getText().toString().trim();
                 final FieldValue productCreatedDate = FieldValue.serverTimestamp();
@@ -378,7 +442,9 @@ public class AdminAddProductActivity extends AppCompatActivity implements AdminQ
                 /*product.setProductPacking("");
                 product.setProductPrice("");*/
 
-                product.setProductQuantityPrice(priceArrayList);
+                product.setProductPacking(productPacking);
+                product.setProductPrice(Float.parseFloat(productPrice));
+
                 product.setProductDeliveryChange(productDeliveryChange);
                 product.setProductCreatedDate(productCreatedDate);
 
@@ -401,5 +467,49 @@ public class AdminAddProductActivity extends AppCompatActivity implements AdminQ
         } else {
             Utility.displayDialog(AdminAddProductActivity.this, getString(R.string.common_no_internet), false);
         }
+    }
+
+
+
+
+    private void getProductDetials() {
+        fireReference = fireStore.collection("products").document(mAdminProductId);
+        fireReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Product product = document.toObject(Product.class);
+
+                        editTextItemName.setText(product.getProductName());
+                        editTextItemQuantity.setText(String.valueOf(product.getProductQuantity()));
+                        editTextItemPrice.setText(String.valueOf(product.getProductPrice()));
+                        editTextItemDeliveryChrg.setText(String.valueOf(product.getProductDeliveryChange()));
+
+                        RequestOptions options = new RequestOptions()
+                                .centerCrop()
+                                .placeholder(R.mipmap.ic_launcher_round)
+                                .error(R.mipmap.ic_launcher_round);
+                        Glide.with(AdminAddProductActivity.this).asBitmap().load(product.getProductImg()).apply(options).into(imgProduct);
+
+
+                        String compareValue = product.getProductCategory();
+                        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(AdminAddProductActivity.this, R.array.product_category, R.layout.list_item);
+                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        spinnerCategory.setAdapter(adapter);
+                        if (compareValue != null) {
+                            int spinnerPosition = adapter.getPosition(compareValue);
+                            spinnerCategory.setSelection(spinnerPosition);
+                        }
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
     }
 }

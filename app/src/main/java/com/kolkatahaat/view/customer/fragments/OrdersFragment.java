@@ -1,11 +1,13 @@
 package com.kolkatahaat.view.customer.fragments;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -25,18 +27,21 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.gson.Gson;
 import com.kolkatahaat.R;
 
-import com.kolkatahaat.adapterview.OrdersListAdapter;
-import com.kolkatahaat.interfaces.ItemClickListener;
+import com.kolkatahaat.adapterview.OrdersItemListAdapter;
+import com.kolkatahaat.interfaces.RecyclerViewClickListener;
+import com.kolkatahaat.model.BillItem;
 import com.kolkatahaat.model.OrdersItem;
+import com.kolkatahaat.view.customer.OrderDetailsActivity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class OrdersFragment extends Fragment implements ItemClickListener {
+public class OrdersFragment extends Fragment {
 
     public final String TAG = OrdersFragment.this.getClass().getSimpleName();
 
@@ -50,8 +55,9 @@ public class OrdersFragment extends Fragment implements ItemClickListener {
     private CollectionReference collectReference;
 
     private RecyclerView recyclerView;
-    private OrdersListAdapter mAdapter;
-     private List<OrdersItem> messages;
+    private OrdersItemListAdapter mAdapter;
+     private List<BillItem> billItems;
+     //private List<OrdersItem> messages;
 
     private String mParam1;
     private String mParam2;
@@ -59,7 +65,7 @@ public class OrdersFragment extends Fragment implements ItemClickListener {
     public OrdersFragment() {
         fireStore = FirebaseFirestore.getInstance();
         fireAuth = FirebaseAuth.getInstance();
-        messages = new ArrayList<>();
+        billItems = new ArrayList<>();
     }
 
 
@@ -92,14 +98,14 @@ public class OrdersFragment extends Fragment implements ItemClickListener {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
 
-        mAdapter = new OrdersListAdapter(getActivity());
-        mAdapter.setClickListener(this);
+        mAdapter = new OrdersItemListAdapter(getActivity());
         getAllOrders();
 
         return view;
     }
 
     public void getAllOrders(){
+
         FirebaseUser user = fireAuth.getCurrentUser();
         DocumentReference fireRefe = fireStore.collection("order_confirm").document(user.getUid());
         //collectReference = fireStore.collection("orders").document(user.getUid()).collection(fireReference.getId());
@@ -110,21 +116,31 @@ public class OrdersFragment extends Fragment implements ItemClickListener {
             @Override
             public void onComplete(@NonNull Task<QuerySnapshot> task) {
                 for (DocumentSnapshot document : task.getResult()) {
-                    messages = (List<OrdersItem>) document.get("order");
+                    //messages = (ArrayList<BillItem>) document.get("order");
+
+                    BillItem ordersItem = document.toObject(BillItem.class);
 
                     /*for (OrdersItem item : list) {
                         Log.d("TAG", item.getProductName());
                     }*/
+                    //messages.addAll(ordersItem.getItemArrayList());
+                    billItems.add(ordersItem);
+
                 }
 
-                mAdapter = new OrdersListAdapter(getActivity(),messages);
+                RecyclerViewClickListener listener = new RecyclerViewClickListener() {
+                    @Override
+                    public void onClick(View view, int position) {
+                        Toast.makeText(getContext(), "Position " + billItems.get(position).getOrderStatus(), Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(getActivity(), OrderDetailsActivity.class);
+                        intent.putExtra("EXTRA_BILL_ITEM_ID", billItems.get(position).getDocId());
+                        getActivity().startActivity(intent);
+                    }
+                };
+                mAdapter = new OrdersItemListAdapter(getActivity(),billItems, listener);
                 recyclerView.setAdapter(mAdapter);
             }
         });
-    }
 
-    @Override
-    public void onClick(View view, int position) {
-        Log.d(TAG, "onSuccess:" + messages.get(position).getProductName());
     }
 }

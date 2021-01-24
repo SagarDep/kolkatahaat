@@ -1,22 +1,23 @@
 package com.kolkatahaat.view.customer;
 
+import android.content.Intent;
 import android.os.Bundle;
-import android.view.MotionEvent;
-import android.view.View;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.kolkatahaat.R;
-import com.kolkatahaat.adapterview.CustomerSamplePagerAdapter;
+import com.kolkatahaat.utills.CartCounterActionView;
 import com.kolkatahaat.view.customer.fragments.ClothingFragment;
 import com.kolkatahaat.view.customer.fragments.EatableFragment;
+import com.kolkatahaat.view.customer.fragments.OthersFragment;
 import com.kolkatahaat.view.customer.fragments.PujaItemsFragment;
 
 public class ProductListActivity extends AppCompatActivity {
@@ -25,20 +26,49 @@ public class ProductListActivity extends AppCompatActivity {
     private TabLayout tabLayout;
 
     private EatableFragment eatableFragment;
+    private PujaItemsFragment pujaItemsFragment;
+    private ClothingFragment clothingFragment;
+    private OthersFragment othersFragment;
+    private int selectTab = 0;
 
+   /* private int cartCount = 0;*/
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_customer_product_list);
 
+
+        Intent intent = getIntent();
+        if (intent.hasExtra("EXTRA_TAB_POSITION")) {
+            selectTab = getIntent().getIntExtra("EXTRA_TAB_POSITION",0);
+        }
+
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
         tabLayout = findViewById(R.id.tab_layout);
+        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        eatableFragment = new EatableFragment();
-        loadFragment(eatableFragment);
+        if(selectTab == 0) {
+            eatableFragment = new EatableFragment();
+            loadFragment(eatableFragment);
+            tabLayout.getTabAt(selectTab).select();
+        } else if(selectTab == 1) {
+            pujaItemsFragment = new PujaItemsFragment();
+            loadFragment(pujaItemsFragment);
+            tabLayout.getTabAt(selectTab).select();
+        } else if(selectTab == 2) {
+            clothingFragment = new ClothingFragment();
+            loadFragment(clothingFragment);
+            tabLayout.getTabAt(selectTab).select();
+        } else {
+            othersFragment = new OthersFragment();
+            loadFragment(othersFragment);
+            tabLayout.getTabAt(selectTab).select();
+        }
 
         tabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -56,6 +86,10 @@ public class ProductListActivity extends AppCompatActivity {
 
                     case 2:
                         fragment = new ClothingFragment();
+                        break;
+
+                    case 3:
+                        fragment = new OthersFragment();
                         break;
                 }
 
@@ -85,4 +119,49 @@ public class ProductListActivity extends AppCompatActivity {
         }
         return false;
     }
+
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+   /* @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_cart, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                finish();
+                return true;
+            case R.id.action_addcart:
+                Intent intent = new Intent(ProductListActivity.this, ProductCartDetailsActivity.class);
+                startActivity(intent);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem itemData = menu.findItem(R.id.action_addcart);
+        //actionView = itemData.getActionView() as CartCounterActionView
+        cartCount = 2;
+        CartCounterActionView rootView = (CartCounterActionView) itemData.getActionView();
+        rootView.setItemData(menu, itemData);
+        rootView.setCount(cartCount);
+        return super.onPrepareOptionsMenu(menu);
+    }*/
 }

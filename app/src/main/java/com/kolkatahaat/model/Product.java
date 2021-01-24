@@ -12,7 +12,10 @@ public class Product {
     /*private String productPacking;
     private String productPrice;*/
 
-    private ArrayList<QuantityPrice> productQuantityPrice;
+    //private ArrayList<QuantityPrice> productQuantityPrice;
+    private String productPacking;
+    private float productPrice;
+    private int productQuantity = 0;
 
     private String productDeliveryChange;
     private Object productCreatedDate;
@@ -57,15 +60,37 @@ public class Product {
 
 
 
-    public ArrayList<QuantityPrice> getProductQuantityPrice() {
+    /*public ArrayList<QuantityPrice> getProductQuantityPrice() {
         return productQuantityPrice;
     }
 
     public void setProductQuantityPrice(ArrayList<QuantityPrice> productQuantityPrice) {
         this.productQuantityPrice = productQuantityPrice;
+    }*/
+
+    public String getProductPacking() {
+        return productPacking;
     }
 
+    public void setProductPacking(String productPacking) {
+        this.productPacking = productPacking;
+    }
 
+    public float getProductPrice() {
+        return productPrice;
+    }
+
+    public void setProductPrice(float productPrice) {
+        this.productPrice = productPrice;
+    }
+
+    public int getProductQuantity() {
+        return productQuantity;
+    }
+
+    public void setProductQuantity(int productQuantity) {
+        this.productQuantity = productQuantity;
+    }
 
 
     /*public String getProductPacking() {

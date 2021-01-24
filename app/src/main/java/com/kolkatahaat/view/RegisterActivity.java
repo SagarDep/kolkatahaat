@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,16 +23,18 @@ import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.iid.FirebaseInstanceId;
+import com.google.firebase.iid.InstanceIdResult;
+import com.google.gson.Gson;
 import com.kolkatahaat.model.Users;
 import com.kolkatahaat.R;
 import com.kolkatahaat.utills.NetUtils;
+import com.kolkatahaat.utills.SharedPrefsUtils;
 import com.kolkatahaat.utills.Utility;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -59,7 +62,7 @@ public class RegisterActivity extends AppCompatActivity {
     private TextInputEditText editTextPassword;
     private Button btnRegister;
     private TextView txtLogin;
-    //private TextView txtInfo;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -92,7 +95,7 @@ public class RegisterActivity extends AppCompatActivity {
 
         btnRegister = findViewById(R.id.btnRegister);
         txtLogin = findViewById(R.id.txtLogin);
-        //txtInfo = findViewById(R.id.txtInfo);
+        progressBar = findViewById(R.id.progressBar);
 
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -111,33 +114,14 @@ public class RegisterActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
+                //intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
+                finish();
             }
         });
     }
-
-
-   /* public boolean chekcValidation(){
-        Utility.hideSoftKeyboard(RegisterActivity.this);
-        if (TextUtils.isEmpty(editTextName.getText().toString().trim())) {
-            textInputName.setError(getResources().getString(R.string.str_err_msg_user_user_name));
-            return false;
-            //return true;
-        } else if (TextUtils.isEmpty(editTextEmail.getText().toString().trim())) {
-            textInputEmail.setError(getResources().getString(R.string.str_err_msg_user_email));
-            return false;
-        } else if (TextUtils.isEmpty(editTextMobile.getText().toString().trim())) {
-            textInputMobile.setError(getResources().getString(R.string.str_err_msg_user_user_mobile));
-            return false;
-        } else if (TextUtils.isEmpty(editTextPassword.getText().toString().trim())) {
-            textInputPassword.setError(getResources().getString(R.string.str_err_msg_user_password));
-            return false;
-        } else {
-            pass.setErrorEnabled(false);
-        }
-        return true;
-    }*/
-
 
     private boolean validateUserName() {
         if (TextUtils.isEmpty(editTextName.getText().toString().trim())) {
@@ -187,8 +171,12 @@ public class RegisterActivity extends AppCompatActivity {
             textInputMobile.setError("Required Field!");
             textInputMobile.requestFocus();
             return false;
-        } else if(editTextMobile.getText().toString().trim().length() < 6){
-            textInputMobile.setError("Mobile can't be less than 6 digit");
+        } else if(editTextMobile.getText().toString().trim().length() > 10){
+            textInputMobile.setError("Mobile can't be less than 10 digit");
+            textInputMobile.requestFocus();
+            return false;
+        } else if(editTextMobile.getText().toString().trim().length() < 10){
+            textInputMobile.setError("Mobile can't be less than 10 digit");
             textInputMobile.requestFocus();
             return false;
         } else {
@@ -211,7 +199,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void userRegister(){
         if (NetUtils.isNetworkAvailable(RegisterActivity.this)) {
-
+            progressBar.setVisibility(View.VISIBLE);
             final String name = editTextName.getText().toString().trim();
             final String email = editTextEmail.getText().toString().trim();
             final String mobile = editTextMobile.getText().toString().trim();
@@ -232,7 +220,8 @@ public class RegisterActivity extends AppCompatActivity {
                         users.setUserMobile(mobile);
                         users.setUserAddress(address);
                         users.setUserToken("Add Firebase Device Token");
-                        users.setUserType(1);
+                        users.setUserType(2);
+                        users.setUserPassword(password);
                         users.setUserCreatedDate(productCreatedDate);
                         users.setUserUpdateDate(productCreatedDate);
 
@@ -242,20 +231,58 @@ public class RegisterActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(Void aVoid) {
                                 Log.d(TAG, "onSuccess: user Profile is created for "+ aVoid);
+                                progressBar.setVisibility(View.GONE);
+
+                                Gson gson = new Gson();
+                                String json = gson.toJson(users);
+                                SharedPrefsUtils.saveToPrefs(RegisterActivity.this, SharedPrefsUtils.USER_DETAIL, json);
+
+
+                                FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<InstanceIdResult> task) {
+                                        final FirebaseUser user = fireAuth.getCurrentUser();
+                                        if (!task.isSuccessful()) {
+                                            String token = task.getException().getMessage();
+                                            Log.w("FCM TOKEN Failed", task.getException());
+                                            fireStore.collection("users").document(user.getUid()).update("userToken",token);
+                                        } else {
+                                            String token = task.getResult().getToken();
+                                            fireStore.collection("users").document(user.getUid()).update("userToken",token);
+                                            Log.i("FCM TOKEN", token);
+                                        }
+                                    }
+                                });
+
+
+                                Object userDetial = SharedPrefsUtils.getFromPrefs(RegisterActivity.this, SharedPrefsUtils.USER_DETAIL, "");
+                                Users obj = gson.fromJson(String.valueOf(userDetial), Users.class);
+                                if (obj.getUserId() != "" && obj.getUserEmail() != "" && obj.getUserType() == 1) {
+                                    Intent intent = new Intent(RegisterActivity.this, HomeAdminActivity.class);
+                                    //intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);                                        startActivity(intent);
+                                    finish();
+                                } else if (obj.getUserId() != "" && obj.getUserEmail() != "" && obj.getUserType() == 2) {
+                                    Intent intent = new Intent(RegisterActivity.this, HomeCustomerActivity.class);
+                                    //intent.setFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);                                        startActivity(intent);
+                                    finish();
+                                }
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
                             public void onFailure(@NonNull Exception e) {
-                                Log.d(TAG, "onFailure: " + e.toString());
+                                Toast.makeText(RegisterActivity.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                                progressBar.setVisibility(View.GONE);
                             }
                         });
 
                     } else {
+                        progressBar.setVisibility(View.GONE);
                         Toast.makeText(RegisterActivity.this, "Error ! " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
-                        //progressBar.setVisibility(View.GONE);
-                        Log.e("==============>",task.getException().getMessage());
                         Utility.displayDialog(RegisterActivity.this, task.getException().getMessage(), false);
-
                     }
                 }
             });

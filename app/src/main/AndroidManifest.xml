@@ -16,28 +16,74 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:usesCleartextTraffic="true"
+        android:hardwareAccelerated="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".view.SplashActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".view.LoginActivity"/>
-        <activity android:name=".MainActivity"/>
-        <activity android:name=".view.RegisterActivity"/>
-        <activity android:name=".view.HomeCustomerActivity"/>
-        <activity android:name=".view.HomeAdminActivity"/>
-        <activity android:name=".fragments.EditProfileFragment"/>
+        <activity android:name=".view.LoginActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/AppTheme"/>
+
+        <activity android:name=".view.RegisterActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/AppTheme"/>
+
+        <activity android:name=".view.HomeCustomerActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/AppTheme"/>
+
+        <activity android:name=".view.HomeAdminActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme"/>
+
+        <activity android:name=".fragments.EditProfileFragment"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/AppTheme"/>
+
         <activity android:name=".view.admin.AdminAddProductActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".view.customer.ProductListActivity"/>
-        <activity android:name=".view.ForgotPasswordActivity"/>
-        <activity android:name=".view.customer.ProductPurchaseActivity"/>
-        <activity android:name=".view.customer.ProductCartDetailsActivity"/>
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize"
+            android:parentActivityName=".view.HomeAdminActivity">
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".view.HomeAdminActivity" />
+        </activity>
+
+        <activity android:name=".view.customer.ProductListActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/AppTheme"/>
+
+        <activity android:name=".view.ForgotPasswordActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/AppTheme"/>
+
+        <activity android:name=".view.customer.ProductPurchaseActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/AppTheme"/>
+
+        <activity android:name=".view.customer.ProductCartDetailsActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/AppTheme"/>
+
+        <activity android:name=".view.customer.OrderDetailsActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/AppTheme"/>
+
+        <activity android:name=".view.admin.AdminOrdersDetailsActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/AppTheme"/>
+
+        <activity android:name=".view.admin.AdminEditCustomerProfileActivity"
+            android:windowSoftInputMode="adjustResize"
+            android:theme="@style/AppTheme"/>
 
 
         <meta-data
@@ -53,7 +99,7 @@
             android:resource="@color/colorAccent" />
 
         <service
-            android:name="com.kolkatahaat.service.FirebaseIDService"
+            android:name=".service.FirebaseIDService"
             android:exported="false">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT"/>

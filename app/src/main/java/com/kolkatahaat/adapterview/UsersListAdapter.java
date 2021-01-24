@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.Timestamp;
 import com.kolkatahaat.R;
-import com.kolkatahaat.interfaces.RecyclerViewClickListener;
+import com.kolkatahaat.interfaces.RecyclerViewRemoveClickListener;
 import com.kolkatahaat.model.Users;
 import com.kolkatahaat.utills.Utility;
 
@@ -23,9 +23,9 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.User
 
     private Context mContext;
     private List<Users> messages;
-    private RecyclerViewClickListener mListener;
+    private RecyclerViewRemoveClickListener mListener;
 
-    public UsersListAdapter(Context mContext, List<Users> messages, RecyclerViewClickListener listener) {
+    public UsersListAdapter(Context mContext, List<Users> messages, RecyclerViewRemoveClickListener listener) {
         this.mContext = mContext;
         this.messages = messages;
         this.mListener = listener;
@@ -76,10 +76,11 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.User
         public ImageView imgUser;
         public LinearLayout llContainer;
         public TextView txtUserName, txtUserMobile, txtUserDate;
+        public ImageView imgProductDelete;
 
-        private RecyclerViewClickListener mListener;
+        private RecyclerViewRemoveClickListener mListener;
 
-        public UserViewHolder(View view, RecyclerViewClickListener listener) {
+        public UserViewHolder(View view, RecyclerViewRemoveClickListener listener) {
             super(view);
             mListener = listener;
             imgUser = view.findViewById(R.id.imgUser);
@@ -88,12 +89,18 @@ public class UsersListAdapter extends RecyclerView.Adapter<UsersListAdapter.User
             txtUserName = view.findViewById(R.id.txtUserName);
             txtUserMobile = view.findViewById(R.id.txtUserMobile);
             txtUserDate = view.findViewById(R.id.txtUserDate);
+            imgProductDelete = view.findViewById(R.id.imgProductDelete);
             llContainer.setOnClickListener(this);
+            imgProductDelete.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-            mListener.onClick(view, getAdapterPosition());
+            if(view.getId() == R.id.imgProductDelete) {
+                mListener.onRemoveItem(view, getAdapterPosition());
+            } else {
+                mListener.onClick(view, getAdapterPosition());
+            }
         }
     }
 }

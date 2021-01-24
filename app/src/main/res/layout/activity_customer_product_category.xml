@@ -4,8 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    tools:context=".MainActivity">
+    android:orientation="vertical">
 
     <com.glide.slider.library.SliderLayout
         android:id="@+id/slider"
@@ -43,7 +42,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="@dimen/_5sdp"
-                android:src="@mipmap/ic_launcher"
+                android:src="@drawable/app_logo"
                 app:civ_border_width="2dp" />
 
             <LinearLayout
@@ -59,7 +58,7 @@
                     android:layout_height="wrap_content"
                     android:ellipsize="end"
                     android:lines="1"
-                    android:text="@string/menu_str_eatable"
+                    android:text="@string/menu_str_eatable_instead"
                     android:textColor="#000000"
                     android:textSize="@dimen/_14sdp"
                     android:textStyle="bold" />
@@ -85,12 +84,12 @@
             </LinearLayout>
 
             <ImageView
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_20sdp"
+                android:layout_width="@dimen/_10sdp"
+                android:layout_height="@dimen/_10sdp"
                 android:layout_alignParentRight="true"
                 android:layout_centerInParent="true"
                 android:scaleType="centerCrop"
-                android:src="@mipmap/ic_launcher" />
+                app:srcCompat="@drawable/ic_right_arrow" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -107,7 +106,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="@dimen/_5sdp"
-                android:src="@mipmap/ic_launcher"
+                android:src="@drawable/app_logo"
                 app:civ_border_width="2dp" />
 
             <LinearLayout
@@ -149,12 +148,12 @@
             </LinearLayout>
 
             <ImageView
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_20sdp"
+                android:layout_width="@dimen/_10sdp"
+                android:layout_height="@dimen/_10sdp"
                 android:layout_alignParentRight="true"
                 android:layout_centerInParent="true"
                 android:scaleType="centerCrop"
-                android:src="@mipmap/ic_launcher" />
+                app:srcCompat="@drawable/ic_right_arrow" />
         </RelativeLayout>
 
         <RelativeLayout
@@ -171,7 +170,7 @@
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
                 android:layout_marginRight="@dimen/_5sdp"
-                android:src="@mipmap/ic_launcher"
+                android:src="@drawable/app_logo"
                 app:civ_border_width="2dp" />
 
             <LinearLayout
@@ -213,14 +212,77 @@
             </LinearLayout>
 
             <ImageView
-                android:layout_width="@dimen/_20sdp"
-                android:layout_height="@dimen/_20sdp"
+                android:layout_width="@dimen/_10sdp"
+                android:layout_height="@dimen/_10sdp"
                 android:layout_alignParentRight="true"
                 android:layout_centerInParent="true"
                 android:scaleType="centerCrop"
-                android:src="@mipmap/ic_launcher" />
+                app:srcCompat="@drawable/ic_right_arrow" />
         </RelativeLayout>
 
+        <RelativeLayout
+            android:id="@+id/llOther"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_marginTop="@dimen/_10sdp"
+            android:orientation="vertical">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="@dimen/_50sdp"
+                android:layout_height="@dimen/_50sdp"
+                android:layout_alignParentLeft="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="@dimen/_5sdp"
+                android:src="@drawable/app_logo"
+                app:civ_border_width="2dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:orientation="vertical"
+                android:paddingLeft="72dp"
+                android:paddingRight="@dimen/_16sdp">
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="@string/menu_str_others"
+                    android:textColor="#000000"
+                    android:textSize="@dimen/_14sdp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="sdfdsf df"
+                    android:textColor="#111111"
+                    android:textSize="@dimen/_13sdp" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="sdfds ds"
+                    android:textColor="#7a7a7a"
+                    android:textSize="@dimen/_12sdp" />
+
+            </LinearLayout>
+
+            <ImageView
+                android:layout_width="@dimen/_10sdp"
+                android:layout_height="@dimen/_10sdp"
+                android:layout_alignParentRight="true"
+                android:layout_centerInParent="true"
+                android:scaleType="centerCrop"
+                app:srcCompat="@drawable/ic_right_arrow" />
+        </RelativeLayout>
 
     </LinearLayout>
 

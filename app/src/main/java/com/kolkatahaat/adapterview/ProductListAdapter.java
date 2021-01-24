@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.kolkatahaat.R;
-import com.kolkatahaat.interfaces.RecyclerViewClickListener;
+import com.kolkatahaat.interfaces.RecyclerViewRemoveClickListener;
 import com.kolkatahaat.model.Product;
 
 import java.util.List;
@@ -21,9 +21,9 @@ import java.util.List;
 public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.ViewHolder> {
     private Context mContext;
     private List<Product> messages;
-    private RecyclerViewClickListener mListener;
+    private RecyclerViewRemoveClickListener mListener;
 
-    public ProductListAdapter(Context mContext, List<Product> messages, RecyclerViewClickListener listener) {
+    public ProductListAdapter(Context mContext, List<Product> messages, RecyclerViewRemoveClickListener listener) {
         this.mContext = mContext;
         this.messages = messages;
         this.mListener = listener;
@@ -70,22 +70,29 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
         public ImageView imgProduct;
         public LinearLayout llContainer;
         public TextView txtProductName, txtProductCategory;
+        public ImageView imgProductDelete;
 
-        private RecyclerViewClickListener mListener;
+        private RecyclerViewRemoveClickListener mListener;
 
-        public ViewHolder(View view, RecyclerViewClickListener listener) {
+        public ViewHolder(View view, RecyclerViewRemoveClickListener listener) {
             super(view);
             mListener = listener;
             imgProduct = view.findViewById(R.id.imgProduct);
             llContainer = view.findViewById(R.id.llContainer);
             txtProductName = view.findViewById(R.id.txtProductName);
             txtProductCategory = view.findViewById(R.id.txtProductCategory);
+            imgProductDelete = view.findViewById(R.id.imgProductDelete);
             llContainer.setOnClickListener(this);
+            imgProductDelete.setOnClickListener(this);
         }
 
         @Override
         public void onClick(View view) {
-            mListener.onClick(view, getAdapterPosition());
+            if(view.getId() == R.id.imgProductDelete) {
+                mListener.onRemoveItem(view, getAdapterPosition());
+            } else {
+                mListener.onClick(view, getAdapterPosition());
+            }
         }
     }
 }

@@ -20,7 +20,6 @@ import com.kolkatahaat.R;
 import com.kolkatahaat.view.customer.ProductListActivity;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class CustomerProductCategoryFragment extends Fragment implements View.OnClickListener{
 
@@ -31,6 +30,7 @@ public class CustomerProductCategoryFragment extends Fragment implements View.On
     RelativeLayout llEatable;
     RelativeLayout llPujaItem;
     RelativeLayout llClothing;
+    RelativeLayout llOther;
 
     public CustomerProductCategoryFragment() {
 
@@ -53,7 +53,7 @@ public class CustomerProductCategoryFragment extends Fragment implements View.On
 
             sliderView
                     .image(listUrl.get(i))
-                    .description(listName.get(i))
+                    //.description(listName.get(i))
                     .setRequestOption(requestOptions)
                     .setProgressBarVisible(true);
                     //.setOnSliderClickListener(this);
@@ -70,7 +70,7 @@ public class CustomerProductCategoryFragment extends Fragment implements View.On
 
         mDemoSlider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
         mDemoSlider.setCustomAnimation(new DescriptionAnimation());
-        mDemoSlider.setDuration(4000);
+        mDemoSlider.setDuration(5000);
         //mDemoSlider.addOnPageChangeListener(this);
         mDemoSlider.stopCyclingWhenTouch(false);
 
@@ -82,9 +82,11 @@ public class CustomerProductCategoryFragment extends Fragment implements View.On
         llEatable = view.findViewById(R.id.llEatable);
         llPujaItem = view.findViewById(R.id.llPujaItem);
         llClothing = view.findViewById(R.id.llClothing);
+        llOther = view.findViewById(R.id.llOther);
         llEatable.setOnClickListener(this);
         llPujaItem.setOnClickListener(this);
         llClothing.setOnClickListener(this);
+        llOther.setOnClickListener(this);
 
 
         listUrl.add("https://www.revive-adserver.com/media/GitHub.jpg");
@@ -110,22 +112,32 @@ public class CustomerProductCategoryFragment extends Fragment implements View.On
 
     @Override
     public void onClick(View v) {
-
+        Intent intent = null;
         switch(v.getId()){
 
             case R.id.llEatable:
-                Intent intent1 = new Intent(getActivity(), ProductListActivity.class);
-                startActivity(intent1);
+                intent = new Intent(getActivity(), ProductListActivity.class);
+                intent.putExtra("EXTRA_TAB_POSITION", 0);
+
+                startActivity(intent);
                 break;
 
             case R.id.llPujaItem:
-                Intent intent2 = new Intent(getActivity(), ProductListActivity.class);
-                startActivity(intent2);
+                intent = new Intent(getActivity(), ProductListActivity.class);
+                intent.putExtra("EXTRA_TAB_POSITION", 1);
+                startActivity(intent);
                 break;
 
             case R.id.llClothing:
-                Intent intent3 = new Intent(getActivity(), ProductListActivity.class);
-                startActivity(intent3);
+                intent = new Intent(getActivity(), ProductListActivity.class);
+                intent.putExtra("EXTRA_TAB_POSITION", 2);
+                startActivity(intent);
+                break;
+
+            case R.id.llOther:
+                intent = new Intent(getActivity(), ProductListActivity.class);
+                intent.putExtra("EXTRA_TAB_POSITION", 3);
+                startActivity(intent);
                 break;
         }
     }

@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -35,7 +36,6 @@ public class EditProfileFragment extends Fragment {
     private FirebaseAuth fireAuth;
     private FirebaseFirestore fireStore;
 
-
     private ImageView img_logo;
 
     private TextInputLayout textInputName;
@@ -50,9 +50,8 @@ public class EditProfileFragment extends Fragment {
     private TextInputLayout textInputMobile;
     private TextInputEditText editTextMobile;
 
-    private TextInputLayout textInputPassword;
-    private TextInputEditText editTextPassword;
     private Button btnUserUpdate;
+    private ProgressBar progressBar;
 
     private Users usersInfo = null;
 
@@ -63,17 +62,12 @@ public class EditProfileFragment extends Fragment {
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_edit_profile, container, false);
-
         init(view);
-
         return view;
     }
 
-
     public void init(View view) {
-
         textInputName = view.findViewById(R.id.textInputName);
         editTextName = view.findViewById(R.id.editTextName);
 
@@ -86,10 +80,8 @@ public class EditProfileFragment extends Fragment {
         textInputMobile = view.findViewById(R.id.textInputMobile);
         editTextMobile = view.findViewById(R.id.editTextMobile);
 
-        textInputPassword = view.findViewById(R.id.textInputPassword);
-        editTextPassword = view.findViewById(R.id.editTextPassword);
-
         btnUserUpdate = view.findViewById(R.id.btnUserUpdate);
+        progressBar = view.findViewById(R.id.progressBar);
 
         getUserData();
 
@@ -163,8 +155,12 @@ public class EditProfileFragment extends Fragment {
             textInputMobile.setError("Required Field!");
             textInputMobile.requestFocus();
             return false;
-        } else if (editTextMobile.getText().toString().trim().length() < 6) {
-            textInputMobile.setError("Mobile can't be less than 6 digit");
+        } else if (editTextMobile.getText().toString().trim().length() > 10) {
+            textInputMobile.setError("Mobile can't be less than 10 digit");
+            textInputMobile.requestFocus();
+            return false;
+        } else if(editTextMobile.getText().toString().trim().length() < 10){
+            textInputMobile.setError("Mobile can't be less than 10 digit");
             textInputMobile.requestFocus();
             return false;
         } else {
@@ -175,16 +171,16 @@ public class EditProfileFragment extends Fragment {
 
 
     private void getUserData() {
+        Utility.hideSoftKeyboard(getActivity());
+        progressBar.setVisibility(View.VISIBLE);
         if (fireAuth.getCurrentUser() != null) {
-
             DocumentReference documentReference = fireStore.collection("users")
                     .document(fireAuth.getCurrentUser().getUid());
-
             documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                 @Override
                 public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-
                     if (task.isSuccessful()) {
+                        progressBar.setVisibility(View.GONE);
                         DocumentSnapshot snapshot = task.getResult();
                         usersInfo = snapshot.toObject(Users.class);
                         assert snapshot != null;
@@ -198,13 +194,15 @@ public class EditProfileFragment extends Fragment {
                     }
                 }
             });
+        } else {
+            progressBar.setVisibility(View.GONE);
         }
     }
 
 
     public void userUpdate() {
         if (NetUtils.isNetworkAvailable(getActivity())) {
-
+            progressBar.setVisibility(View.VISIBLE);
             final String name = editTextName.getText().toString().trim();
             final String email = editTextEmail.getText().toString().trim();
             final String mobile = editTextMobile.getText().toString().trim();
@@ -230,6 +228,7 @@ public class EditProfileFragment extends Fragment {
                         .addOnSuccessListener(new OnSuccessListener<Void>() {
                             @Override
                             public void onSuccess(Void aVoid) {
+                                progressBar.setVisibility(View.GONE);
                                 Toast.makeText(getActivity(), "Update Successful", Toast.LENGTH_SHORT).show();
                             }
                         })
@@ -237,13 +236,15 @@ public class EditProfileFragment extends Fragment {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 Toast.makeText(getActivity(), "ERROR" + e.toString(), Toast.LENGTH_SHORT).show();
-
+                                progressBar.setVisibility(View.GONE);
                             }
                         });
             } else {
+                progressBar.setVisibility(View.GONE);
                 Utility.displayDialog(getActivity(), "Please login! After you complete your profile", false);
             }
         } else {
+            progressBar.setVisibility(View.GONE);
             Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
         }
     }

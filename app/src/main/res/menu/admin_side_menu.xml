@@ -6,19 +6,29 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_product"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@drawable/ic_product"
             android:title="@string/menu_product"
+            app:iconTint="@color/colorAccent"
             app:showAsAction="never"
             />
         <item
             android:id="@+id/nav_users_list"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@drawable/ic_users_group"
             android:title="@string/menu_users_list"
+            app:iconTint="@color/colorAccent"
             app:showAsAction="never"/>
+
+        <item
+            android:id="@+id/nav_users_orders"
+            android:icon="@drawable/ic_shopping_bag"
+            android:title="@string/menu_users_orders"
+            app:iconTint="@color/colorAccent"
+            app:showAsAction="never" />
         <item
             android:id="@+id/nav_about_us"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@drawable/ic_about"
             android:title="@string/menu_about_us"
+            app:iconTint="@color/colorAccent"
             app:showAsAction="never"/>
 
     </group>
@@ -27,28 +37,16 @@
         <menu>
             <item
                 android:id="@+id/nav_profile"
-                android:icon="@mipmap/ic_launcher"
+                android:icon="@drawable/ic_user_profile"
                 android:title="@string/menu_profile"
+                app:iconTint="@color/colorAccent"
                 app:showAsAction="never"/>
             <item
                 android:id="@+id/nav_logout"
-                android:icon="@mipmap/ic_launcher"
+                android:icon="@drawable/ic_log_out"
                 android:title="@string/menu_logout"
+                app:iconTint="@color/colorAccent"
                 app:showAsAction="never" />
         </menu>
     </item>
-    <!-- <group
-         android:id="@+id/menu_bottom"
-         android:checkableBehavior="single">
-
-         <item
-             android:id="@+id/menu_about"
-
-             android:icon="@mipmap/ic_launcher"
-             android:title="About" />
-         <item
-             android:id="@+id/menu_logout"
-              android:icon="@mipmap/ic_launcher"
-             android:title="Logout" />
-     </group>-->
 </menu>
