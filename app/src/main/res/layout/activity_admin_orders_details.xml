@@ -188,7 +188,7 @@
         android:layout_centerHorizontal="true"
         android:layout_gravity="bottom"
         android:gravity="center"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/btnOrderStatus"
@@ -197,7 +197,19 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:gravity="center"
+            android:layout_marginRight="@dimen/_5sdp"
             android:text="@string/order_type1"
+            app:cornerRadius="12dp" />
+
+        <Button
+            android:id="@+id/btnOrderRejected"
+            style="@style/Widget.MaterialComponents.Button"
+            android:layout_width="@dimen/_100sdp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginLeft="@dimen/_5sdp"
+            android:gravity="center"
+            android:text="@string/order_type6"
             app:cornerRadius="12dp" />
     </LinearLayout>
 </RelativeLayout>

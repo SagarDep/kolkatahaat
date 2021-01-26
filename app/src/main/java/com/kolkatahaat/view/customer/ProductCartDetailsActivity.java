@@ -200,6 +200,12 @@ public class ProductCartDetailsActivity extends AppCompatActivity {
                 Log.d(TAG, "DocumentSnapshot successfully deleted!");
                 mAdapter.removeAt(position);
                 txtTotalBill.setText(String.valueOf(mAdapter.grandTotal(itemList)));
+                if(mAdapter.grandTotal(itemList) == 0){
+                    txtTotalBill.setText("00");
+                    recyclerView.setVisibility(View.GONE);
+                    empty_view.setVisibility(View.VISIBLE);
+                    btnPurchase.setEnabled(false);
+                }
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override

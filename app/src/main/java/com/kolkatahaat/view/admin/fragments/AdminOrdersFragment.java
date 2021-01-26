@@ -46,6 +46,7 @@ import com.kolkatahaat.view.customer.fragments.OrdersFragment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 public class AdminOrdersFragment extends Fragment {
 
@@ -212,6 +213,7 @@ public class AdminOrdersFragment extends Fragment {
                                                 for (int i = 0; i < billItemsList.size(); i++) {
                                                     if (billItemsList.get(i).getDocId().equals(dc.getDocument().getId())) {
                                                         BillItem mbillModel = dc.getDocument().toObject(BillItem.class);
+                                                        mbillModel.setItemUsers(billItemsList.get(i).getItemUsers());
                                                         billItemsList.set(i, mbillModel);
                                                         mAdapter.notifyDataSetChanged();
                                                         break;

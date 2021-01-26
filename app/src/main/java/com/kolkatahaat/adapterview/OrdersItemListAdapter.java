@@ -75,7 +75,7 @@ public class OrdersItemListAdapter extends RecyclerView.Adapter<OrdersItemListAd
             BillItem message = messages.get(position);
 
             // displaying text view data
-            Glide.with(mContext).load(mContext.getResources().getDrawable(R.mipmap.ic_launcher))
+            Glide.with(mContext).load(mContext.getResources().getDrawable(R.drawable.app_logo))
                     .thumbnail(0.5f)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(holder.thumbnail);
@@ -85,12 +85,16 @@ public class OrdersItemListAdapter extends RecyclerView.Adapter<OrdersItemListAd
             Date date1 = timestamp.toDate();
             holder.txtCategoryDes.setText(Utility.getDateTime(date1));
 
+            if(message.getRejectionStatus()){
+                holder.txtCategoryNote.setText(message.getRejectionNote());
+            }
+
         }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public ImageView thumbnail;
-        public TextView txtCategoryName, txtCategoryDes;
+        public TextView txtCategoryName, txtCategoryNote, txtCategoryDes;
         private RecyclerViewClickListener mListener;
 
         public ViewHolder(View view, RecyclerViewClickListener listener) {
@@ -98,6 +102,7 @@ public class OrdersItemListAdapter extends RecyclerView.Adapter<OrdersItemListAd
             mListener = listener;
             thumbnail = view.findViewById(R.id.thumbnail);
             txtCategoryName = view.findViewById(R.id.txtCategoryName);
+            txtCategoryNote = view.findViewById(R.id.txtCategoryNote);
             txtCategoryDes = view.findViewById(R.id.txtCategoryDes);
             itemView.setOnClickListener(this);
         }

@@ -74,6 +74,19 @@ public class RegisterActivity extends AppCompatActivity {
         fireReference = fireStore.collection("users").document();
 
         init();
+
+        Bundle bundle = getIntent().getExtras();
+        if (bundle != null) {
+            if (!TextUtils.isEmpty(getIntent().getStringExtra("EXTRA_USER_MOBILE")) &&
+                    getIntent().getStringExtra("EXTRA_USER_MOBILE") != null) {
+                String userMobile = getIntent().getStringExtra("EXTRA_USER_MOBILE");
+                editTextMobile.setText(userMobile);
+            } else {
+                finish();
+            }
+        } else {
+            finish();
+        }
     }
 
     public void init(){

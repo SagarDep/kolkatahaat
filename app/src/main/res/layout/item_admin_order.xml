@@ -49,7 +49,7 @@
                     android:maxLines="1"
                     android:text="Order Status: "
                     android:textColor="#535353"
-                    android:textSize="@dimen/_14sdp" />
+                    android:textSize="@dimen/_12sdp" />
 
                 <TextView
                     android:id="@+id/txtCategoryName"
@@ -62,7 +62,7 @@
                     android:maxLines="1"
                     android:text="Chicken Overload Meal"
                     android:textColor="#535353"
-                    android:textSize="@dimen/_14sdp" />
+                    android:textSize="@dimen/_12sdp" />
             </LinearLayout>
 
             <LinearLayout
@@ -70,6 +70,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/llOrderStatus"
+                android:layout_marginTop="@dimen/_2sdp"
                 android:layout_toRightOf="@+id/thumbnail"
                 android:orientation="horizontal">
 

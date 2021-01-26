@@ -3,6 +3,7 @@ package com.kolkatahaat.view;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
@@ -17,28 +18,46 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
 import com.kolkatahaat.R;
 import com.kolkatahaat.fragments.AboutUsFragment;
 import com.kolkatahaat.fragments.EditProfileFragment;
+import com.kolkatahaat.model.Product;
 import com.kolkatahaat.model.Users;
+import com.kolkatahaat.utills.CartCounterActionView;
 import com.kolkatahaat.utills.SharedPrefsUtils;
+import com.kolkatahaat.view.customer.ProductCartDetailsActivity;
 import com.kolkatahaat.view.customer.fragments.CustomerProductCategoryFragment;
 import com.kolkatahaat.view.customer.fragments.OrdersFragment;
+
+import java.util.ListIterator;
 
 public class HomeCustomerActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     public Toolbar toolbar;
     private DrawerLayout drawer;
     private FirebaseAuth fireAuth;
+    private FirebaseFirestore fireStore;
+
+    private CartCounterActionView rootView;
+    private int cartCount = 0;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home_customer);
 
+        fireStore = FirebaseFirestore.getInstance();
         fireAuth = FirebaseAuth.getInstance();
 
         toolbar = findViewById(R.id.toolbar);
@@ -69,6 +88,7 @@ public class HomeCustomerActivity extends AppCompatActivity implements Navigatio
             txtName.setText(obj.getUserName());
             txtEmailAddress.setText(obj.getUserEmail());
         }
+
         loadFragment(new CustomerProductCategoryFragment());
     }
 
@@ -122,10 +142,10 @@ public class HomeCustomerActivity extends AppCompatActivity implements Navigatio
     }
 
 
-    @Override
+    /*@Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         return super.onPrepareOptionsMenu(menu);
-    }
+    }*/
 
 
     @Override
@@ -144,7 +164,57 @@ public class HomeCustomerActivity extends AppCompatActivity implements Navigatio
             case android.R.id.home:
                 drawer.openDrawer(GravityCompat.START);
                 return true;
+
+            case R.id.action_addcart:
+                Intent intent = new Intent(HomeCustomerActivity.this, ProductCartDetailsActivity.class);
+                startActivity(intent);
+                return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_cart, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onPrepareOptionsMenu(Menu menu) {
+        MenuItem itemData = menu.findItem(R.id.action_addcart);
+        //actionView = itemData.getActionView() as CartCounterActionView
+        rootView = (CartCounterActionView) itemData.getActionView();
+        rootView.setItemData(menu, itemData);
+        return super.onPrepareOptionsMenu(menu);
+    }
+
+    public void getCountProduct(){
+        cartCount = 0;
+        FirebaseUser user = fireAuth.getCurrentUser();
+        DocumentReference fireRefe = fireStore.collection("orders").document(user.getUid());
+        CollectionReference firee = fireRefe.collection(fireRefe.getId());
+        firee.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                if (task.isSuccessful()) {
+                    for (DocumentSnapshot document : task.getResult()) {
+                        Product cartProduct = document.toObject(Product.class);
+                        cartCount = cartCount + cartProduct.getProductQuantity();
+                    }
+                    rootView.setCount(cartCount);
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        getCountProduct();
     }
 }

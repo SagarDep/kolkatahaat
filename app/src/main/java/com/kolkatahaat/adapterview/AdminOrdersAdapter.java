@@ -85,7 +85,7 @@ public class AdminOrdersAdapter extends RecyclerView.Adapter<AdminOrdersAdapter.
                     .thumbnail(0.5f)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(holder.thumbnail);*/
-            holder.thumbnail.setImageDrawable(mContext.getResources().getDrawable(R.drawable.ic_cart));
+            holder.thumbnail.setImageDrawable(mContext.getResources().getDrawable(R.drawable.app_logo));
             holder.txtCategoryName.setText(message.getOrderStatus());
             holder.txtOrderUserName.setText(message.getItemUsers().getUserName());
 

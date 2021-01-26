@@ -11,6 +11,9 @@ public class BillItem {
     private String orderStatus; //Pending , Accept, Dispatch, Delivered
     private Object billCreatedDate;
 
+    private String rejectionNote;
+    private boolean rejectionStatus = false;
+
     public BillItem(){
 
     }
@@ -69,5 +72,22 @@ public class BillItem {
 
     public void setOrderStatus(String orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+
+    public String getRejectionNote() {
+        return rejectionNote;
+    }
+
+    public void setRejectionNote(String rejectionNote) {
+        this.rejectionNote = rejectionNote;
+    }
+
+    public boolean getRejectionStatus() {
+        return rejectionStatus;
+    }
+
+    public void setRejectionStatus(boolean rejectionStatus) {
+        this.rejectionStatus = rejectionStatus;
     }
 }

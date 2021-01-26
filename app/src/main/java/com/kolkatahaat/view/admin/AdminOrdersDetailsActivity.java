@@ -2,6 +2,7 @@ package com.kolkatahaat.view.admin;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,13 +33,15 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.kolkatahaat.R;
 import com.kolkatahaat.adapterview.AdminOrdersDetailsAdapter;
+import com.kolkatahaat.interfaces.AdminOrderRejectDialogListener;
 import com.kolkatahaat.interfaces.RecyclerViewClickListener;
 import com.kolkatahaat.model.BillItem;
 import com.kolkatahaat.model.OrderCompleteModel;
+import com.kolkatahaat.view.admin.fragments.OrderRejectOrderNoteDialog;
 
 import java.util.ArrayList;
 
-public class AdminOrdersDetailsActivity extends AppCompatActivity {
+public class AdminOrdersDetailsActivity extends AppCompatActivity implements AdminOrderRejectDialogListener {
 
     private FirebaseAuth fireAuth;
     private FirebaseFirestore fireStore;
@@ -55,6 +58,7 @@ public class AdminOrdersDetailsActivity extends AppCompatActivity {
     private BillItem billItemModel;
 
     private Button btnOrderStatus;
+    private Button btnOrderRejected;
     String selectedUserId;
     String productId;
 
@@ -106,6 +110,7 @@ public class AdminOrdersDetailsActivity extends AppCompatActivity {
         });
 
         btnOrderStatus = findViewById(R.id.btnOrderStatus);
+        btnOrderRejected = findViewById(R.id.btnOrderRejected);
         empty_view = findViewById(R.id.empty_view);
         recyclerView = findViewById(R.id.recyclerView);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(AdminOrdersDetailsActivity.this);
@@ -131,6 +136,14 @@ public class AdminOrdersDetailsActivity extends AppCompatActivity {
                     Log.e("===>", "recived");
                     btnOrderStatus.setText(billItemModel.getOrderStatus());
                 }
+            }
+        });
+
+        btnOrderRejected.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                OrderRejectOrderNoteDialog dialog = new OrderRejectOrderNoteDialog();
+                dialog.show(getSupportFragmentManager(), "TransparentDialogFragment");
             }
         });
     }
@@ -239,5 +252,26 @@ public class AdminOrdersDetailsActivity extends AppCompatActivity {
                 receivedReference.set(completeModel);
             }
         });
+    }
+
+    @Override
+    public void onDialogPositive(String mRejectOrder) {
+        if (!TextUtils.isEmpty(mRejectOrder) && mRejectOrder != null) {
+            DocumentReference questionsRef = fireStore.collection("order_confirm").document(selectedUserId);
+            DocumentReference reference = questionsRef.collection(selectedUserId).document(productId);
+            reference.update("orderStatus", getResources().getString(R.string.order_type6),
+                    "rejectionNote",mRejectOrder,
+                    "rejectionStatus",true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+
+                }
+            });
+        }
+    }
+
+    @Override
+    public void onDialogNegative(Object object) {
+
     }
 }

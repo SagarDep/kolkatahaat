@@ -30,10 +30,13 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
@@ -206,8 +209,64 @@ public class PujaItemsFragment extends Fragment {
                 });
             }
         });
+
+        checkStatus();
         return view;
     }
+
+
+    public void checkStatus() {
+        FirebaseUser user = fireAuth.getCurrentUser();
+        DocumentReference fireRefe = fireStore.collection("orders").document(user.getUid());
+        CollectionReference firee = fireRefe.collection(fireRefe.getId());
+        firee.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w("TAG", "listen:error", e);
+                    return;
+                }
+
+                for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                    switch (dc.getType()) {
+                        /*case ADDED:
+                            Log.d("TAG", "Add New Msg: " + dc.getDocument().getId());
+                            break;*/
+                        case MODIFIED:
+                            if (dc.getDocument() != null) {
+                                Product cartProduct = dc.getDocument().toObject(Product.class);
+                                for (final ListIterator<Product> i = messages.listIterator(); i.hasNext();) {
+                                    final Product element = i.next();
+                                    if(element.getProductId().equals(cartProduct.getProductId())) {
+                                        i.set(cartProduct);
+                                    }
+                                }
+                                mAdapter.updateDataVal(messages);
+                                mAdapter.notifyDataSetChanged();
+                            }
+                            break;
+
+                        case REMOVED:
+                            Product cartProduct = dc.getDocument().toObject(Product.class);
+                            cartProduct.setProductQuantity(0);
+                            for (final ListIterator<Product> i = messages.listIterator(); i.hasNext();) {
+                                final Product element = i.next();
+                                if(element.getProductId().equals(cartProduct.getProductId())) {
+                                    i.set(cartProduct);
+                                }
+                            }
+                            mAdapter.updateDataVal(messages);
+                            mAdapter.notifyDataSetChanged();
+                            break;
+                    }
+                }
+            }
+        });
+    }
+
+
+
+
 
     private void AddCartProduct(Product selectProduct, final int indPosition) {
         if (NetUtils.isNetworkAvailable(getActivity())) {
@@ -253,7 +312,6 @@ public class PujaItemsFragment extends Fragment {
             Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
         }
     }
-
 
     public void UpdateCartProduct(Product selectProduct, final int indPosition){
         if (NetUtils.isNetworkAvailable(getActivity())) {
@@ -367,5 +425,10 @@ public class PujaItemsFragment extends Fragment {
                 rootView.setCount(cartCount);
             }
         }
+        cartCount = 0;
+        for (Product ip : messages) {
+            cartCount += ip.getProductQuantity();
+        }
+        rootView.setCount(cartCount);
     }
 }

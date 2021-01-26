@@ -24,10 +24,13 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.gson.Gson;
 import com.kolkatahaat.R;
 import com.kolkatahaat.model.Users;
 import com.kolkatahaat.utills.NetUtils;
+import com.kolkatahaat.utills.SharedPrefsUtils;
 import com.kolkatahaat.utills.Utility;
+import com.kolkatahaat.view.LoginActivity;
 
 public class EditProfileFragment extends Fragment {
 
@@ -82,6 +85,15 @@ public class EditProfileFragment extends Fragment {
 
         btnUserUpdate = view.findViewById(R.id.btnUserUpdate);
         progressBar = view.findViewById(R.id.progressBar);
+
+        Gson gson = new Gson();
+        Object userDetial = SharedPrefsUtils.getFromPrefs(getActivity(), SharedPrefsUtils.USER_DETAIL, "");
+        Users obj = gson.fromJson(String.valueOf(userDetial), Users.class);
+        if(obj.getUserType() == 1){
+            editTextMobile.setEnabled(true);
+        } else {
+            editTextMobile.setEnabled(false);
+        }
 
         getUserData();
 

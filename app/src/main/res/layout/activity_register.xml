@@ -97,6 +97,7 @@
                         android:imeOptions="actionNext"
                         android:inputType="phone"
                         android:lines="1"
+                        android:enabled="false"
                         android:maxLength="10"
                         android:maxLines="1"
                         android:singleLine="true" />

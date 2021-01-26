@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -22,9 +23,12 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.google.gson.Gson;
@@ -131,9 +135,13 @@ public class OrdersFragment extends Fragment {
                 RecyclerViewClickListener listener = new RecyclerViewClickListener() {
                     @Override
                     public void onClick(View view, int position) {
-                        Toast.makeText(getContext(), "Position " + billItems.get(position).getOrderStatus(), Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getContext(), "Position " + billItems.get(position).getOrderStatus(), Toast.LENGTH_SHORT).show();
                         Intent intent = new Intent(getActivity(), OrderDetailsActivity.class);
                         intent.putExtra("EXTRA_BILL_ITEM_ID", billItems.get(position).getDocId());
+                        if(billItems.get(position).getRejectionStatus()){
+                            intent.putExtra("EXTRA_REJECT_STATUS", billItems.get(position).getRejectionStatus());
+                            intent.putExtra("EXTRA_REJECT_NOTE", billItems.get(position).getRejectionNote());
+                        }
                         getActivity().startActivity(intent);
                     }
                 };
@@ -142,5 +150,49 @@ public class OrdersFragment extends Fragment {
             }
         });
 
+        checkStatus();
+
+    }
+
+
+    public void checkStatus() {
+        FirebaseUser user = fireAuth.getCurrentUser();
+        DocumentReference fireRefe = fireStore.collection("order_confirm").document(user.getUid());
+        //collectReference = fireStore.collection("orders").document(user.getUid()).collection(fireReference.getId());
+        CollectionReference firee = fireRefe.collection(fireRefe.getId());
+        firee.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w("TAG", "listen:error", e);
+                    return;
+                }
+
+                for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                    switch (dc.getType()) {
+                        /*case ADDED:
+                            Log.d("TAG", "New Msg: " + dc.getDocument().toObject(BillModel.class));
+                            break;*/
+                        case MODIFIED:
+
+                            if (billItems.size() != 0) {
+                                for (int i = 0; i < billItems.size(); i++) {
+                                    if (billItems.get(i).getDocId().equals(dc.getDocument().getId())) {
+                                        BillItem billModel = dc.getDocument().toObject(BillItem.class);
+                                        billItems.set(i, billModel);
+                                        mAdapter.notifyDataSetChanged();
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+
+                        case REMOVED:
+                            //Log.d("TAG", "Removed Msg: " + dc.getDocument().toObject(BillModel.class));
+                            break;
+                    }
+                }
+            }
+        });
     }
 }

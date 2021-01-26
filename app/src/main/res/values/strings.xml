@@ -81,10 +81,11 @@
     <string name="notification_channel_id">default</string>
 
     <string name="order_type1">Pending</string>
-    <string name="order_type2">Accept</string>
+    <string name="order_type2">Accepted</string>
     <string name="order_type3">Packing</string>
     <string name="order_type4">Delivered</string>
     <string name="order_type5">Received</string>
+    <string name="order_type6">Rejected</string>
     <string name="str_delivery_charges">Delivery Charges</string>
     <string name="str_price">Price</string>
     <string name="no_data_available">No Data Available</string>

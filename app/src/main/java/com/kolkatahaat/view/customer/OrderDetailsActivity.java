@@ -4,6 +4,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -45,7 +46,14 @@ public class OrderDetailsActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView empty_view;
 
+    private LinearLayout llOrderReject;
+    private TextView txtCategoryNote;
+
+
     private String billItemId;
+
+    private boolean mRejectStatus;
+    private String mRejectNote;
     private List<OrdersItem> billItems;
     private OrdersItemDetailsAdapter mAdapter;
 
@@ -61,6 +69,8 @@ public class OrderDetailsActivity extends AppCompatActivity {
         Bundle bundle = getIntent().getExtras();
         if(bundle != null){
             billItemId = bundle.getString("EXTRA_BILL_ITEM_ID");
+            mRejectStatus = bundle.getBoolean("EXTRA_REJECT_STATUS",false);
+            mRejectNote = bundle.getString("EXTRA_REJECT_NOTE","");
         }
 
         fireStore = FirebaseFirestore.getInstance();
@@ -69,12 +79,20 @@ public class OrderDetailsActivity extends AppCompatActivity {
 
         progressBar = findViewById(R.id.progressBar);
         empty_view = findViewById(R.id.empty_view);
+
+        llOrderReject = findViewById(R.id.llOrderReject);
+        txtCategoryNote = findViewById(R.id.txtCategoryNote);
+
         recyclerView = findViewById(R.id.recyclerView);
         RecyclerView.LayoutManager mLayoutManager = new LinearLayoutManager(OrderDetailsActivity.this);
         recyclerView.setLayoutManager(mLayoutManager);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(OrderDetailsActivity.this, LinearLayoutManager.VERTICAL));
 
+        if(mRejectStatus){
+            llOrderReject.setVisibility(View.VISIBLE);
+            txtCategoryNote.setText(mRejectNote);
+        }
         getAllOrders(billItemId);
     }
 

@@ -11,8 +11,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:paddingRight="@dimen/_5sdp"
         android:paddingLeft="@dimen/_5sdp"
+        android:paddingRight="@dimen/_5sdp"
         android:weightSum="2">
 
         <RelativeLayout
@@ -24,32 +24,88 @@
                 android:id="@+id/thumbnail"
                 android:layout_width="@dimen/_50sdp"
                 android:layout_height="@dimen/_50sdp"
+                android:layout_centerVertical="true"
                 android:layout_marginRight="@dimen/_5sdp"
                 android:scaleType="centerCrop"
-                android:layout_centerVertical="true"
                 android:src="@drawable/app_logo" />
 
-            <TextView
-                android:id="@+id/txtCategoryName"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:id="@+id/llOrderStatus"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/_10sdp"
                 android:layout_toRightOf="@+id/thumbnail"
-                android:ellipsize="end"
-                android:fontFamily="sans-serif-medium"
-                android:maxLines="1"
-                android:text="Chicken Overload Meal"
-                android:textColor="#535353"
-                android:textSize="17dp" />
+                android:layout_gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_toRightOf="@+id/thumbnail"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="1"
+                    android:text="Order Status: "
+                    android:textColor="#535353"
+                    android:textSize="@dimen/_12sdp" />
+
+                <TextView
+                    android:id="@+id/txtCategoryName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_toRightOf="@+id/thumbnail"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="1"
+                    android:text="Packing"
+                    android:textColor="#535353"
+                    android:textSize="@dimen/_12sdp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llOrderReject"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_toRightOf="@+id/thumbnail"
+                android:layout_below="@+id/llOrderStatus"
+                android:layout_gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/thumbnail"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="1"
+                    android:text="Note: "
+                    android:textColor="#535353"
+                    android:textSize="@dimen/_10sdp" />
+
+                <TextView
+                    android:id="@+id/txtCategoryNote"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/thumbnail"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="1"
+                    android:text="Packing"
+                    android:textColor="#535353"
+                    android:textSize="@dimen/_10sdp" />
+            </LinearLayout>
 
             <TextView
                 android:id="@+id/txtCategoryDes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/txtCategoryName"
-                android:layout_marginTop="@dimen/_5sdp"
+                android:layout_below="@+id/llOrderReject"
+                android:layout_marginTop="@dimen/_2sdp"
                 android:layout_toRightOf="@+id/thumbnail"
-                android:text="Grilled chicken tandoori chicken in masala curry dhossa avalable"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:text="Grilled chicken tandoori chicken in"
                 android:textColor="#a9a9a9"
                 android:textSize="12dp" />
         </RelativeLayout>
