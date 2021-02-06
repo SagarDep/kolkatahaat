@@ -9,6 +9,7 @@ public class BillItem {
     private ArrayList<OrdersItem> itemArrayList;
     private Users itemUsers;
     private String orderStatus; //Pending , Accept, Dispatch, Delivered
+    private int productDeliveryChange;
     private Object billCreatedDate;
 
     private String rejectionNote;
@@ -56,6 +57,14 @@ public class BillItem {
 
     public void setItemUsers(Users itemUsers) {
         this.itemUsers = itemUsers;
+    }
+
+    public int getProductDeliveryChange() {
+        return productDeliveryChange;
+    }
+
+    public void setProductDeliveryChange(int productDeliveryChange) {
+        this.productDeliveryChange = productDeliveryChange;
     }
 
     public Object getBillCreatedDate() {

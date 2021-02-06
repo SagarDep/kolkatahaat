@@ -98,11 +98,45 @@
                     android:textSize="@dimen/_12sdp" />
             </LinearLayout>
 
+
+            <LinearLayout
+                android:id="@+id/llOrderItem"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/llOrderUser"
+                android:layout_marginTop="@dimen/_2sdp"
+                android:layout_toRightOf="@+id/thumbnail"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/thumbnail"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="1"
+                    android:text="Total Order Items: "
+                    android:textColor="@color/colorDimGray"
+                    android:textSize="@dimen/_12sdp" />
+
+                <TextView
+                    android:id="@+id/txtTotOrderItems"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_toRightOf="@+id/thumbnail"
+                    android:ellipsize="end"
+                    android:fontFamily="sans-serif-medium"
+                    android:maxLines="1"
+                    android:text="user name"
+                    android:textColor="@color/colorDimGray"
+                    android:textSize="@dimen/_12sdp" />
+            </LinearLayout>
+
             <TextView
                 android:id="@+id/txtCategoryDes"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@+id/llOrderUser"
+                android:layout_below="@+id/llOrderItem"
                 android:layout_marginTop="@dimen/_5sdp"
                 android:layout_toRightOf="@+id/thumbnail"
                 android:text="Grilled chicken masala curry dhossa avalable"

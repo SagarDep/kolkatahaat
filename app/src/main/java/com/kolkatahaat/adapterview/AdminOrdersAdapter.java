@@ -88,6 +88,7 @@ public class AdminOrdersAdapter extends RecyclerView.Adapter<AdminOrdersAdapter.
             holder.thumbnail.setImageDrawable(mContext.getResources().getDrawable(R.drawable.app_logo));
             holder.txtCategoryName.setText(message.getOrderStatus());
             holder.txtOrderUserName.setText(message.getItemUsers().getUserName());
+            holder.txtTotOrderItems.setText(String.valueOf(message.getItemArrayList().size()));
 
             Timestamp timestamp = new Timestamp(((Timestamp) message.getBillCreatedDate()).toDate());
             Date date1 = timestamp.toDate();
@@ -97,7 +98,7 @@ public class AdminOrdersAdapter extends RecyclerView.Adapter<AdminOrdersAdapter.
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public ImageView thumbnail;
-        public TextView txtCategoryName, txtOrderUserName, txtCategoryDes;
+        public TextView txtCategoryName, txtOrderUserName, txtTotOrderItems, txtCategoryDes;
         private RecyclerViewClickListener mListener;
 
         public ViewHolder(View view, RecyclerViewClickListener listener) {
@@ -106,6 +107,7 @@ public class AdminOrdersAdapter extends RecyclerView.Adapter<AdminOrdersAdapter.
             thumbnail = view.findViewById(R.id.thumbnail);
             txtCategoryName = view.findViewById(R.id.txtCategoryName);
             txtOrderUserName = view.findViewById(R.id.txtOrderUserName);
+            txtTotOrderItems = view.findViewById(R.id.txtTotOrderItems);
             txtCategoryDes = view.findViewById(R.id.txtCategoryDes);
             itemView.setOnClickListener(this);
         }

@@ -16,7 +16,9 @@ import com.kolkatahaat.R;
 import com.kolkatahaat.interfaces.RecyclerViewRemoveClickListener;
 import com.kolkatahaat.model.Product;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.ListIterator;
 
 public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.ViewHolder> {
     private Context mContext;
@@ -47,11 +49,70 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
         return position;
     }
 
+
+    public List<Product> getEatableItem(List<Product> productsItem) {
+        List<Product> productsEatable = new ArrayList<>();
+       /* for (final ListIterator<Product> i = messages.listIterator(); i.hasNext();) {
+            Product cartProduct = new Product();
+            final Product element = i.next();
+            if(element.getProductId().equals("Eatable")) {
+                i.set(cartProduct);
+            }
+        }*/
+
+        for (Product pojoOfJsonArray : productsItem) {
+            if(pojoOfJsonArray.getProductCategory().equals("Eatable")) {
+                productsEatable.add(pojoOfJsonArray);
+            }
+        }
+        //messages = productsEatable;
+        return productsEatable;
+    }
+
+    public List<Product> getClothingItem(List<Product> productsItem) {
+        List<Product> productsEatable = new ArrayList<>();
+        for (Product pojoOfJsonArray : productsItem) {
+            if(pojoOfJsonArray.getProductCategory().equals("Clothing")) {
+                productsEatable.add(pojoOfJsonArray);
+            }
+        }
+        //messages = productsEatable;
+        return productsEatable;
+    }
+
+    public List<Product> getPujaItemsItem(List<Product> productsItem) {
+        List<Product> productsEatable = new ArrayList<>();
+        for (Product pojoOfJsonArray : productsItem) {
+            if(pojoOfJsonArray.getProductCategory().equals("Puja Items")) {
+                productsEatable.add(pojoOfJsonArray);
+            }
+        }
+        //messages = productsEatable;
+        return productsEatable;
+    }
+
+    public List<Product> getOthersItem(List<Product> productsItem) {
+
+        List<Product> productsEatable = new ArrayList<>();
+        for (Product pojoOfJsonArray : productsItem) {
+            if(pojoOfJsonArray.getProductCategory().equals("Others")) {
+                productsEatable.add(pojoOfJsonArray);
+            }
+        }
+        //messages = productsEatable;
+        return productsEatable;
+    }
+
     public void updateData(List<Product> dataset) {
         messages.clear();
         messages.addAll(dataset);
         notifyDataSetChanged();
     }
+    public void updateDataVal(final List<Product> stationArrivalPOJO ) {
+        messages = new ArrayList<>();
+        messages.addAll(stationArrivalPOJO);
+    }
+
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {

@@ -28,6 +28,7 @@
         <item>Others</item>
     </string-array>
 
+    <string name="menu_str_all">All</string>
     <string name="menu_str_eatable">Eatable</string>
     <string name="menu_str_eatable_instead">Grocery</string>
     <string name="menu_str_puja_items">Puja Items</string>
@@ -36,6 +37,7 @@
 
     <string name="menu_product">Products</string>
     <string name="menu_users_list">Users List</string>
+    <string name="menu_other_content">Other Content</string>
     <string name="menu_users_orders">All Orders</string>
     <string name="menu_about_us">About Us</string>
     <string name="menu_profile">Profile</string>

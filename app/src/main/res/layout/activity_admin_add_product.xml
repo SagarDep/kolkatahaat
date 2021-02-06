@@ -26,6 +26,7 @@
             android:layout_alignParentTop="true">
 
             <LinearLayout
+                android:id="@+id/llAddProduct"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/_5sdp"
@@ -160,7 +161,7 @@
 
                     </LinearLayout>
 
-                    <com.google.android.material.textfield.TextInputLayout
+                    <!--<com.google.android.material.textfield.TextInputLayout
                         android:id="@+id/textInputItemDeliveryChrg"
                         style="@style/TextInputLayoutAppearance"
                         android:layout_marginTop="@dimen/_10sdp"
@@ -171,7 +172,7 @@
                             style="@style/modifiedEditText"
                             android:inputType="number"
                             android:maxLines="1" />
-                    </com.google.android.material.textfield.TextInputLayout>
+                    </com.google.android.material.textfield.TextInputLayout>-->
 
                 </LinearLayout>
 
@@ -183,8 +184,31 @@
                     android:layout_gravity="center_horizontal"
                     android:layout_marginTop="@dimen/loginViewsMargin"
                     android:textAllCaps="false"
+                    android:visibility="gone"
                     android:text="@string/str_add_product" />
+
+                <Button
+                    android:id="@+id/btnUpdateProduct"
+                    style="@style/Widget.AppCompat.Button.Colored"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_marginTop="@dimen/loginViewsMargin"
+                    android:textAllCaps="false"
+                    android:visibility="gone"
+                    android:text="Update Product" />
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_marginTop="@dimen/_15sdp"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:visibility="visible"/>
 </RelativeLayout>

@@ -18,6 +18,7 @@
             android:id="@+id/app_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryDark"
             android:fitsSystemWindows="true"
             android:theme="@style/AppTheme.AppBarOverlay">
 
@@ -121,23 +122,23 @@
                             android:textSize="@dimen/_12sdp" />
                     </LinearLayout>
 
-                  <!--  <TextView
-                        android:id="@+id/tv_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:text="Firste line "
-                        android:textSize="15sp" />
+                    <!--  <TextView
+                          android:id="@+id/tv_title"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_alignParentRight="true"
+                          android:text="Firste line "
+                          android:textSize="15sp" />
 
-                    <TextView
-                        android:id="@+id/tv_description"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentRight="true"
-                        android:text="Second line "
-                        android:textColor="@color/colorWhite"
-                        android:textSize="30sp"
-                        android:textStyle="bold" />-->
+                      <TextView
+                          android:id="@+id/tv_description"
+                          android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:layout_alignParentRight="true"
+                          android:text="Second line "
+                          android:textColor="@color/colorWhite"
+                          android:textSize="30sp"
+                          android:textStyle="bold" />-->
                 </LinearLayout>
 
                 <androidx.appcompat.widget.Toolbar
@@ -162,9 +163,9 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
+            android:text="@string/no_available_any_order"
             android:textSize="@dimen/_14sdp"
             android:visibility="gone"
-            android:text="@string/no_available_any_order"
             app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
         <ProgressBar
@@ -174,8 +175,8 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center"
-            app:layout_behavior="@string/appbar_scrolling_view_behavior"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:layout_behavior="@string/appbar_scrolling_view_behavior" />
 
     </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
@@ -183,34 +184,142 @@
         android:id="@+id/llOrderStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/btnRegister"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:layout_gravity="bottom"
+        android:paddingTop="@dimen/_5sdp"
+        android:paddingLeft="@dimen/_5sdp"
+        android:paddingRight="@dimen/_5sdp"
+        android:background="@color/colorTotalAmount"
         android:gravity="center"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btnOrderStatus"
-            style="@style/Widget.MaterialComponents.Button"
-            android:layout_width="@dimen/_100sdp"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:gravity="center"
-            android:layout_marginRight="@dimen/_5sdp"
-            android:text="@string/order_type1"
-            app:cornerRadius="12dp" />
+            android:layout_marginBottom="@dimen/_5sdp"
+            android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btnOrderRejected"
-            style="@style/Widget.MaterialComponents.Button"
-            android:layout_width="@dimen/_100sdp"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="Delivery Charges:"
+                    android:textColor="@color/colorGrayDark"
+                    android:textSize="@dimen/_13sdp" />
+
+                <TextView
+                    android:id="@+id/txtDeliveryCharges"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="00"
+                    android:paddingLeft="@dimen/_5sdp"
+                    android:textColor="@color/colorGrayDark"
+                    android:textSize="@dimen/_13sdp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_20sdp"
+                android:layout_gravity="center"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="Total product cost:"
+                    android:textColor="@color/colorGrayDark"
+                    android:textSize="@dimen/_13sdp" />
+
+                <TextView
+                    android:id="@+id/txtProductAmount"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:ellipsize="end"
+                    android:lines="1"
+                    android:text="00"
+                    android:paddingLeft="@dimen/_5sdp"
+                    android:textColor="@color/colorGrayDark"
+                    android:textSize="@dimen/_13sdp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/llTotalAmount"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/_30sdp"
+                android:layout_alignParentBottom="true"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/txtTotal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|start"
+                    android:gravity="center|start"
+                    android:text="Total Bill Amount: "
+                    android:textColor="#000"
+                    android:textSize="@dimen/_14sdp" />
+
+                <TextView
+                    android:id="@+id/txtTotalBill"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center|start"
+                    android:gravity="center|start"
+                    android:text="00"
+                    android:textColor="#000"
+                    android:textSize="@dimen/_14sdp" />
+
+            </LinearLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginLeft="@dimen/_5sdp"
             android:gravity="center"
-            android:text="@string/order_type6"
-            app:cornerRadius="12dp" />
+            android:layout_marginBottom="@dimen/_2sdp"
+            android:orientation="horizontal">
+
+            <Button
+                android:id="@+id/btnOrderStatus"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="@dimen/_100sdp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginRight="@dimen/_5sdp"
+                android:textAllCaps="false"
+                android:gravity="center"
+                android:text="@string/order_type1"
+                app:cornerRadius="12dp" />
+
+            <Button
+                android:id="@+id/btnOrderRejected"
+                style="@style/Widget.MaterialComponents.Button"
+                android:layout_width="@dimen/_100sdp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginLeft="@dimen/_5sdp"
+                android:textAllCaps="false"
+                android:gravity="center"
+                android:text="@string/order_type6"
+                app:cornerRadius="12dp" />
+        </LinearLayout>
     </LinearLayout>
 </RelativeLayout>
 

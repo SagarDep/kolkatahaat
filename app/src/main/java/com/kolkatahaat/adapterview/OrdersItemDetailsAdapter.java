@@ -81,7 +81,7 @@ public class OrdersItemDetailsAdapter extends RecyclerView.Adapter<OrdersItemDet
                     .into(holder.imgProduct);
             holder.txtProductName.setText(message.getProductName());
             holder.txtProductQuantity.setText(message.getProductCategory());
-            holder.txtProductCharge.setText(message.getProductDeliveryChange());
+            //holder.txtProductCharge.setText(message.getProductDeliveryChange());
             holder.txtProductTotal.setText(String.valueOf(message.getProductTotalAmount()));
 
         }
@@ -89,14 +89,14 @@ public class OrdersItemDetailsAdapter extends RecyclerView.Adapter<OrdersItemDet
 
     public class ViewHolder extends RecyclerView.ViewHolder{
         public ImageView imgProduct;
-        public TextView txtProductName, txtProductQuantity, txtProductCharge, txtProductTotal;
+        public TextView txtProductName, txtProductQuantity, txtProductTotal; //txtProductCharge, ;
 
         public ViewHolder(View view) {
             super(view);
             imgProduct = view.findViewById(R.id.imgProduct);
             txtProductName = view.findViewById(R.id.txtProductName);
             txtProductQuantity = view.findViewById(R.id.txtProductQuantity);
-            txtProductCharge = view.findViewById(R.id.txtProductCharge);
+            //txtProductCharge = view.findViewById(R.id.txtProductCharge);
             txtProductTotal = view.findViewById(R.id.txtProductTotal);
         }
     }

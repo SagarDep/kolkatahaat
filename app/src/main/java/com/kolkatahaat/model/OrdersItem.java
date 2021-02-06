@@ -15,7 +15,7 @@ public class OrdersItem {
     private float productPrice;
     private int productQuantity = 0;
 
-    private String productDeliveryChange;
+    //private String productDeliveryChange;
     private String productItemTotal;
     private float productTotalAmount;
 
@@ -106,13 +106,13 @@ public class OrdersItem {
         this.productQuantity = productQuantity;
     }
 
-    public String getProductDeliveryChange() {
+    /*public String getProductDeliveryChange() {
         return productDeliveryChange;
     }
 
     public void setProductDeliveryChange(String productDeliveryChange) {
         this.productDeliveryChange = productDeliveryChange;
-    }
+    }*/
 
     public String getProductItemTotal() {
         return productItemTotal;

@@ -181,7 +181,7 @@
                     android:textColor="#000"
                     android:textSize="@dimen/_14sdp" />
 
-                <TextView
+                <!--<TextView
                     android:id="@+id/txtProductDelivery"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -191,7 +191,7 @@
                     android:paddingLeft="@dimen/_10sdp"
                     android:gravity="center_horizontal"
                     android:text="@string/app_name"
-                    android:textSize="@dimen/_14sdp" />
+                    android:textSize="@dimen/_14sdp" />-->
             </LinearLayout>
 
             <LinearLayout

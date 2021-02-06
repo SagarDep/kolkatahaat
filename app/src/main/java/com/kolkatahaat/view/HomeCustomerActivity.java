@@ -194,22 +194,26 @@ public class HomeCustomerActivity extends AppCompatActivity implements Navigatio
     }
 
     public void getCountProduct(){
-        cartCount = 0;
-        FirebaseUser user = fireAuth.getCurrentUser();
-        DocumentReference fireRefe = fireStore.collection("orders").document(user.getUid());
-        CollectionReference firee = fireRefe.collection(fireRefe.getId());
-        firee.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (DocumentSnapshot document : task.getResult()) {
-                        Product cartProduct = document.toObject(Product.class);
-                        cartCount = cartCount + cartProduct.getProductQuantity();
+        try {
+            cartCount = 0;
+            FirebaseUser user = fireAuth.getCurrentUser();
+            DocumentReference fireRefe = fireStore.collection("orders").document(user.getUid());
+            CollectionReference firee = fireRefe.collection(fireRefe.getId());
+            firee.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (DocumentSnapshot document : task.getResult()) {
+                            Product cartProduct = document.toObject(Product.class);
+                            cartCount = cartCount + cartProduct.getProductQuantity();
+                        }
+                        rootView.setCount(cartCount);
                     }
-                    rootView.setCount(cartCount);
                 }
-            }
-        });
+            });
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override

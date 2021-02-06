@@ -17,7 +17,7 @@ public class Product {
     private float productPrice;
     private int productQuantity = 0;
 
-    private String productDeliveryChange;
+    //private String productDeliveryChange;
     private Object productCreatedDate;
 
     public Product(){
@@ -110,13 +110,13 @@ public class Product {
     }*/
 
 
-    public String getProductDeliveryChange() {
+   /* public String getProductDeliveryChange() {
         return productDeliveryChange;
     }
 
     public void setProductDeliveryChange(String productDeliveryChange) {
         this.productDeliveryChange = productDeliveryChange;
-    }
+    }*/
 
     public Object getProductCreatedDate() {
         return productCreatedDate;

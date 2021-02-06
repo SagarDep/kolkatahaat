@@ -29,6 +29,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -68,6 +69,7 @@ public class ProductCartDetailsActivity extends AppCompatActivity {
     private FirebaseFirestore fireStore;
     private DocumentReference fireReference;
     private CollectionReference collectReference;
+    private DocumentReference collectionReferenceDelivery;
 
     public Toolbar toolbar;
     private RecyclerView recyclerView;
@@ -77,6 +79,10 @@ public class ProductCartDetailsActivity extends AppCompatActivity {
     private Button btnPurchase;
     private ProductCartAdapter mAdapter;
     private List<OrdersItem> itemList;
+
+    private TextView txtDeliveryCharges;
+    private TextView txtProductAmount;
+    private int mDeliveryCharge = 0;
 
     private List<Users> adminItemList;
 
@@ -95,6 +101,8 @@ public class ProductCartDetailsActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        collectionReferenceDelivery = fireStore.collection("delivery_charge").document("deliveryCharge");
+
         init();
 
          //clCsEidfQyiqjdEeH8ecZs:APA91bEnNvYSJ1DZkGTc_RaV2aXoZSSh08MMEcREQ6LpTviWluQPWhUsQXx7QlYJ561JmWeGwsjuaJphlzK60Tu-3-34rRH_0xgGV0xhUWem9c0F4C8uCMHks2ckt1B4vezaXCBancfO
@@ -107,19 +115,31 @@ public class ProductCartDetailsActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         empty_view = findViewById(R.id.empty_view);
 
+        txtDeliveryCharges = findViewById(R.id.txtDeliveryCharges);
+        txtProductAmount = findViewById(R.id.txtProductAmount);
+
         txtTotalBill = findViewById(R.id.txtTotalBill);
         btnPurchase = findViewById(R.id.btnPurchase);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(ProductCartDetailsActivity.this, LinearLayoutManager.VERTICAL));
-        getProductDetails();
+
+        if (NetUtils.isNetworkAvailable(ProductCartDetailsActivity.this)) {
+            getProductDetails();
+            getDeliveryChrarge();
+        } else {
+            Utility.displayDialog(ProductCartDetailsActivity.this, getString(R.string.common_no_internet), false);
+        }
 
         btnPurchase.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                getAllAdminUser();
-                setPlaceYourOrder();
-
+                if (NetUtils.isNetworkAvailable(ProductCartDetailsActivity.this)) {
+                    getAllAdminUser();
+                    setPlaceYourOrder();
+                } else {
+                    Utility.displayDialog(ProductCartDetailsActivity.this, getString(R.string.common_no_internet), false);
+                }
             }
         });
     }
@@ -134,6 +154,26 @@ public class ProductCartDetailsActivity extends AppCompatActivity {
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void getDeliveryChrarge(){
+        collectionReferenceDelivery.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        mDeliveryCharge = Integer.valueOf(document.getData().get("deliveryCharges").toString());
+                        txtDeliveryCharges.setText(""+mDeliveryCharge);
+                    } else {
+                        Log.d(TAG, "No such document");
+                    }
+                } else {
+                    Log.d(TAG, "get failed with ", task.getException());
+                }
+            }
+        });
     }
 
     private void getProductDetails() {
@@ -176,7 +216,8 @@ public class ProductCartDetailsActivity extends AppCompatActivity {
                     recyclerView.setVisibility(View.VISIBLE);
                     progressBar.setVisibility(View.GONE);
                     empty_view.setVisibility(View.GONE);
-                    txtTotalBill.setText(String.valueOf(mAdapter.grandTotal(itemList)));
+                    txtProductAmount.setText(String.valueOf(mAdapter.grandTotal(itemList)));
+                    txtTotalBill.setText(String.valueOf(mDeliveryCharge + mAdapter.grandTotal(itemList)));
                     btnPurchase.setEnabled(true);
                 } else {
                     progressBar.setVisibility(View.GONE);
@@ -202,6 +243,7 @@ public class ProductCartDetailsActivity extends AppCompatActivity {
                 txtTotalBill.setText(String.valueOf(mAdapter.grandTotal(itemList)));
                 if(mAdapter.grandTotal(itemList) == 0){
                     txtTotalBill.setText("00");
+                    txtProductAmount.setText("00");
                     recyclerView.setVisibility(View.GONE);
                     empty_view.setVisibility(View.VISIBLE);
                     btnPurchase.setEnabled(false);
@@ -246,6 +288,7 @@ public class ProductCartDetailsActivity extends AppCompatActivity {
                     billItem.setUuId(user.getUid());
                     billItem.setOrderStatus(getResources().getString(R.string.order_type1));  //Pending , Accept, Dispatch, Delivered
                     billItem.setBillCreatedDate(billDate);
+                    billItem.setProductDeliveryChange(mDeliveryCharge);
                     billItem.setItemArrayList(allItemList);
 
                     firee.set(billItem).addOnCompleteListener(new OnCompleteListener<Void>() {

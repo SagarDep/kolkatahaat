@@ -44,7 +44,7 @@
             android:lines="1"
             android:text="sdfjdfkd dfdsf dsfdsf"
             android:textColor="#000000"
-            android:textSize="@dimen/_14sdp"
+            android:textSize="@dimen/_12sdp"
             android:textStyle="bold" />
 
         <TextView
@@ -55,7 +55,7 @@
             android:lines="1"
             android:text="sdfdsf df"
             android:textColor="#111111"
-            android:textSize="@dimen/_13sdp" />
+            android:textSize="@dimen/_12sdp" />
 
         <TextView
             android:id="@+id/txtUserDate"

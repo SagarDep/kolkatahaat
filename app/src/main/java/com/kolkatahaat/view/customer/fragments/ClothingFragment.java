@@ -49,7 +49,6 @@ import com.kolkatahaat.utills.CartCounterActionView;
 import com.kolkatahaat.utills.NetUtils;
 import com.kolkatahaat.utills.Utility;
 import com.kolkatahaat.view.customer.ProductCartDetailsActivity;
-import com.kolkatahaat.view.customer.ProductPurchaseActivity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -202,6 +201,7 @@ public class ClothingFragment extends Fragment {
                             progressBar.setVisibility(View.GONE);
                             empty_view.setVisibility(View.GONE);
                         } else {
+                            recyclerView.setVisibility(View.GONE);
                             progressBar.setVisibility(View.GONE);
                             empty_view.setVisibility(View.VISIBLE);
                         }
@@ -281,14 +281,14 @@ public class ClothingFragment extends Fragment {
             ordersItem.setProductPrice(selectProduct.getProductPrice());
             ordersItem.setProductQuantity(selectProduct.getProductQuantity());
 
-            ordersItem.setProductDeliveryChange(selectProduct.getProductDeliveryChange());
+            //ordersItem.setProductDeliveryChange(selectProduct.getProductDeliveryChange());
 
             ordersItem.setProductItemTotal(String.valueOf(
                     (Float.valueOf(selectProduct.getProductQuantity()) *
                             Float.valueOf(selectProduct.getProductPrice()))));
 
-            ordersItem.setProductTotalAmount(Float.valueOf(ordersItem.getProductItemTotal()) +
-                    Float.valueOf(selectProduct.getProductDeliveryChange()));
+            ordersItem.setProductTotalAmount(Float.valueOf(ordersItem.getProductItemTotal()));
+                    //+ Float.valueOf(selectProduct.getProductDeliveryChange()));
 
             ordersItem.setProductCreatedDate(productCreatedDate);
 
@@ -325,8 +325,8 @@ public class ClothingFragment extends Fragment {
                             Float.valueOf(selectProduct.getProductPrice())));
 
             float totalAmount = (Float.valueOf(selectProduct.getProductQuantity()) *
-                    Float.valueOf(selectProduct.getProductPrice())) +
-                    Float.valueOf(selectProduct.getProductDeliveryChange());
+                    Float.valueOf(selectProduct.getProductPrice()));
+                    //+ Float.valueOf(selectProduct.getProductDeliveryChange());
 
             firee.update("productItemTotal",itemTotal,
                     "productQuantity",selectProduct.getProductQuantity(),

@@ -5,6 +5,12 @@
 
     <group android:checkableBehavior="single">
         <item
+            android:id="@+id/nav_users_orders"
+            android:icon="@drawable/ic_shopping_bag"
+            android:title="@string/menu_users_orders"
+            app:iconTint="@color/colorAccent"
+            app:showAsAction="never" />
+        <item
             android:id="@+id/nav_product"
             android:icon="@drawable/ic_product"
             android:title="@string/menu_product"
@@ -17,20 +23,18 @@
             android:title="@string/menu_users_list"
             app:iconTint="@color/colorAccent"
             app:showAsAction="never"/>
-
         <item
-            android:id="@+id/nav_users_orders"
-            android:icon="@drawable/ic_shopping_bag"
-            android:title="@string/menu_users_orders"
+            android:id="@+id/nav_other_content"
+            android:icon="@drawable/ic_slider"
+            android:title="@string/menu_other_content"
             app:iconTint="@color/colorAccent"
-            app:showAsAction="never" />
+            app:showAsAction="never"/>
         <item
             android:id="@+id/nav_about_us"
             android:icon="@drawable/ic_about"
             android:title="@string/menu_about_us"
             app:iconTint="@color/colorAccent"
             app:showAsAction="never"/>
-
     </group>
 
     <item android:title="">

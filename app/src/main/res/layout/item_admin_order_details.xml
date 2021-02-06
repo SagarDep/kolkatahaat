@@ -8,28 +8,37 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="horizontal">
 
         <!-- Media -->
-        <ImageView
+        <!--<ImageView
             android:id="@+id/imgProduct"
             android:layout_width="match_parent"
             android:layout_height="150dp"
             android:contentDescription="@string/app_name"
             android:scaleType="centerCrop"
-            app:srcCompat="@drawable/app_logo" />
+            app:srcCompat="@drawable/app_logo" />-->
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/imgProduct"
+            android:layout_width="@dimen/_50sdp"
+            android:layout_height="@dimen/_50sdp"
+            android:layout_alignLeft="@+id/llContainer"
+            android:layout_alignParentLeft="true"
+            android:layout_gravity="center"
+            android:layout_marginLeft="@dimen/_5sdp"
+            android:src="@mipmap/ic_launcher"
+            app:civ_border_width="2dp" />
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="@dimen/_2sdp">
+            android:orientation="horizontal">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="@dimen/_5sdp">
+                android:paddingLeft="@dimen/_4sdp">
 
                 <!-- Title, secondary and supporting text -->
                 <TextView
@@ -37,18 +46,22 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="title"
+                    android:ellipsize="end"
+                    android:maxLines="1"
                     android:textAppearance="?attr/textAppearanceHeadline6" />
 
                 <TextView
                     android:id="@+id/txtProductQuantity"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
                     android:text="secondary_text"
+                    android:ellipsize="end"
+                    android:maxLines="1"
                     android:textAppearance="?attr/textAppearanceBody2"
                     android:textColor="?android:attr/textColorSecondary" />
 
-                <LinearLayout
+                <!--<LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="@dimen/_10sdp"
@@ -70,18 +83,20 @@
                         android:textAppearance="?attr/textAppearanceBody2"
                         android:textColor="?android:attr/textColorSecondary" />
 
-                </LinearLayout>
+                </LinearLayout>-->
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="@dimen/_10sdp"
+                    android:layout_marginTop="@dimen/_5sdp"
                     android:orientation="horizontal">
 
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/str_price"
+                        android:ellipsize="end"
+                        android:maxLines="1"
                         android:textAppearance="?attr/textAppearanceBody2"
                         android:textColor="@color/colorBlack" />
 
@@ -91,6 +106,8 @@
                         android:layout_height="wrap_content"
                         android:paddingLeft="@dimen/_10sdp"
                         android:text="supporting_text"
+                        android:ellipsize="end"
+                        android:maxLines="1"
                         android:textAppearance="?attr/textAppearanceBody2"
                         android:textColor="?android:attr/textColorSecondary" />
 

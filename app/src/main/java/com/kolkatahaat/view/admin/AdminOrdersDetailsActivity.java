@@ -31,12 +31,15 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
+import com.google.firebase.firestore.Query;
 import com.kolkatahaat.R;
 import com.kolkatahaat.adapterview.AdminOrdersDetailsAdapter;
 import com.kolkatahaat.interfaces.AdminOrderRejectDialogListener;
 import com.kolkatahaat.interfaces.RecyclerViewClickListener;
 import com.kolkatahaat.model.BillItem;
 import com.kolkatahaat.model.OrderCompleteModel;
+import com.kolkatahaat.model.Users;
+import com.kolkatahaat.service.FirebaseIDService;
 import com.kolkatahaat.view.admin.fragments.OrderRejectOrderNoteDialog;
 
 import java.util.ArrayList;
@@ -56,6 +59,11 @@ public class AdminOrdersDetailsActivity extends AppCompatActivity implements Adm
     private AdminOrdersDetailsAdapter detailsAdapter;
     private ArrayList<BillItem> productsList;
     private BillItem billItemModel;
+
+    private TextView txtDeliveryCharges;
+    private TextView txtProductAmount;
+    private TextView txtTotalBill;
+    private int mDeliveryCharge = 0;
 
     private Button btnOrderStatus;
     private Button btnOrderRejected;
@@ -86,6 +94,10 @@ public class AdminOrdersDetailsActivity extends AppCompatActivity implements Adm
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+
+        txtDeliveryCharges = findViewById(R.id.txtDeliveryCharges);
+        txtProductAmount = findViewById(R.id.txtProductAmount);
+        txtTotalBill = findViewById(R.id.txtTotalBill);
 
         collapsingToolbar = findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(" ");
@@ -172,6 +184,9 @@ public class AdminOrdersDetailsActivity extends AppCompatActivity implements Adm
                 billItemModel = value.toObject(BillItem.class);
                 productsList.add(billItemModel);
 
+                txtDeliveryCharges.setText(String.valueOf(billItemModel.getProductDeliveryChange()));
+                mDeliveryCharge = billItemModel.getProductDeliveryChange();
+
                 RecyclerViewClickListener listener = new RecyclerViewClickListener() {
                     @Override
                     public void onClick(View view, int position) {
@@ -180,6 +195,9 @@ public class AdminOrdersDetailsActivity extends AppCompatActivity implements Adm
                 };
                 detailsAdapter = new AdminOrdersDetailsAdapter(AdminOrdersDetailsActivity.this, productsList.get(0).getItemArrayList(),listener);
                 recyclerView.setAdapter(detailsAdapter);
+
+                txtProductAmount.setText(String.valueOf(detailsAdapter.grandTotal(productsList.get(0).getItemArrayList())));
+                txtTotalBill.setText(String.valueOf(mDeliveryCharge + detailsAdapter.grandTotal(productsList.get(0).getItemArrayList())));
 
                 if(billItemModel != null) {
                     if (billItemModel.getOrderStatus().equals(getResources().getString(R.string.order_type1))) {
@@ -204,7 +222,7 @@ public class AdminOrdersDetailsActivity extends AppCompatActivity implements Adm
         reference.update("orderStatus",getResources().getString(R.string.order_type2)).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-
+                sendNotify("Your order is "+getResources().getString(R.string.order_type2));
             }
         });
     }
@@ -215,7 +233,7 @@ public class AdminOrdersDetailsActivity extends AppCompatActivity implements Adm
         reference.update("orderStatus",getResources().getString(R.string.order_type3)).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-
+                sendNotify("Your order is "+getResources().getString(R.string.order_type3));
             }
         });
     }
@@ -226,7 +244,7 @@ public class AdminOrdersDetailsActivity extends AppCompatActivity implements Adm
         reference.update("orderStatus",getResources().getString(R.string.order_type4)).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-
+                sendNotify("Your order is "+getResources().getString(R.string.order_type4));
             }
         });
     }
@@ -237,6 +255,8 @@ public class AdminOrdersDetailsActivity extends AppCompatActivity implements Adm
         receivedReference.update("orderStatus",getResources().getString(R.string.order_type5)).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
+                sendNotify("Your order is "+getResources().getString(R.string.order_type4));
+
                 final FieldValue productCreatedDate = FieldValue.serverTimestamp();
 
                 OrderCompleteModel completeModel = new OrderCompleteModel();
@@ -274,4 +294,24 @@ public class AdminOrdersDetailsActivity extends AppCompatActivity implements Adm
     public void onDialogNegative(Object object) {
 
     }
+
+
+
+
+    public void sendNotify(String nMessage){
+        DocumentReference query = fireStore.collection("users").document(selectedUserId);
+        query.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    progressBar.setVisibility(View.GONE);
+                    Users usersInfo = task.getResult().toObject(Users.class);
+
+                    FirebaseIDService idService = new FirebaseIDService();
+                    idService.sendWithOtherThreadOrderStatus(usersInfo.getUserToken(), nMessage, false);
+                }
+            }
+        });
+    }
 }
+

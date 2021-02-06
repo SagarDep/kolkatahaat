@@ -11,6 +11,7 @@ import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -26,8 +27,11 @@ import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.kolkatahaat.R;
@@ -78,7 +82,92 @@ public class AdminAllUserListFragment extends Fragment {
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
 
-        collectReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+
+
+        collectReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+            @Override
+            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w("TAG", "listen:error", e);
+                    return;
+                }
+
+                for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                    switch (dc.getType()) {
+                        case ADDED:
+                            Log.d("TAG", "New Msg: " + dc.getDocument().toObject(Users.class));
+                            Users note = dc.getDocument().toObject(Users.class);
+                            messages.add(note);
+                            mAdapter.notifyDataSetChanged();
+                            break;
+                        case MODIFIED:
+                            String key = dc.getDocument().getId();
+                            Log.d("TAG", "Modified Msg: " + key);
+
+                            if (messages.size() != 0) {
+                                for (int i = 0; i < messages.size(); i++) {
+                                    if (messages.get(i).getUserUId().equals(dc.getDocument().getId())) {
+
+                                        Users billModel = dc.getDocument().toObject(Users.class);
+                                        messages.set(i, billModel);
+                                        mAdapter.notifyDataSetChanged();
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+
+                        case REMOVED:
+                            Log.d("TAG", "Removed Msg: " + dc.getDocument().toObject(Users.class));
+
+                            if (messages.size() != 0) {
+                                for (int i = 0; i < messages.size(); i++) {
+                                    if (messages.get(i).getUserUId().equals(dc.getDocument().getId())) {
+
+                                        //BillModel billModel = dc.getDocument().toObject(BillModel.class);
+                                        messages.remove(i);
+                                        mAdapter.notifyDataSetChanged();
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                    }
+                }
+            }
+        });
+
+        RecyclerViewRemoveClickListener listener = new RecyclerViewRemoveClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                //Toast.makeText(getContext(), "Position " + messages.get(position).getUserUId(), Toast.LENGTH_SHORT).show();
+                if(!TextUtils.isEmpty(messages.get(position).getUserUId()) && messages.get(position).getUserUId() != null && messages.get(position).getUserUId() != "") {
+                    Intent intent = new Intent(getActivity(), AdminEditCustomerProfileActivity.class);
+                    intent.putExtra("EXTRA_EDIT_USER_ID", messages.get(position).getUserUId());
+                    getActivity().startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onRemoveItem(View view, int position) {
+                //Toast.makeText(getContext(), "Position " + messages.get(position).getUserUId(), Toast.LENGTH_SHORT).show();
+                if (NetUtils.isNetworkAvailable(getActivity())) {
+                    if (messages.size() != 0  && messages != null) {
+                        userRemove(messages, position);
+                    } else {
+                        Utility.displayDialog(getActivity(), getString(R.string.common_no_user_available), false);
+                    }
+                } else {
+                    Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
+                }
+            }
+        };
+        mAdapter = new UsersListAdapter(getActivity(), messages, listener);
+        mRecyclerView.setAdapter(mAdapter);
+        mRecyclerView.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
+
+        /*collectReference.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
             @Override
             public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
@@ -118,7 +207,7 @@ public class AdminAllUserListFragment extends Fragment {
                 mRecyclerView.setVisibility(View.VISIBLE);
                 progressBar.setVisibility(View.GONE);
             }
-        });
+        });*/
         return view;
     }
 

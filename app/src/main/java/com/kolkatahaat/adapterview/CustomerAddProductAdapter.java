@@ -77,7 +77,7 @@ public class CustomerAddProductAdapter extends RecyclerView.Adapter<CustomerAddP
         holder.txtProductName.setText(message.getProductName());
         holder.txtProductCategory.setText(message.getProductCategory());
         holder.txtProductPrice.setText(String.valueOf(message.getProductPrice()));
-        holder.txtDeliveryCharges.setText(String.valueOf(message.getProductDeliveryChange()));
+        //holder.txtDeliveryCharges.setText(String.valueOf(message.getProductDeliveryChange()));
         holder.txtQuantitySize.setText(String.valueOf(message.getProductQuantity()));
 
     }
@@ -85,7 +85,7 @@ public class CustomerAddProductAdapter extends RecyclerView.Adapter<CustomerAddP
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public ImageView imgProduct;
         public LinearLayout llContainer;
-        public TextView txtProductName, txtProductCategory, txtProductPrice, txtDeliveryCharges, txtQuantitySize;
+        public TextView txtProductName, txtProductCategory, txtProductPrice, txtQuantitySize;
         public Button btnDecrease, btnIncrease ;
 
         private RecyclerViewProductClickListener mListener;
@@ -98,7 +98,7 @@ public class CustomerAddProductAdapter extends RecyclerView.Adapter<CustomerAddP
             txtProductName = view.findViewById(R.id.txtProductName);
             txtProductCategory = view.findViewById(R.id.txtProductCategory);
             txtProductPrice = view.findViewById(R.id.txtProductPrice);
-            txtDeliveryCharges = view.findViewById(R.id.txtDeliveryCharges);
+            //txtDeliveryCharges = view.findViewById(R.id.txtDeliveryCharges);
 
 
             btnDecrease = view.findViewById(R.id.btnDecrease);

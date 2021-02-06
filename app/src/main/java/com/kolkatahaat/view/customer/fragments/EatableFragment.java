@@ -158,38 +158,46 @@ public class EatableFragment extends Fragment {
                             @Override
                             public void onClickDecrease(View view, int position) {
                                 //Toast.makeText(getContext(), "onClickDecrease " + messages.get(position).getProductId(), Toast.LENGTH_SHORT).show();
-                                if(messages.get(position).getProductQuantity() == 1) {
-                                    removeProduct(messages.get(position).getProductId(), position);
-                                    cartCountRemove();
-                                } else {
-                                    Product product = messages.get(position);
-                                    if(product.getProductQuantity() != 0) {
-                                        product.setProductQuantity(product.getProductQuantity() - 1);
-                                        //product.setProductPrice(product.getProductQuantity() * product.getProductPrice());
-                                        UpdateCartProduct(product, position);
-
+                                try {
+                                    if(messages.get(position).getProductQuantity() == 1) {
+                                        removeProduct(messages.get(position).getProductId(), position);
                                         cartCountRemove();
+                                    } else {
+                                        Product product = messages.get(position);
+                                        if(product.getProductQuantity() != 0) {
+                                            product.setProductQuantity(product.getProductQuantity() - 1);
+                                            //product.setProductPrice(product.getProductQuantity() * product.getProductPrice());
+                                            UpdateCartProduct(product, position);
+
+                                            cartCountRemove();
+                                        }
                                     }
+                                } catch (Exception e){
+                                    e.printStackTrace();
                                 }
                             }
 
                             @Override
                             public void onClickIncrease(View view, int position) {
-                                if(messages.get(position).getProductQuantity() == 0) {
-                                    Product product = messages.get(position);
-                                    product.setProductQuantity(1);
-                                    //product.setProductPrice(product.getProductQuantity() * product.getProductPrice());
-                                    AddCartProduct(product, position);
+                                try {
+                                    if(messages.get(position).getProductQuantity() == 0) {
+                                        Product product = messages.get(position);
+                                        product.setProductQuantity(1);
+                                        //product.setProductPrice(product.getProductQuantity() * product.getProductPrice());
+                                        AddCartProduct(product, position);
 
-                                    cartCountAdd();
-                                } else {
-                                    Toast.makeText(getContext(), "onClickIncrease " + messages.get(position).getProductQuantity(), Toast.LENGTH_SHORT).show();
-                                    Product product = messages.get(position);
-                                    product.setProductQuantity(1 + product.getProductQuantity());
-                                    //product.setProductPrice(product.getProductQuantity() * product.getProductPrice());
-                                    UpdateCartProduct(product, position);
+                                        cartCountAdd();
+                                    } else {
+                                        Toast.makeText(getContext(), "onClickIncrease " + messages.get(position).getProductQuantity(), Toast.LENGTH_SHORT).show();
+                                        Product product = messages.get(position);
+                                        product.setProductQuantity(1 + product.getProductQuantity());
+                                        //product.setProductPrice(product.getProductQuantity() * product.getProductPrice());
+                                        UpdateCartProduct(product, position);
 
-                                    cartCountAdd();
+                                        cartCountAdd();
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
                                 }
                             }
                         };
@@ -201,6 +209,7 @@ public class EatableFragment extends Fragment {
                             progressBar.setVisibility(View.GONE);
                             empty_view.setVisibility(View.GONE);
                         } else {
+                            recyclerView.setVisibility(View.GONE);
                             progressBar.setVisibility(View.GONE);
                             empty_view.setVisibility(View.VISIBLE);
                         }
@@ -280,14 +289,14 @@ public class EatableFragment extends Fragment {
             ordersItem.setProductPrice(selectProduct.getProductPrice());
             ordersItem.setProductQuantity(selectProduct.getProductQuantity());
 
-            ordersItem.setProductDeliveryChange(selectProduct.getProductDeliveryChange());
+            //ordersItem.setProductDeliveryChange(selectProduct.getProductDeliveryChange());
 
             ordersItem.setProductItemTotal(String.valueOf(
                     (Float.valueOf(selectProduct.getProductQuantity()) *
                             Float.valueOf(selectProduct.getProductPrice()))));
 
-            ordersItem.setProductTotalAmount(Float.valueOf(ordersItem.getProductItemTotal()) +
-                    Float.valueOf(selectProduct.getProductDeliveryChange()));
+            ordersItem.setProductTotalAmount(Float.valueOf(ordersItem.getProductItemTotal()));
+                   // + Float.valueOf(selectProduct.getProductDeliveryChange()));
 
             ordersItem.setProductCreatedDate(productCreatedDate);
 
@@ -324,8 +333,8 @@ public class EatableFragment extends Fragment {
                             Float.valueOf(selectProduct.getProductPrice())));
 
             float totalAmount = (Float.valueOf(selectProduct.getProductQuantity()) *
-                    Float.valueOf(selectProduct.getProductPrice())) +
-                    Float.valueOf(selectProduct.getProductDeliveryChange());
+                    Float.valueOf(selectProduct.getProductPrice()));
+                    //+ Float.valueOf(selectProduct.getProductDeliveryChange());
 
             firee.update("productItemTotal",itemTotal,
                     "productQuantity",selectProduct.getProductQuantity(),

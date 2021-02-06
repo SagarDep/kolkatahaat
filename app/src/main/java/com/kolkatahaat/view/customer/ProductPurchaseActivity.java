@@ -66,7 +66,7 @@ public class ProductPurchaseActivity extends AppCompatActivity {
     private TextView txtProductDiscount;
     private TextView txtProductDescription;
     private ChipGroup chipGroup;
-    private TextView txtProductDelivery;
+    //private TextView txtProductDelivery;
     private TextView txtProductTotal;
     private FloatingActionButton fabAdd;
     private Button btnAddToCart;
@@ -112,7 +112,7 @@ public class ProductPurchaseActivity extends AppCompatActivity {
         txtProductDiscount = findViewById(R.id.txtProductDiscount);
         txtProductDescription = findViewById(R.id.txtProductDescription);
         chipGroup = findViewById(R.id.chipGroup);
-        txtProductDelivery = findViewById(R.id.txtProductDelivery);
+        //txtProductDelivery = findViewById(R.id.txtProductDelivery);
         txtProductTotal = findViewById(R.id.txtProductTotal);
         fabAdd = findViewById(R.id.fabAdd);
         btnAddToCart = findViewById(R.id.btnAddToCart);
@@ -210,7 +210,7 @@ public class ProductPurchaseActivity extends AppCompatActivity {
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(imgProduct);
         txtProductName.setText(mSelectProduct.getProductName());
-        txtProductDelivery.setText(mSelectProduct.getProductDeliveryChange());
+        //txtProductDelivery.setText(mSelectProduct.getProductDeliveryChange());
         //setTag(mSelectProduct.getProductQuantityPrice());
     }
 
@@ -281,10 +281,10 @@ public class ProductPurchaseActivity extends AppCompatActivity {
                 ordersItem.setProductCategory(selectProduct.getProductCategory());
                 ordersItem.setProductName(selectProduct.getProductName());
                 //ordersItem.setProductQuantityPrice(getCheckedChipIds());
-                ordersItem.setProductDeliveryChange(selectProduct.getProductDeliveryChange());
+                //ordersItem.setProductDeliveryChange(selectProduct.getProductDeliveryChange());
                 ordersItem.setProductItemTotal(txtProductTotal.getText().toString().trim());
-                ordersItem.setProductTotalAmount(Float.valueOf(txtProductTotal.getText().toString().trim()) +
-                        Float.valueOf(selectProduct.getProductDeliveryChange()));
+                /*ordersItem.setProductTotalAmount(Float.valueOf(txtProductTotal.getText().toString().trim()) +
+                        Float.valueOf(selectProduct.getProductDeliveryChange()));*/
                 ordersItem.setProductCreatedDate(productCreatedDate);
 
                 FirebaseUser user = fireAuth.getCurrentUser();

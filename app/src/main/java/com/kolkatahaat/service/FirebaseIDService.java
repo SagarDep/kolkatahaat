@@ -173,16 +173,25 @@ public class FirebaseIDService extends FirebaseMessagingService {
     }*/
 
 
-    public void sendWithOtherThread(final String token, final String orderItemSize) {
+    public void sendWithOtherThread(final String token, final String orderItemSize, final boolean mOrderSizeOrStatus) {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                pushNotification(token, orderItemSize);
+                pushNotification(token, orderItemSize, mOrderSizeOrStatus);
             }
         }).start();
     }
 
-    private void pushNotification(String mToken, String orderItemSize) {
+    public void sendWithOtherThreadOrderStatus(final String token, final String orderItemSize, final boolean mOrderSizeOrStatus) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                pushNotification(token, orderItemSize, mOrderSizeOrStatus);
+            }
+        }).start();
+    }
+
+    private void pushNotification(String mToken, String orderItemSize, boolean mOrderSizeOrStatus) {
         JSONObject jPayload = new JSONObject();
         JSONObject jNotification = new JSONObject();
         //JSONObject jData = new JSONObject();
@@ -194,7 +203,13 @@ public class FirebaseIDService extends FirebaseMessagingService {
             Users obj = gson.fromJson(String.valueOf(userDetial), Users.class);
 
             jNotification.put("title", "You have an order from "+obj.getUserName());
-            jNotification.put("body", "He has purchased " + orderItemSize + " items");
+
+            if(mOrderSizeOrStatus) {
+                jNotification.put("body", "He has purchased " + orderItemSize + " items");
+            }
+            else {
+                jNotification.put("body", "He has purchased " + orderItemSize + " items");
+            }
             jNotification.put("sound", "default");
             jNotification.put("badge", "1");
             jNotification.put("click_action", "OPEN_ACTIVITY_1");

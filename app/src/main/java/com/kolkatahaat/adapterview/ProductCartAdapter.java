@@ -80,7 +80,7 @@ public class ProductCartAdapter extends RecyclerView.Adapter<ProductCartAdapter.
                 .into(holder.imgProduct);
         holder.txtProductName.setText(message.getProductName());
         holder.txtProductCategory.setText(message.getProductCategory());
-        holder.txtProductCharge.setText(String.valueOf(message.getProductDeliveryChange()));
+        //holder.txtProductCharge.setText(String.valueOf(message.getProductDeliveryChange()));
         holder.txtProductQuantity.setText(String.valueOf(message.getProductQuantity()));
         holder.txtProductTotal.setText(String.valueOf(message.getProductTotalAmount()));
     }
@@ -88,7 +88,7 @@ public class ProductCartAdapter extends RecyclerView.Adapter<ProductCartAdapter.
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public LinearLayout llCartItem;
         public ImageView imgProduct, imgProductDelete;
-        public TextView txtProductName, txtProductCategory, txtProductQuantity, txtProductCharge, txtProductTotal;
+        public TextView txtProductName, txtProductCategory, txtProductQuantity, txtProductTotal;//txtProductCharge, ;
         private RecyclerViewRemoveClickListener mListener;
 
         public ViewHolder(View view, RecyclerViewRemoveClickListener listener) {
@@ -99,7 +99,7 @@ public class ProductCartAdapter extends RecyclerView.Adapter<ProductCartAdapter.
             txtProductName = view.findViewById(R.id.txtProductName);
             txtProductCategory = view.findViewById(R.id.txtProductCategory);
             txtProductQuantity = view.findViewById(R.id.txtProductQuantity);
-            txtProductCharge = view.findViewById(R.id.txtProductCharge);
+            //txtProductCharge = view.findViewById(R.id.txtProductCharge);
             txtProductTotal = view.findViewById(R.id.txtProductTotal);
             imgProductDelete = view.findViewById(R.id.imgProductDelete);
             llCartItem.setOnClickListener(this);

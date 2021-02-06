@@ -3,8 +3,10 @@ package com.kolkatahaat.view.admin;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.StrictMode;
 import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
@@ -13,6 +15,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -33,6 +37,7 @@ import com.google.android.material.chip.ChipGroup;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -50,6 +55,9 @@ import com.kolkatahaat.utills.Utility;
 import com.kolkatahaat.view.admin.fragments.AddQuantityDialog;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.UUID;
 
@@ -79,6 +87,9 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
     private Spinner spinnerCategory;
     private String strCategoryName;
 
+    private LinearLayout llAddProduct;
+    private ProgressBar progressBar;
+
     private TextInputLayout textInputItemName;
     private TextInputEditText editTextItemName;
 
@@ -91,15 +102,18 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
     private TextInputLayout textInputItemPrice;
     private TextInputEditText editTextItemPrice;
 
-    private TextInputLayout textInputItemDeliveryChrg;
-    private TextInputEditText editTextItemDeliveryChrg;
+    /*private TextInputLayout textInputItemDeliveryChrg;
+    private TextInputEditText editTextItemDeliveryChrg;*/
 
     private Button btnAppProduct;
+    private Button btnUpdateProduct;
 
     //private ArrayList<QuantityPrice> priceArrayList;
 
     private Bitmap bitmap;
-
+    //private Bitmap editBitmap;
+    private String uploadedUrl = "";
+    private Product updateProduct = null;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -121,9 +135,19 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
         init();
 
         if(mAdminProductEdit){
+            updateProduct = new Product();
+            llAddProduct.setVisibility(View.GONE);
+            progressBar.setVisibility(View.VISIBLE);
 
+            btnUpdateProduct.setVisibility(View.VISIBLE);
+            btnAppProduct.setVisibility(View.GONE);
             getProductDetials();
         } else {
+            llAddProduct.setVisibility(View.VISIBLE);
+            progressBar.setVisibility(View.GONE);
+
+            btnUpdateProduct.setVisibility(View.GONE);
+            btnAppProduct.setVisibility(View.VISIBLE);
             setupAutoCompleteView();
         }
     }
@@ -134,6 +158,9 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        llAddProduct = findViewById(R.id.llAddProduct);
+        progressBar = findViewById(R.id.progressBar);
 
         imgProduct = findViewById(R.id.imgProduct);
         btnChoose = findViewById(R.id.btnChoose);
@@ -153,10 +180,11 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
         editTextItemName = findViewById(R.id.editTextItemName);
 
 
-        textInputItemDeliveryChrg = findViewById(R.id.textInputItemDeliveryChrg);
-        editTextItemDeliveryChrg = findViewById(R.id.editTextItemDeliveryChrg);
+       /* textInputItemDeliveryChrg = findViewById(R.id.textInputItemDeliveryChrg);
+        editTextItemDeliveryChrg = findViewById(R.id.editTextItemDeliveryChrg);*/
 
         btnAppProduct = findViewById(R.id.btnAppProduct);
+        btnUpdateProduct = findViewById(R.id.btnUpdateProduct);
 
         //priceArrayList = new ArrayList<>();
 
@@ -171,12 +199,48 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
         btnAppProduct.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (!validateItemName() && !validateQuantity() && !validatePrice() && !validateDeliveryChr() && !chekcValidation()) {
+                if (!validateItemName() && !validateQuantity() && !validatePrice() && !chekcValidation()) {
                     return;
                 }
-                else if(validateItemName() && validateQuantity() && validatePrice() && validateDeliveryChr() && chekcValidation()) {
+                else if(validateItemName() && validateQuantity() && validatePrice() && chekcValidation()) {
                     uploadImage();
                 }
+            }
+        });
+
+        btnUpdateProduct.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (!validateItemName() && !validateQuantity() && !validatePrice() && !chekcValidation()) {
+                    return;
+                }
+                else if(validateItemName() && validateQuantity() && validatePrice() && chekcValidation()) {
+                    if(filePath != null && !filePath.equals("")){
+                        uploadImage();
+                    } else {
+                        updateProduct(uploadedUrl);
+                    }
+                }
+                /*if(imagesAreEqual(bitmap,editBitmap)) {
+                    System.out.println("Two Image are Equal");
+
+                    if (!validateItemName() && !validateQuantity() && !validatePrice() && !validateDeliveryChr() && !chekcValidation()) {
+                        return;
+                    }
+                    else if(validateItemName() && validateQuantity() && validatePrice() && validateDeliveryChr() && chekcValidation()) {
+                        //updateProduct();
+                    }
+
+                } else {
+                    System.out.println("Two Image are Equal");
+
+                    if (!validateItemName() && !validateQuantity() && !validatePrice() && !validateDeliveryChr() && !chekcValidation()) {
+                        return;
+                    }
+                    else if(validateItemName() && validateQuantity() && validatePrice() && validateDeliveryChr() && chekcValidation()) {
+                        uploadImage();
+                    }
+                }*/
             }
         });
 
@@ -294,7 +358,20 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
                         @Override
                         public void onSuccess(Uri uri) {
                             Log.e(TAG, "onSuccess: uri= " + uri.toString());
-                            uploadProduct(uri.toString());
+                            if(mAdminProductEdit) {
+                                if(filePath != null && !filePath.equals("")){
+                                    updateProduct(uri.toString());
+                                } else {
+                                    updateProduct(uploadedUrl);
+                                }
+                                /*if(uploadedUrl == "" && uploadedUrl == null && TextUtils.isEmpty(uploadedUrl)){
+
+                                } else {
+
+                                }*/
+                            } else {
+                                addProduct(uri.toString());
+                            }
                         }
                     });
                 }
@@ -368,7 +445,7 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
         return true;
     }
 
-    private boolean validateDeliveryChr() {
+    /*private boolean validateDeliveryChr() {
         if (TextUtils.isEmpty(editTextItemDeliveryChrg.getText().toString().trim())) {
             textInputItemDeliveryChrg.setError(getResources().getString(R.string.str_err_msg_user_user_mobile));
             textInputItemDeliveryChrg.requestFocus();
@@ -377,7 +454,7 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
             textInputItemDeliveryChrg.setErrorEnabled(false);
         }
         return true;
-    }
+    }*/
 
     private boolean validateQuantity() {
         if (TextUtils.isEmpty(editTextItemQuantity.getText().toString().trim())) {
@@ -418,7 +495,8 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
         }
     }
 
-    private void uploadProduct(String UploadUrl) {
+
+    private void addProduct(String UploadUrl) {
 
         if (NetUtils.isNetworkAvailable(AdminAddProductActivity.this)) {
 
@@ -430,7 +508,7 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
                 final String productPacking = editTextItemQuantity.getText().toString().trim();
                 final String productPrice = editTextItemPrice.getText().toString().trim();
 
-                final String productDeliveryChange = editTextItemDeliveryChrg.getText().toString().trim();
+                //final String productDeliveryChange = editTextItemDeliveryChrg.getText().toString().trim();
                 final FieldValue productCreatedDate = FieldValue.serverTimestamp();
 
                 Product product = new Product();
@@ -445,7 +523,7 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
                 product.setProductPacking(productPacking);
                 product.setProductPrice(Float.parseFloat(productPrice));
 
-                product.setProductDeliveryChange(productDeliveryChange);
+                //product.setProductDeliveryChange(productDeliveryChange);
                 product.setProductCreatedDate(productCreatedDate);
 
                 fireReference.set(product).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -470,6 +548,75 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
     }
 
 
+    private void updateProduct(String UploadUrl) {
+
+        if (NetUtils.isNetworkAvailable(AdminAddProductActivity.this)) {
+
+            if(UploadUrl != null && !UploadUrl.isEmpty() && UploadUrl != "") {
+                //final String productId = fireReference.getId();
+                //final String productImg = UploadUrl;
+                final String productName = editTextItemName.getText().toString().trim();
+
+                final String productPacking = editTextItemQuantity.getText().toString().trim();
+                final String productPrice = editTextItemPrice.getText().toString().trim();
+
+                //final String productDeliveryChange = editTextItemDeliveryChrg.getText().toString().trim();
+                //final FieldValue productCreatedDate = FieldValue.serverTimestamp();
+
+                Product product = updateProduct;
+                //product.setProductId(productId);
+                product.setProductImg(UploadUrl);
+                product.setProductCategory(strCategoryName);
+                product.setProductName(productName);
+
+                /*product.setProductPacking("");
+                product.setProductPrice("");*/
+
+                product.setProductPacking(productPacking);
+                product.setProductPrice(Float.parseFloat(productPrice));
+
+                //product.setProductDeliveryChange(productDeliveryChange);
+                //product.setProductCreatedDate(productCreatedDate);
+
+
+                CollectionReference collectionReference= fireStore.collection("products");
+                collectionReference.document(product.getProductId()).set(product).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        if (task.isSuccessful()){
+                            Log.d(TAG, "onSuccess: user Profile is created for ");
+                            onBackPressed();
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "onFailure: " + e.toString());
+                    }
+                });
+
+
+                /*fireReference.set(product).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "onSuccess: user Profile is created for " + aVoid);
+                        onBackPressed();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.d(TAG, "onFailure: " + e.toString());
+                    }
+                });*/
+            } else {
+                Utility.displayDialog(AdminAddProductActivity.this, "Please try again", false);
+            }
+
+        } else {
+            Utility.displayDialog(AdminAddProductActivity.this, getString(R.string.common_no_internet), false);
+        }
+    }
+
 
 
     private void getProductDetials() {
@@ -482,10 +629,17 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
                     if (document.exists()) {
                         Product product = document.toObject(Product.class);
 
+                        updateProduct = product;
+
+                        llAddProduct.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.GONE);
+
+
                         editTextItemName.setText(product.getProductName());
-                        editTextItemQuantity.setText(String.valueOf(product.getProductQuantity()));
+                        editTextItemQuantity.setText(String.valueOf(product.getProductPacking()));
                         editTextItemPrice.setText(String.valueOf(product.getProductPrice()));
-                        editTextItemDeliveryChrg.setText(String.valueOf(product.getProductDeliveryChange()));
+                        //editTextItemDeliveryChrg.setText(String.valueOf(product.getProductDeliveryChange()));
+                        uploadedUrl = product.getProductImg();
 
                         RequestOptions options = new RequestOptions()
                                 .centerCrop()
@@ -493,13 +647,21 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
                                 .error(R.mipmap.ic_launcher_round);
                         Glide.with(AdminAddProductActivity.this).asBitmap().load(product.getProductImg()).apply(options).into(imgProduct);
 
+                        Bitmap bitmapm = getBitmapFromURL(product.getProductImg());
+                        bitmap = bitmapm;
 
-                        String compareValue = product.getProductCategory();
+                       /* Bitmap bitmapm = getBitmapFromURL(product.getProductImg());
+                        imgProduct.setImageBitmap(bitmapm);
+                        bitmap = bitmapm;
+                        editBitmap = bitmapm;*/
+
+                        //String compareValue = product.getProductCategory();
+                        strCategoryName = product.getProductCategory();
                         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(AdminAddProductActivity.this, R.array.product_category, R.layout.list_item);
                         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                         spinnerCategory.setAdapter(adapter);
-                        if (compareValue != null) {
-                            int spinnerPosition = adapter.getPosition(compareValue);
+                        if (strCategoryName != null) {
+                            int spinnerPosition = adapter.getPosition(strCategoryName);
                             spinnerCategory.setSelection(spinnerPosition);
                         }
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
@@ -512,4 +674,33 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
             }
         });
     }
+
+    public static Bitmap getBitmapFromURL(String src) {
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        try {
+            URL url = new URL(src);
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setDoInput(true);
+            connection.connect();
+            InputStream input = connection.getInputStream();
+            Bitmap myBitmap = BitmapFactory.decodeStream(input);
+            return myBitmap;
+        } catch (IOException e) {
+            // Log exception
+            return null;
+        }
+    }
+
+    /*boolean imagesAreEqual(Bitmap i1, Bitmap i2) {
+        if (i1.getHeight() != i2.getHeight())
+            return false;
+        if (i1.getWidth() != i2.getWidth()) return false;
+
+        for (int y = 0; y < i1.getHeight(); ++y)
+            for (int x = 0; x < i1.getWidth(); ++x)
+                if (i1.getPixel(x, y) != i2.getPixel(x, y)) return false;
+
+        return true;
+    }*/
 }

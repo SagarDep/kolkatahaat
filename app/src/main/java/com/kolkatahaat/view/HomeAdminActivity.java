@@ -27,6 +27,7 @@ import com.kolkatahaat.fragments.AboutUsFragment;
 import com.kolkatahaat.fragments.EditProfileFragment;
 import com.kolkatahaat.model.Users;
 import com.kolkatahaat.utills.SharedPrefsUtils;
+import com.kolkatahaat.view.admin.fragments.AdminAddOtherContentFragment;
 import com.kolkatahaat.view.admin.fragments.AdminAllUserListFragment;
 import com.kolkatahaat.view.admin.fragments.AdminOrdersFragment;
 import com.kolkatahaat.view.admin.fragments.AdminProductListFragment;
@@ -77,7 +78,7 @@ public class HomeAdminActivity extends AppCompatActivity implements NavigationVi
             txtEmailAddress.setText(obj.getUserEmail());
         }
 
-        loadFragment(new AdminProductListFragment()); //<----- enable this line
+        loadFragment(new AdminOrdersFragment()); //<----- enable this line
     }
 
 
@@ -105,6 +106,10 @@ public class HomeAdminActivity extends AppCompatActivity implements NavigationVi
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         Fragment fragment = null;
         switch (item.getItemId()) {
+            case R.id.nav_users_orders:
+                fragment = new AdminOrdersFragment();
+                break;
+
             case R.id.nav_product:
                 fragment = new AdminProductListFragment();
                 break;
@@ -113,9 +118,11 @@ public class HomeAdminActivity extends AppCompatActivity implements NavigationVi
                 fragment = new AdminAllUserListFragment();
                 break;
 
-            case R.id.nav_users_orders:
-                fragment = new AdminOrdersFragment();
+                case R.id.nav_other_content:
+                fragment = new AdminAddOtherContentFragment();
                 break;
+
+
 
             case R.id.nav_about_us:
                 fragment = new AboutUsFragment();
