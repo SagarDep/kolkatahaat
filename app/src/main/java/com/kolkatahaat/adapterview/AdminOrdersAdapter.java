@@ -19,6 +19,7 @@ import com.kolkatahaat.interfaces.RecyclerViewClickListener;
 import com.kolkatahaat.model.BillItem;
 import com.kolkatahaat.utills.Utility;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -67,6 +68,11 @@ public class AdminOrdersAdapter extends RecyclerView.Adapter<AdminOrdersAdapter.
         messages.clear();
         messages.addAll(dataset);
         notifyDataSetChanged();
+    }
+
+    public void updateDataVal(final List<BillItem> stationArrivalPOJO ) {
+        messages = new ArrayList<>();
+        messages.addAll(stationArrivalPOJO);
     }
 
     @Override

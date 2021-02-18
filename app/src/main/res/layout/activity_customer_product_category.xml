@@ -70,7 +70,8 @@
                     android:lines="1"
                     android:text="sdfdsf df"
                     android:textColor="#111111"
-                    android:textSize="@dimen/_13sdp" />
+                    android:textSize="@dimen/_13sdp"
+                    android:visibility="gone"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -79,7 +80,8 @@
                     android:lines="1"
                     android:text="sdfds ds"
                     android:textColor="#7a7a7a"
-                    android:textSize="@dimen/_12sdp" />
+                    android:textSize="@dimen/_12sdp"
+                    android:visibility="gone"/>
 
             </LinearLayout>
 
@@ -134,7 +136,8 @@
                     android:lines="1"
                     android:text="sdfdsf df"
                     android:textColor="#111111"
-                    android:textSize="@dimen/_13sdp" />
+                    android:textSize="@dimen/_13sdp"
+                    android:visibility="gone"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -143,7 +146,8 @@
                     android:lines="1"
                     android:text="sdfds ds"
                     android:textColor="#7a7a7a"
-                    android:textSize="@dimen/_12sdp" />
+                    android:textSize="@dimen/_12sdp"
+                    android:visibility="gone"/>
 
             </LinearLayout>
 
@@ -198,7 +202,8 @@
                     android:lines="1"
                     android:text="sdfdsf df"
                     android:textColor="#111111"
-                    android:textSize="@dimen/_13sdp" />
+                    android:textSize="@dimen/_13sdp"
+                    android:visibility="gone"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -207,7 +212,8 @@
                     android:lines="1"
                     android:text="sdfds ds"
                     android:textColor="#7a7a7a"
-                    android:textSize="@dimen/_12sdp" />
+                    android:textSize="@dimen/_12sdp"
+                    android:visibility="gone"/>
 
             </LinearLayout>
 
@@ -262,7 +268,8 @@
                     android:lines="1"
                     android:text="sdfdsf df"
                     android:textColor="#111111"
-                    android:textSize="@dimen/_13sdp" />
+                    android:textSize="@dimen/_13sdp"
+                    android:visibility="gone"/>
 
                 <TextView
                     android:layout_width="match_parent"
@@ -271,7 +278,8 @@
                     android:lines="1"
                     android:text="sdfds ds"
                     android:textColor="#7a7a7a"
-                    android:textSize="@dimen/_12sdp" />
+                    android:textSize="@dimen/_12sdp"
+                    android:visibility="gone"/>
 
             </LinearLayout>
 

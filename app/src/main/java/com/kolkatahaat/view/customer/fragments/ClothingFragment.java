@@ -234,29 +234,33 @@ public class ClothingFragment extends Fragment {
                             break;*/
                         case MODIFIED:
                             if (dc.getDocument() != null) {
+                                if(messages.size() != 0) {
+                                    Product cartProduct = dc.getDocument().toObject(Product.class);
+                                    for (final ListIterator<Product> i = messages.listIterator(); i.hasNext(); ) {
+                                        final Product element = i.next();
+                                        if (element.getProductId().equals(cartProduct.getProductId())) {
+                                            i.set(cartProduct);
+                                        }
+                                    }
+                                    mAdapter.updateDataVal(messages);
+                                    mAdapter.notifyDataSetChanged();
+                                }
+                            }
+                            break;
+
+                        case REMOVED:
+                            if(messages.size() != 0) {
                                 Product cartProduct = dc.getDocument().toObject(Product.class);
-                                for (final ListIterator<Product> i = messages.listIterator(); i.hasNext();) {
+                                cartProduct.setProductQuantity(0);
+                                for (final ListIterator<Product> i = messages.listIterator(); i.hasNext(); ) {
                                     final Product element = i.next();
-                                    if(element.getProductId().equals(cartProduct.getProductId())) {
+                                    if (element.getProductId().equals(cartProduct.getProductId())) {
                                         i.set(cartProduct);
                                     }
                                 }
                                 mAdapter.updateDataVal(messages);
                                 mAdapter.notifyDataSetChanged();
                             }
-                            break;
-
-                        case REMOVED:
-                            Product cartProduct = dc.getDocument().toObject(Product.class);
-                            cartProduct.setProductQuantity(0);
-                            for (final ListIterator<Product> i = messages.listIterator(); i.hasNext();) {
-                                final Product element = i.next();
-                                if(element.getProductId().equals(cartProduct.getProductId())) {
-                                    i.set(cartProduct);
-                                }
-                            }
-                            mAdapter.updateDataVal(messages);
-                            mAdapter.notifyDataSetChanged();
                             break;
                     }
                 }

@@ -98,6 +98,7 @@ public class AdminOrdersDetailsActivity extends AppCompatActivity implements Adm
         txtDeliveryCharges = findViewById(R.id.txtDeliveryCharges);
         txtProductAmount = findViewById(R.id.txtProductAmount);
         txtTotalBill = findViewById(R.id.txtTotalBill);
+        progressBar = findViewById(R.id.progressBar);
 
         collapsingToolbar = findViewById(R.id.collapsing_toolbar);
         collapsingToolbar.setTitle(" ");
@@ -251,11 +252,11 @@ public class AdminOrdersDetailsActivity extends AppCompatActivity implements Adm
 
     public void ordersReceived(BillItem billModel){
         DocumentReference questionsRef = fireStore.collection("order_confirm").document(selectedUserId);
-        DocumentReference receivedReference = questionsRef.collection(selectedUserId).document();
+        DocumentReference receivedReference = questionsRef.collection(selectedUserId).document(productId);
         receivedReference.update("orderStatus",getResources().getString(R.string.order_type5)).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
-                sendNotify("Your order is "+getResources().getString(R.string.order_type4));
+                sendNotify("Your order is "+getResources().getString(R.string.order_type5));
 
                 final FieldValue productCreatedDate = FieldValue.serverTimestamp();
 
