@@ -33,7 +33,7 @@
                 android:layout_centerHorizontal="true"
                 android:gravity="center_horizontal"
                 android:scaleType="center"
-                android:src="@drawable/app_logo" />
+                android:src="@mipmap/ic_launcher" />
 
             <TextView
                 android:id="@+id/txtProductName"

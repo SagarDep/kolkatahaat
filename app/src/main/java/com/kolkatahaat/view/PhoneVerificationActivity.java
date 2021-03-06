@@ -199,7 +199,7 @@ public class PhoneVerificationActivity extends AppCompatActivity {
         public void onCodeSent(String s, PhoneAuthProvider.ForceResendingToken forceResendingToken) {
             super.onCodeSent(s, forceResendingToken);
             verificationId = s;
-            Toast.makeText(PhoneVerificationActivity.this, verificationId+"", Toast.LENGTH_LONG).show();
+            //Toast.makeText(PhoneVerificationActivity.this, verificationId+"", Toast.LENGTH_LONG).show();
 
             llSendingCode.setVisibility(View.GONE);
             llSendOtp.setVisibility(View.GONE);

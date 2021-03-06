@@ -7,11 +7,14 @@ import androidx.multidex.MultiDex;
 import androidx.multidex.MultiDexApplication;
 
 import com.google.firebase.FirebaseApp;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 
 public class GlobalApplication extends MultiDexApplication {
 
     private static GlobalApplication instance;
     private static Context appContext;
+    private FirebaseCrashlytics mCrashlytics;
+
 
     public static GlobalApplication getInstance() {
         return instance;
@@ -32,6 +35,8 @@ public class GlobalApplication extends MultiDexApplication {
         instance = this;
 
         FirebaseApp.initializeApp(this);
+        mCrashlytics = FirebaseCrashlytics.getInstance();
+        FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(true);
 
         this.setAppContext(getApplicationContext());
         AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);

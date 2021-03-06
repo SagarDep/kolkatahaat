@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "43226185534-hkoeqjk2vt1ior69bdn6pg29mtolbqpb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.kolkatahaat",
+            "certificate_hash": "b2b5043816095895aab035b7717c3dfbe2f4f98a"
+          }
+        },
+        {
           "client_id": "43226185534-ncj7ciddvq28koclachj94775rj5ffid.apps.googleusercontent.com",
           "client_type": 3
         }

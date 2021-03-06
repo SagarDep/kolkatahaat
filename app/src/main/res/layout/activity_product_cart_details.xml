@@ -45,6 +45,7 @@
             android:orientation="vertical">
 
             <LinearLayout
+                android:id="@+id/llDeliveryCharge"
                 android:layout_width="match_parent"
                 android:layout_height="@dimen/_20sdp"
                 android:layout_gravity="center"

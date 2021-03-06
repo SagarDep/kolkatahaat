@@ -18,20 +18,10 @@
 
     <ImageView
         android:id="@+id/cl_logo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/txt_label"
+        android:layout_width="@dimen/_190sdp"
+        android:layout_height="@dimen/_150sdp"
         android:layout_centerInParent="true"
         android:layout_marginTop="10dp"
-        android:src="@drawable/app_logo" />
+        android:src="@drawable/ic_splash_img" />
 
-    <com.kolkatahaat.utills.TextViewRegular
-        android:id="@+id/copy_right"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:clickable="true"
-        android:linksClickable="true"
-        android:text="" />
 </RelativeLayout>

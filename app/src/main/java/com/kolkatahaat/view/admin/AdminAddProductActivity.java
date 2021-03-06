@@ -530,6 +530,7 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
                     @Override
                     public void onSuccess(Void aVoid) {
                         Log.d(TAG, "onSuccess: user Profile is created for " + aVoid);
+                        passIntentResult();
                         onBackPressed();
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -552,48 +553,53 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
 
         if (NetUtils.isNetworkAvailable(AdminAddProductActivity.this)) {
 
-            if(UploadUrl != null && !UploadUrl.isEmpty() && UploadUrl != "") {
-                //final String productId = fireReference.getId();
-                //final String productImg = UploadUrl;
-                final String productName = editTextItemName.getText().toString().trim();
+            strCategoryName = spinnerCategory.getSelectedItem().toString();
 
-                final String productPacking = editTextItemQuantity.getText().toString().trim();
-                final String productPrice = editTextItemPrice.getText().toString().trim();
+            if(!spinnerCategory.getSelectedItem().equals("Select") && strCategoryName != null && !strCategoryName.isEmpty()) {
 
-                //final String productDeliveryChange = editTextItemDeliveryChrg.getText().toString().trim();
-                //final FieldValue productCreatedDate = FieldValue.serverTimestamp();
+                if (UploadUrl != null && !UploadUrl.isEmpty() && UploadUrl != "") {
+                    //final String productId = fireReference.getId();
+                    //final String productImg = UploadUrl;
+                    final String productName = editTextItemName.getText().toString().trim();
 
-                Product product = updateProduct;
-                //product.setProductId(productId);
-                product.setProductImg(UploadUrl);
-                product.setProductCategory(strCategoryName);
-                product.setProductName(productName);
+                    final String productPacking = editTextItemQuantity.getText().toString().trim();
+                    final String productPrice = editTextItemPrice.getText().toString().trim();
+
+                    //final String productDeliveryChange = editTextItemDeliveryChrg.getText().toString().trim();
+                    //final FieldValue productCreatedDate = FieldValue.serverTimestamp();
+
+                    Product product = updateProduct;
+                    //product.setProductId(productId);
+                    product.setProductImg(UploadUrl);
+                    product.setProductCategory(strCategoryName);
+                    product.setProductName(productName);
 
                 /*product.setProductPacking("");
                 product.setProductPrice("");*/
 
-                product.setProductPacking(productPacking);
-                product.setProductPrice(Float.parseFloat(productPrice));
+                    product.setProductPacking(productPacking);
+                    product.setProductPrice(Float.parseFloat(productPrice));
 
-                //product.setProductDeliveryChange(productDeliveryChange);
-                //product.setProductCreatedDate(productCreatedDate);
+                    //product.setProductDeliveryChange(productDeliveryChange);
+                    //product.setProductCreatedDate(productCreatedDate);
 
 
-                CollectionReference collectionReference= fireStore.collection("products");
-                collectionReference.document(product.getProductId()).set(product).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if (task.isSuccessful()){
-                            Log.d(TAG, "onSuccess: user Profile is created for ");
-                            onBackPressed();
+                    CollectionReference collectionReference = fireStore.collection("products");
+                    collectionReference.document(product.getProductId()).set(product).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Log.d(TAG, "onSuccess: user Profile is created for ");
+                                passIntentResult();
+                                onBackPressed();
+                            }
                         }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.d(TAG, "onFailure: " + e.toString());
-                    }
-                });
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.d(TAG, "onFailure: " + e.toString());
+                        }
+                    });
 
 
                 /*fireReference.set(product).addOnSuccessListener(new OnSuccessListener<Void>() {
@@ -608,8 +614,11 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
                         Log.d(TAG, "onFailure: " + e.toString());
                     }
                 });*/
+                } else {
+                    Utility.displayDialog(AdminAddProductActivity.this, "Please try again", false);
+                }
             } else {
-                Utility.displayDialog(AdminAddProductActivity.this, "Please try again", false);
+                Utility.displayDialog(AdminAddProductActivity.this, "Please select your product category", false);
             }
 
         } else {
@@ -703,4 +712,11 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
 
         return true;
     }*/
+
+    private void passIntentResult(){
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("result", "changed");
+        setResult(RESULT_OK, resultIntent);
+        finish();
+    }
 }

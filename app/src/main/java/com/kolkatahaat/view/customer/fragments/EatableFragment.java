@@ -188,7 +188,7 @@ public class EatableFragment extends Fragment {
 
                                         cartCountAdd();
                                     } else {
-                                        Toast.makeText(getContext(), "onClickIncrease " + messages.get(position).getProductQuantity(), Toast.LENGTH_SHORT).show();
+                                        //Toast.makeText(getContext(), "onClickIncrease " + messages.get(position).getProductQuantity(), Toast.LENGTH_SHORT).show();
                                         Product product = messages.get(position);
                                         product.setProductQuantity(1 + product.getProductQuantity());
                                         //product.setProductPrice(product.getProductQuantity() * product.getProductPrice());

@@ -47,15 +47,11 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import com.kolkatahaat.R;
 import com.kolkatahaat.adapterview.AdminSliderImageAdapter;
-import com.kolkatahaat.interfaces.OnStartDragListener;
+import com.kolkatahaat.interfaces.RecyclerViewSliderClickListener;
 import com.kolkatahaat.model.SliderImgItem;
-import com.kolkatahaat.model.Users;
-import com.kolkatahaat.utills.EditItemTouchHelperCallback;
 import com.kolkatahaat.utills.NetUtils;
 import com.kolkatahaat.utills.Utility;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.kolkatahaat.view.admin.AdminUpdateSliderImageActivity;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -68,7 +64,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 import static android.app.Activity.RESULT_OK;
 
-public class AdminAddOtherContentFragment extends Fragment implements OnStartDragListener {
+public class AdminAddOtherContentFragment extends Fragment {
 
     private static final String TAG = AdminAddOtherContentFragment.class.getSimpleName();
 
@@ -98,7 +94,6 @@ public class AdminAddOtherContentFragment extends Fragment implements OnStartDra
     private Bitmap bitmap;
 
     private List<SliderImgItem> messages;
-    ItemTouchHelper mItemTouchHelper;
 
     public AdminAddOtherContentFragment() {
         fireAuth = FirebaseAuth.getInstance();
@@ -133,10 +128,72 @@ public class AdminAddOtherContentFragment extends Fragment implements OnStartDra
         mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         mRecyclerView.setHasFixedSize(true);
 
-        imageAdapter = new AdminSliderImageAdapter(getActivity(), messages, this);
-        ItemTouchHelper.Callback callback = new EditItemTouchHelperCallback(imageAdapter);
-        mItemTouchHelper = new ItemTouchHelper(callback);
-        mItemTouchHelper.attachToRecyclerView(mRecyclerView);
+        RecyclerViewSliderClickListener listener = new RecyclerViewSliderClickListener() {
+            @Override
+            public void onClick(View view, int position) {
+                //Toast.makeText(getContext(), "Position " + messages.get(position).getProductId(), Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onClickEdit(View view, int position) {
+                //Toast.makeText(getContext(), "Position edit", Toast.LENGTH_SHORT).show();
+                if(!TextUtils.isEmpty(messages.get(position).getUserUId()) &&
+                !TextUtils.isEmpty(messages.get(position).getImgUrl()) && messages.get(position).getImgUrl() != null) {
+                    Intent intent = new Intent(getActivity(), AdminUpdateSliderImageActivity.class);
+                    intent.putExtra("EXTRA_SLIDER_IMG_ITEM_ID", messages.get(position).getDocId());
+                    intent.putExtra("EXTRA_SLIDER_IMG_URL", messages.get(position).getImgUrl());
+                    getActivity().startActivity(intent);
+                }
+            }
+
+            @Override
+            public void onClickDelete(View view, int position) {
+                //Toast.makeText(getContext(), "Position delete" + messages.get(position).getDocId(), Toast.LENGTH_SHORT).show();
+                StorageReference imageRef = storage.getReferenceFromUrl(messages.get(position).getImgUrl());
+                imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void aVoid) {
+                        Log.d(TAG, "onSuccess: deleted file");
+
+                        if (!TextUtils.isEmpty(messages.get(position).getDocId()) && messages.get(position).getDocId() != null) {
+                            collectionReference.document(messages.get(position).getDocId()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    messages.remove(position);
+                                    imageAdapter.notifyDataSetChanged();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                }
+                            });
+                        }
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception exception) {
+                        // Uh-oh, an error occurred!
+                        Log.d(TAG, "onFailure: did not delete file");
+
+                        if (!TextUtils.isEmpty(messages.get(position).getDocId()) && messages.get(position).getDocId() != null) {
+                            collectionReference.document(messages.get(position).getDocId()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    messages.remove(position);
+                                    imageAdapter.notifyDataSetChanged();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+        };
+
+        imageAdapter = new AdminSliderImageAdapter(getActivity(), messages, listener);
         mRecyclerView.setAdapter(imageAdapter);
 
         btnChoose.setOnClickListener(new View.OnClickListener() {
@@ -152,7 +209,7 @@ public class AdminAddOtherContentFragment extends Fragment implements OnStartDra
                 if (!chekcValidation()) {
                     return;
                 } else if (chekcValidation()) {
-                    uploadImage();
+                    addImage();
                 }
             }
         });
@@ -182,10 +239,6 @@ public class AdminAddOtherContentFragment extends Fragment implements OnStartDra
         }
     }
 
-    @Override
-    public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
-        mItemTouchHelper.startDrag(viewHolder);
-    }
 
     public boolean chekcValidation() {
         Utility.hideSoftKeyboard(getActivity());
@@ -229,7 +282,7 @@ public class AdminAddOtherContentFragment extends Fragment implements OnStartDra
         }
     }
 
-    private void uploadImage() {
+    private void addImage() {
         if (filePath != null) {
             final ProgressDialog progressDialog = new ProgressDialog(getActivity());
             progressDialog.setTitle("Uploading...");
@@ -277,7 +330,7 @@ public class AdminAddOtherContentFragment extends Fragment implements OnStartDra
 
                 SliderImgItem sliderImgItem = new SliderImgItem();
                 sliderImgItem.setUserUId(user.getUid());
-                sliderImgItem.setDocId(collectionReference.getId());
+                sliderImgItem.setDocId(fireStore.collection("slider").document().getId());
                 sliderImgItem.setImgUrl(UploadUrl);
                 sliderImgItem.setImgName(imgNm);
                 sliderImgItem.setCurrentDate(createdDate);
@@ -286,7 +339,8 @@ public class AdminAddOtherContentFragment extends Fragment implements OnStartDra
                     @Override
                     public void onSuccess(DocumentReference documentReference) {
                         bitmap = null;
-                        Log.d(TAG, "onSuccess: user Profile is created for ");
+                        collectionReference.document(documentReference.getId()).update("docId",documentReference.getId());
+                        Log.d(TAG, "onSuccess: user Profile is created for fgjDq4TqJeHpzwNNzxCY "+documentReference.getId());
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -335,7 +389,7 @@ public class AdminAddOtherContentFragment extends Fragment implements OnStartDra
 
                             if (messages.size() != 0) {
                                 for (int i = 0; i < messages.size(); i++) {
-                                    if (messages.get(i).getUserUId().equals(dc.getDocument().getId())) {
+                                    if (messages.get(i).getDocId().equals(dc.getDocument().getId())) {
 
                                         SliderImgItem billModel = dc.getDocument().toObject(SliderImgItem.class);
                                         messages.set(i, billModel);
@@ -360,7 +414,7 @@ public class AdminAddOtherContentFragment extends Fragment implements OnStartDra
 
                             if (messages.size() != 0) {
                                 for (int i = 0; i < messages.size(); i++) {
-                                    if (messages.get(i).getUserUId().equals(dc.getDocument().getId())) {
+                                    if (messages.get(i).getDocId().equals(dc.getDocument().getId())) {
 
                                         //BillModel billModel = dc.getDocument().toObject(BillModel.class);
                                         messages.remove(i);

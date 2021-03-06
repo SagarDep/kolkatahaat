@@ -69,9 +69,9 @@
                             android:ellipsize="end"
                             android:lines="1"
                             android:paddingRight="@dimen/_5sdp"
-                            android:text="Packing Size:"
-                            android:textColor="#7a7a7a"
-                            android:textSize="@dimen/_12sdp" />
+                            android:text="@string/str_category_type"
+                            android:textAppearance="?attr/textAppearanceBody2"
+                            android:textColor="@color/colorBlack"/>
 
                         <TextView
                             android:id="@+id/txtProductCategory"
@@ -80,7 +80,7 @@
                             android:layout_marginTop="@dimen/_5sdp"
                             android:ellipsize="end"
                             android:lines="1"
-                            android:text="500 gm"
+                            android:text="@string/menu_str_clothing"
                             android:textColor="#7a7a7a"
                             android:textSize="@dimen/_12sdp" />
                     </LinearLayout>
@@ -97,10 +97,10 @@
                             android:layout_marginTop="@dimen/_5sdp"
                             android:ellipsize="end"
                             android:lines="1"
+                            android:textAppearance="?attr/textAppearanceBody2"
                             android:paddingRight="@dimen/_5sdp"
-                            android:text="price:"
-                            android:textColor="#7a7a7a"
-                            android:textSize="@dimen/_12sdp" />
+                            android:text="@string/str_price"
+                            android:textColor="@color/colorBlack"/>
 
                         <TextView
                             android:id="@+id/txtProductPrice"

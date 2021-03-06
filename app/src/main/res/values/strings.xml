@@ -53,10 +53,6 @@
 
     <string name="MODEL">list</string>
     <string name="position">position</string>
-    <!--
-    drawer ==> https://achmadprogrammer.medium.com/android-navigation-drawer-like-gmail-with-fragment-d198a2d972c9
-    drawer git link==> https://github.com/achmadqomarudin/Navigation-Drawer-with-Fragment
-    -->
 
     <string name="countericon">CounterIcon</string>
     <string name="countertextview">CounterTextView</string>
@@ -89,8 +85,10 @@
     <string name="order_type5">Received</string>
     <string name="order_type6">Rejected</string>
     <string name="str_delivery_charges">Delivery Charges</string>
-    <string name="str_price">Price</string>
+    <string name="str_price">Price: </string>
     <string name="no_data_available">No Data Available</string>
     <string name="no_available_any_order">No Available Any Order</string>
+    <string name="str_category_type">Category Type: </string>
+    <string name="str_total_quantity">Total Quantity: </string>
 
 </resources>

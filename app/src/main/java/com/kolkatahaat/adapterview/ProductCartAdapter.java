@@ -20,6 +20,8 @@ import com.kolkatahaat.model.Product;
 
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class ProductCartAdapter extends RecyclerView.Adapter<ProductCartAdapter.ViewHolder> {
     private Context mContext;
     private List<OrdersItem> messages;
@@ -87,7 +89,8 @@ public class ProductCartAdapter extends RecyclerView.Adapter<ProductCartAdapter.
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public LinearLayout llCartItem;
-        public ImageView imgProduct, imgProductDelete;
+        public CircleImageView imgProduct;
+        public ImageView imgProductDelete;
         public TextView txtProductName, txtProductCategory, txtProductQuantity, txtProductTotal;//txtProductCharge, ;
         private RecyclerViewRemoveClickListener mListener;
 

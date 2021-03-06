@@ -6,9 +6,7 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.core.view.MotionEventCompat;
@@ -18,9 +16,7 @@ import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.kolkatahaat.R;
 import com.kolkatahaat.interfaces.ItemTouchHelperAdapter;
-import com.kolkatahaat.interfaces.ItemTouchHelperViewHolder;
-import com.kolkatahaat.interfaces.OnStartDragListener;
-import com.kolkatahaat.interfaces.RecyclerViewProductClickListener;
+import com.kolkatahaat.interfaces.RecyclerViewSliderClickListener;
 import com.kolkatahaat.model.SliderImgItem;
 
 import java.util.ArrayList;
@@ -31,14 +27,12 @@ public class AdminSliderImageAdapter extends RecyclerView.Adapter<AdminSliderIma
 
     private Context mContext;
     private List<SliderImgItem> messages;
-    //private RecyclerViewProductClickListener mListener;
-    OnItemClickListener mItemClickListener;
-    private final OnStartDragListener mDragStartListener;
+    private RecyclerViewSliderClickListener mListener;
 
-    public AdminSliderImageAdapter(Context mContext, List<SliderImgItem> messages, OnStartDragListener dragListner) {
+    public AdminSliderImageAdapter(Context mContext, List<SliderImgItem> messages, RecyclerViewSliderClickListener listener) {
         this.mContext = mContext;
         this.messages = messages;
-        this.mDragStartListener = dragListner;
+        this.mListener = listener;
     }
 
     public void updateDataVal(final List<SliderImgItem> stationArrivalPOJO ) {
@@ -66,16 +60,6 @@ public class AdminSliderImageAdapter extends RecyclerView.Adapter<AdminSliderIma
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.imgSlider);
         //holder.txtDate.setText("");
-
-        holder.image_menu.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                if (MotionEventCompat.getActionMasked(event) == MotionEvent.ACTION_DOWN) {
-                    mDragStartListener.onStartDrag(holder);
-                }
-                return false;
-            }
-        });
     }
 
     @Override
@@ -83,69 +67,42 @@ public class AdminSliderImageAdapter extends RecyclerView.Adapter<AdminSliderIma
         View itemView = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_admin_slider_image, parent, false);
 
-        return new ViewHolder(itemView);
+        return new ViewHolder(itemView, mListener);
     }
 
 
-    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener , ItemTouchHelperViewHolder {
-        public ImageView imgSlider, image_menu;
-        public TextView txtDate;
+    public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        public ImageView imgSlider, image_edit, image_delete;
+        public RecyclerViewSliderClickListener mListener;
 
-        //private RecyclerViewProductClickListener mListener;
-
-        public ViewHolder(View view) {
+        public ViewHolder(View view, RecyclerViewSliderClickListener listener) {
             super(view);
-            //mListener = listener;
+            mListener = listener;
             imgSlider = view.findViewById(R.id.imgSlider);
-            image_menu = view.findViewById(R.id.image_menu);
-            //txtDate = view.findViewById(R.id.txtDate);
-
+            image_edit = view.findViewById(R.id.image_edit);
+            image_delete = view.findViewById(R.id.image_delete);
             itemView.setOnClickListener(this);
+            image_edit.setOnClickListener(this);
+            image_delete.setOnClickListener(this);
         }
 
         @Override
-        public void onClick(View v) {
-            if (mItemClickListener != null) {
-                mItemClickListener.onItemClick(v, getPosition());
-            }
-        }
-
-        @Override
-        public void onItemSelected() {
-            itemView.setBackgroundColor(Color.LTGRAY);
-        }
-
-        @Override
-        public void onItemClear() {
-            itemView.setBackgroundColor(0);
-        }
-        /*@Override
         public void onClick(View view) {
-            //mListener.onClick(view, getAdapterPosition());
             switch (view.getId()) {
-                case R.id.btnDecrease:
-                    mListener.onClickDecrease(view, getAdapterPosition());
+                case R.id.image_edit:
+                    mListener.onClickEdit(view, getAdapterPosition());
                     break;
-                case R.id.btnIncrease:
-                    mListener.onClickIncrease(view, getAdapterPosition());
+                case R.id.image_delete:
+                    mListener.onClickDelete(view, getAdapterPosition());
                     break;
-                case R.id.imgProduct:
-                    mListener.onClick(view, getAdapterPosition());
-                    break;
-
                 default:
                     break;
             }
-        }*/
+        }
     }
 
-    public interface OnItemClickListener {
-        public void onItemClick(View view, int position);
-    }
 
-    public void setOnItemClickListener(final OnItemClickListener mItemClickListener) {
-        this.mItemClickListener = mItemClickListener;
-    }
+
 
     @Override
     public void onItemDismiss(int position) {

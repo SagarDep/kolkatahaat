@@ -17,7 +17,7 @@
             android:layout_height="150dp"
             android:contentDescription="@string/app_name"
             android:scaleType="centerCrop"
-            app:srcCompat="@drawable/app_logo" />
+            app:srcCompat="@mipmap/ic_launcher" />
 
         <RelativeLayout
             android:layout_width="match_parent"

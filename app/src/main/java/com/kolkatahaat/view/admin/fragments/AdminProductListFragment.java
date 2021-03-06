@@ -1,5 +1,6 @@
 package com.kolkatahaat.view.admin.fragments;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -11,6 +12,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -36,11 +38,15 @@ import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 import com.kolkatahaat.R;
 import com.kolkatahaat.adapterview.ProductListAdapter;
 import com.kolkatahaat.interfaces.RecyclerViewClickListener;
 import com.kolkatahaat.interfaces.RecyclerViewRemoveClickListener;
 import com.kolkatahaat.model.Product;
+import com.kolkatahaat.utills.NetUtils;
+import com.kolkatahaat.utills.Utility;
 import com.kolkatahaat.view.admin.AdminAddProductActivity;
 
 import java.util.ArrayList;
@@ -49,11 +55,16 @@ import java.util.Comparator;
 import java.util.List;
 
 public class AdminProductListFragment extends Fragment {
+    public final String TAG = AdminProductListFragment.this.getClass().getSimpleName();
+
+    public int START_ADMIN_PRODUCT_LIST_RESULT = 11;
 
     private FirebaseFirestore fireStore;
     private CollectionReference collectReference;
     private FirebaseAuth fireAuth;
+    private FirebaseStorage storage;
 
+    private TextView empty_view;
     private TabLayout tabLayout;
     private FloatingActionButton mAddFab;
     private RecyclerView mRecyclerView;
@@ -67,6 +78,9 @@ public class AdminProductListFragment extends Fragment {
     public AdminProductListFragment() {
         fireStore = FirebaseFirestore.getInstance();
         fireAuth = FirebaseAuth.getInstance();
+
+        storage = FirebaseStorage.getInstance();
+
         collectReference = fireStore.collection("products");
         messages = new ArrayList<>();
     }
@@ -81,6 +95,8 @@ public class AdminProductListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_admin_product_list, container, false);
+
+        empty_view = view.findViewById(R.id.empty_view);
 
         tabLayout = view.findViewById(R.id.tab_layout);
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
@@ -116,17 +132,18 @@ public class AdminProductListFragment extends Fragment {
                         RecyclerViewRemoveClickListener listener2 = new RecyclerViewRemoveClickListener() {
                             @Override
                             public void onClick(View view, int position) {
-                                Toast.makeText(getContext(), "Position " + getEatableItem().get(position).getProductName(), Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getContext(), "Position " + getEatableItem().get(position).getProductName(), Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(getActivity(), AdminAddProductActivity.class);
                                 intent.putExtra("EXTRA_ADMIN_PRODUCT_ID", getEatableItem().get(position).getProductId());
                                 intent.putExtra("EXTRA_ADMIN_PRODUCT_EDIT", true);
-                                startActivity(intent);
+                                startActivityForResult(intent, START_ADMIN_PRODUCT_LIST_RESULT);
                             }
                             @Override
                             public void onRemoveItem(View view, int position) {
                                 if (getEatableItem().get(position) != null && getEatableItem().get(position).getProductId() != null
                                         && !TextUtils.isEmpty(getEatableItem().get(position).getProductId())) {
-                                    productRemove(getEatableItem().get(position).getProductId());
+                                    productRemove(getEatableItem().get(position).getProductId(),
+                                            getEatableItem().get(position).getProductImg());
                                 }
                             }
                         };
@@ -142,17 +159,18 @@ public class AdminProductListFragment extends Fragment {
                         RecyclerViewRemoveClickListener listener4 = new RecyclerViewRemoveClickListener() {
                             @Override
                             public void onClick(View view, int position) {
-                                Toast.makeText(getContext(), "Position " + getPujaItemsItem().get(position).getProductName(), Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getContext(), "Position " + getPujaItemsItem().get(position).getProductName(), Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(getActivity(), AdminAddProductActivity.class);
                                 intent.putExtra("EXTRA_ADMIN_PRODUCT_ID", getPujaItemsItem().get(position).getProductId());
                                 intent.putExtra("EXTRA_ADMIN_PRODUCT_EDIT", true);
-                                startActivity(intent);
+                                startActivityForResult(intent, START_ADMIN_PRODUCT_LIST_RESULT);
                             }
                             @Override
                             public void onRemoveItem(View view, int position) {
                                 if (getPujaItemsItem().get(position) != null && getPujaItemsItem().get(position).getProductId() != null
                                         && !TextUtils.isEmpty(getPujaItemsItem().get(position).getProductId())) {
-                                    productRemove(getPujaItemsItem().get(position).getProductId());
+                                    productRemove(getPujaItemsItem().get(position).getProductId(),
+                                            getPujaItemsItem().get(position).getProductImg());
                                 }
                             }
                         };
@@ -167,17 +185,18 @@ public class AdminProductListFragment extends Fragment {
                         RecyclerViewRemoveClickListener listener3 = new RecyclerViewRemoveClickListener() {
                             @Override
                             public void onClick(View view, int position) {
-                                Toast.makeText(getContext(), "Position " + getClothingItem().get(position).getProductName(), Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getContext(), "Position " + getClothingItem().get(position).getProductName(), Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(getActivity(), AdminAddProductActivity.class);
                                 intent.putExtra("EXTRA_ADMIN_PRODUCT_ID", getClothingItem().get(position).getProductId());
                                 intent.putExtra("EXTRA_ADMIN_PRODUCT_EDIT", true);
-                                startActivity(intent);
+                                startActivityForResult(intent, START_ADMIN_PRODUCT_LIST_RESULT);
                             }
                             @Override
                             public void onRemoveItem(View view, int position) {
                                 if (getClothingItem().get(position) != null && getClothingItem().get(position).getProductId() != null
                                         && !TextUtils.isEmpty(getClothingItem().get(position).getProductId())) {
-                                    productRemove(getClothingItem().get(position).getProductId());
+                                    productRemove(getClothingItem().get(position).getProductId(),
+                                            getClothingItem().get(position).getProductImg());
                                 }
                             }
                         };
@@ -192,17 +211,18 @@ public class AdminProductListFragment extends Fragment {
                         RecyclerViewRemoveClickListener listener5 = new RecyclerViewRemoveClickListener() {
                             @Override
                             public void onClick(View view, int position) {
-                                Toast.makeText(getContext(), "Position " + getOthersItem().get(position).getProductName(), Toast.LENGTH_SHORT).show();
+                                //Toast.makeText(getContext(), "Position " + getOthersItem().get(position).getProductName(), Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(getActivity(), AdminAddProductActivity.class);
                                 intent.putExtra("EXTRA_ADMIN_PRODUCT_ID", getOthersItem().get(position).getProductId());
                                 intent.putExtra("EXTRA_ADMIN_PRODUCT_EDIT", true);
-                                startActivity(intent);
+                                startActivityForResult(intent, START_ADMIN_PRODUCT_LIST_RESULT);
                             }
                             @Override
                             public void onRemoveItem(View view, int position) {
                                 if (getOthersItem().get(position) != null && getOthersItem().get(position).getProductId() != null
                                         && !TextUtils.isEmpty(getOthersItem().get(position).getProductId())) {
-                                    productRemove(getOthersItem().get(position).getProductId());
+                                    productRemove(getOthersItem().get(position).getProductId(),
+                                            getOthersItem().get(position).getProductImg());
                                 }
                             }
                         };
@@ -222,40 +242,7 @@ public class AdminProductListFragment extends Fragment {
         });
 
 
-        collectReference.orderBy("productCreatedDate", Query.Direction.DESCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                String data = "";
-                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    Product note = documentSnapshot.toObject(Product.class);
-                    messages.add(note);
-                }
-
-
-                /*RecyclerViewRemoveClickListener listener = new RecyclerViewRemoveClickListener() {
-                    @Override
-                    public void onClick(View view, int position) {
-                        Toast.makeText(getContext(), "Position " + messages.get(position).getProductName(), Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(getActivity(), AdminAddProductActivity.class);
-                        intent.putExtra("EXTRA_ADMIN_PRODUCT_ID", messages.get(position).getProductId());
-                        intent.putExtra("EXTRA_ADMIN_PRODUCT_EDIT", true);
-                        startActivity(intent);
-                    }
-
-                    @Override
-                    public void onRemoveItem(View view, int position) {
-                        if(messages.get(position) != null && messages.get(position).getProductId() != null
-                                && !TextUtils.isEmpty(messages.get(position).getProductId())){
-                            productRemove(messages.get(position).getProductId());
-                        }
-                    }
-                };*/
-                mAdapter = new ProductListAdapter(getActivity(), messages, listener);
-                mRecyclerView.setAdapter(mAdapter);
-                mRecyclerView.setVisibility(View.VISIBLE);
-                progressBar.setVisibility(View.GONE);
-            }
-        });
+        getAllProduct();
 
 
         mAddFab = view.findViewById(R.id.btnFab);
@@ -264,7 +251,7 @@ public class AdminProductListFragment extends Fragment {
             public void onClick(View v) {
                 Intent intent = new Intent(getActivity(), AdminAddProductActivity.class);
                 intent.putExtra("EXTRA_ADMIN_PRODUCT_EDIT", false);
-                startActivity(intent);
+                startActivityForResult(intent,START_ADMIN_PRODUCT_LIST_RESULT);
             }
         });
 
@@ -275,21 +262,34 @@ public class AdminProductListFragment extends Fragment {
     RecyclerViewRemoveClickListener listener = new RecyclerViewRemoveClickListener() {
         @Override
         public void onClick(View view, int position) {
-            Toast.makeText(getContext(), "Position " + messages.get(position).getProductName(), Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), "Position " + messages.get(position).getProductName(), Toast.LENGTH_SHORT).show();
             Intent intent = new Intent(getActivity(), AdminAddProductActivity.class);
             intent.putExtra("EXTRA_ADMIN_PRODUCT_ID", messages.get(position).getProductId());
             intent.putExtra("EXTRA_ADMIN_PRODUCT_EDIT", true);
-            startActivity(intent);
+            startActivityForResult(intent, START_ADMIN_PRODUCT_LIST_RESULT);
         }
 
         @Override
         public void onRemoveItem(View view, int position) {
             if (messages.get(position) != null && messages.get(position).getProductId() != null
                     && !TextUtils.isEmpty(messages.get(position).getProductId())) {
-                productRemove(messages.get(position).getProductId());
+                productRemove(messages.get(position).getProductId(),messages.get(position).getProductImg());
             }
         }
     };
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == START_ADMIN_PRODUCT_LIST_RESULT) {
+            if (resultCode == Activity.RESULT_OK) {
+                String result = data.getStringExtra("result");
+                if(!TextUtils.isEmpty(result) && result != null && result != ""){
+                    getAllProduct();
+                }
+            }
+        }
+    }
 
     @Override
     public void onResume() {
@@ -416,75 +416,159 @@ public class AdminProductListFragment extends Fragment {
         super.onPrepareOptionsMenu(menu);
     }*/
 
-    public void checkListUpdate() {
-        collectReference.orderBy("productCreatedDate", Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w("TAG", "listen:error", e);
-                    return;
+    private void getAllProduct(){
+        if (NetUtils.isNetworkAvailable(getActivity())) {
+            messages.clear();
+            collectReference.orderBy("productCreatedDate", Query.Direction.DESCENDING).get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    String data = "";
+                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        Product note = documentSnapshot.toObject(Product.class);
+                        messages.add(note);
+                    }
+
+
+                    /*RecyclerViewRemoveClickListener listener = new RecyclerViewRemoveClickListener() {
+                        @Override
+                        public void onClick(View view, int position) {
+                            Toast.makeText(getContext(), "Position " + messages.get(position).getProductName(), Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(getActivity(), AdminAddProductActivity.class);
+                            intent.putExtra("EXTRA_ADMIN_PRODUCT_ID", messages.get(position).getProductId());
+                            intent.putExtra("EXTRA_ADMIN_PRODUCT_EDIT", true);
+                            startActivity(intent);
+                        }
+
+                        @Override
+                        public void onRemoveItem(View view, int position) {
+                            if(messages.get(position) != null && messages.get(position).getProductId() != null
+                                    && !TextUtils.isEmpty(messages.get(position).getProductId())){
+                                productRemove(messages.get(position).getProductId());
+                            }
+                        }
+                    };*/
+                    mAdapter = new ProductListAdapter(getActivity(), messages, listener);
+                    mRecyclerView.setAdapter(mAdapter);
+                    mRecyclerView.setVisibility(View.VISIBLE);
+                    progressBar.setVisibility(View.GONE);
                 }
+            });
+        } else {
+            progressBar.setVisibility(View.GONE);
+            Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
+        }
+    }
 
-                for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                    switch (dc.getType()) {
-                        /*case ADDED:
-                            Log.d("TAG", "New Msg: " + dc.getDocument().toObject(BillModel.class));
-                            break;*/
-                        case MODIFIED:
-                            String key = dc.getDocument().getId();
-                            Log.d("TAG", "Modified Msg: " + key);
+    public void checkListUpdate() {
+        if (NetUtils.isNetworkAvailable(getActivity())) {
+            collectReference.orderBy("productCreatedDate", Query.Direction.DESCENDING).addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
+                    if (e != null) {
+                        Log.w("TAG", "listen:error", e);
+                        return;
+                    }
 
-                            if (messages.size() != 0) {
-                                for (int i = 0; i < messages.size(); i++) {
-                                    if (messages.get(i).getProductId().equals(dc.getDocument().getId())) {
+                    for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                        switch (dc.getType()) {
+                            /*case ADDED:
+                                Log.d("TAG", "New Msg: " + dc.getDocument().toObject(BillModel.class));
+                                break;*/
+                            case MODIFIED:
+                                String key = dc.getDocument().getId();
+                                Log.d("TAG", "Modified Msg: " + key);
 
-                                        Product billModel = dc.getDocument().toObject(Product.class);
-                                        messages.set(i, billModel);
-                                        mAdapter.notifyDataSetChanged();
-                                        break;
+                                if (messages.size() != 0) {
+                                    for (int i = 0; i < messages.size(); i++) {
+                                        if (messages.get(i).getProductId().equals(dc.getDocument().getId())) {
+
+                                            Product billModel = dc.getDocument().toObject(Product.class);
+                                            messages.set(i, billModel);
+                                            mAdapter.notifyDataSetChanged();
+                                            break;
+                                        }
                                     }
                                 }
-                            }
-                            break;
+                                break;
 
-                        case REMOVED:
-                            Log.d("TAG", "Removed Msg: " + dc.getDocument().toObject(Product.class));
+                            case REMOVED:
+                                Log.d("TAG", "Removed Msg: " + dc.getDocument().toObject(Product.class));
 
-                            if (messages.size() != 0) {
-                                for (int i = 0; i < messages.size(); i++) {
-                                    if (messages.get(i).getProductId().equals(dc.getDocument().getId())) {
+                                if (messages.size() != 0) {
+                                    for (int i = 0; i < messages.size(); i++) {
+                                        if (messages.get(i).getProductId().equals(dc.getDocument().getId())) {
 
-                                        //BillModel billModel = dc.getDocument().toObject(BillModel.class);
-                                        messages.remove(i);
-                                        mAdapter.notifyDataSetChanged();
-                                        break;
+                                            //BillModel billModel = dc.getDocument().toObject(BillModel.class);
+                                            messages.remove(i);
+                                            mAdapter.notifyDataSetChanged();
+                                            break;
+                                        }
                                     }
                                 }
-                            }
-                            break;
+                                break;
+                        }
                     }
                 }
-            }
-        });
+            });
+        } else {
+            progressBar.setVisibility(View.GONE);
+            Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
+        }
     }
 
 
-    public void productRemove(String mAdminProductId) {
+    public void productRemove(String mAdminProductId, String mProductImg) {
         //Toast.makeText(getContext(), "delete " + id, Toast.LENGTH_SHORT).show();
-        DocumentReference fireReference = fireStore.collection("products").document(mAdminProductId);
-        fireReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d("TAG", "DocumentSnapshot successfully deleted!");
-                /*adapter.remove(adapter.getItem(position));
-                messages.remove(task);
-                mAdapter.notifyDataSetChanged();*/
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w("TAG", "Error deleting document", e);
-            }
-        });
+        if (NetUtils.isNetworkAvailable(getActivity())) {
+            StorageReference imageRef = storage.getReferenceFromUrl(mProductImg);
+            imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "onSuccess: deleted file");
+
+                    DocumentReference fireReference = fireStore.collection("products").document(mAdminProductId);
+                    fireReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("TAG", "DocumentSnapshot successfully deleted!");
+                            /*adapter.remove(adapter.getItem(position));
+                            messages.remove(task);
+                            mAdapter.notifyDataSetChanged();*/
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("TAG", "Error deleting document", e);
+                        }
+                    });
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Uh-oh, an error occurred!
+                    Log.d(TAG, "onFailure: did not delete file");
+
+
+                    DocumentReference fireReference = fireStore.collection("products").document(mAdminProductId);
+                    fireReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d("TAG", "DocumentSnapshot successfully deleted!");
+                            /*adapter.remove(adapter.getItem(position));
+                            messages.remove(task);
+                            mAdapter.notifyDataSetChanged();*/
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("TAG", "Error deleting document", e);
+                        }
+                    });
+                }
+            });
+        } else {
+            progressBar.setVisibility(View.GONE);
+            Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
+        }
     }
 }

@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -80,6 +81,7 @@ public class ProductCartDetailsActivity extends AppCompatActivity {
     private ProductCartAdapter mAdapter;
     private List<OrdersItem> itemList;
 
+    private LinearLayout llDeliveryCharge;
     private TextView txtDeliveryCharges;
     private TextView txtProductAmount;
     private int mDeliveryCharge = 0;
@@ -115,6 +117,7 @@ public class ProductCartDetailsActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         empty_view = findViewById(R.id.empty_view);
 
+        llDeliveryCharge = findViewById(R.id.llDeliveryCharge);
         txtDeliveryCharges = findViewById(R.id.txtDeliveryCharges);
         txtProductAmount = findViewById(R.id.txtProductAmount);
 
@@ -166,6 +169,15 @@ public class ProductCartDetailsActivity extends AppCompatActivity {
                         Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                         mDeliveryCharge = Integer.valueOf(document.getData().get("deliveryCharges").toString());
                         txtDeliveryCharges.setText(""+mDeliveryCharge);
+                        if(itemList.size() != 0 && itemList != null) {
+                            llDeliveryCharge.setVisibility(View.VISIBLE);
+                            txtProductAmount.setText(String.valueOf(mAdapter.grandTotal(itemList)));
+                            txtTotalBill.setText(String.valueOf(mDeliveryCharge + mAdapter.grandTotal(itemList)));
+                        } else {
+                            txtProductAmount.setText("00");
+                            txtTotalBill.setText("00");
+                            llDeliveryCharge.setVisibility(View.GONE);
+                        }
                     } else {
                         Log.d(TAG, "No such document");
                     }
@@ -177,84 +189,93 @@ public class ProductCartDetailsActivity extends AppCompatActivity {
     }
 
     private void getProductDetails() {
-        FirebaseUser user = fireAuth.getCurrentUser();
-        CollectionReference fireRefe = fireStore.collection("orders").document(user.getUid()).collection(user.getUid());
-        fireRefe.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+        if (NetUtils.isNetworkAvailable(ProductCartDetailsActivity.this)) {
+            FirebaseUser user = fireAuth.getCurrentUser();
+            CollectionReference fireRefe = fireStore.collection("orders").document(user.getUid()).collection(user.getUid());
+            fireRefe.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
 
-                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    OrdersItem note = documentSnapshot.toObject(OrdersItem.class);
-                    note.setDocId(documentSnapshot.getId());
-                    itemList.add(note);
-                }
-
-                RecyclerViewRemoveClickListener listener = new RecyclerViewRemoveClickListener() {
-                    @Override
-                    public void onClick(View view, int position) {
-                        //Toast.makeText(getContext(), "Position " + messages.get(position).getUserUId(), Toast.LENGTH_SHORT).show();
+                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        OrdersItem note = documentSnapshot.toObject(OrdersItem.class);
+                        note.setDocId(documentSnapshot.getId());
+                        itemList.add(note);
                     }
 
-                    @Override
-                    public void onRemoveItem(View view, int position) {
-                        //Toast.makeText(getContext(), "Position " + messages.get(position).getUserUId(), Toast.LENGTH_SHORT).show();
-                        if (NetUtils.isNetworkAvailable(ProductCartDetailsActivity.this)) {
-                            if (itemList.size() != 0 && itemList != null) {
-                                removeCartItem(position);
-                            } else {
-                                Utility.displayDialog(ProductCartDetailsActivity.this, getString(R.string.common_no_user_available), false);
-                            }
-                        } else {
-                            Utility.displayDialog(ProductCartDetailsActivity.this, getString(R.string.common_no_internet), false);
+                    RecyclerViewRemoveClickListener listener = new RecyclerViewRemoveClickListener() {
+                        @Override
+                        public void onClick(View view, int position) {
+                            //Toast.makeText(getContext(), "Position " + messages.get(position).getUserUId(), Toast.LENGTH_SHORT).show();
                         }
-                    }
-                };
 
-                if (itemList.size() != 0 && itemList != null) {
-                    mAdapter = new ProductCartAdapter(ProductCartDetailsActivity.this, itemList, listener);
-                    recyclerView.setAdapter(mAdapter);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.GONE);
-                    empty_view.setVisibility(View.GONE);
-                    txtProductAmount.setText(String.valueOf(mAdapter.grandTotal(itemList)));
-                    txtTotalBill.setText(String.valueOf(mDeliveryCharge + mAdapter.grandTotal(itemList)));
-                    btnPurchase.setEnabled(true);
-                } else {
-                    progressBar.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.GONE);
-                    empty_view.setVisibility(View.VISIBLE);
-                    btnPurchase.setEnabled(false);
+                        @Override
+                        public void onRemoveItem(View view, int position) {
+                            //Toast.makeText(getContext(), "Position " + messages.get(position).getUserUId(), Toast.LENGTH_SHORT).show();
+                            if (NetUtils.isNetworkAvailable(ProductCartDetailsActivity.this)) {
+                                if (itemList.size() != 0 && itemList != null) {
+                                    removeCartItem(position);
+                                } else {
+                                    Utility.displayDialog(ProductCartDetailsActivity.this, getString(R.string.common_no_user_available), false);
+                                }
+                            } else {
+                                Utility.displayDialog(ProductCartDetailsActivity.this, getString(R.string.common_no_internet), false);
+                            }
+                        }
+                    };
+
+                    if (itemList.size() != 0 && itemList != null) {
+                        mAdapter = new ProductCartAdapter(ProductCartDetailsActivity.this, itemList, listener);
+                        recyclerView.setAdapter(mAdapter);
+                        recyclerView.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.GONE);
+                        empty_view.setVisibility(View.GONE);
+                        btnPurchase.setEnabled(true);
+                    } else {
+                        progressBar.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.GONE);
+                        empty_view.setVisibility(View.VISIBLE);
+                        btnPurchase.setEnabled(false);
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            progressBar.setVisibility(View.GONE);
+            Utility.displayDialog(ProductCartDetailsActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
 
     public void removeCartItem(final int position) {
-        Log.d(TAG, "onSuccess:" + itemList.get(position).getProductName());
-        FirebaseUser user = fireAuth.getCurrentUser();
-        CollectionReference fireRefe = fireStore.collection("orders").document(user.getUid()).collection(user.getUid());
+        if (NetUtils.isNetworkAvailable(ProductCartDetailsActivity.this)) {
+            Log.d(TAG, "onSuccess:" + itemList.get(position).getProductName());
+            FirebaseUser user = fireAuth.getCurrentUser();
+            CollectionReference fireRefe = fireStore.collection("orders").document(user.getUid()).collection(user.getUid());
 
-        fireRefe.document(itemList.get(position).getDocId()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(TAG, "DocumentSnapshot successfully deleted!");
-                mAdapter.removeAt(position);
-                txtTotalBill.setText(String.valueOf(mAdapter.grandTotal(itemList)));
-                if(mAdapter.grandTotal(itemList) == 0){
-                    txtTotalBill.setText("00");
-                    txtProductAmount.setText("00");
-                    recyclerView.setVisibility(View.GONE);
-                    empty_view.setVisibility(View.VISIBLE);
-                    btnPurchase.setEnabled(false);
+            fireRefe.document(itemList.get(position).getDocId()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "DocumentSnapshot successfully deleted!");
+                    mAdapter.removeAt(position);
+                    txtProductAmount.setText(String.valueOf(mAdapter.grandTotal(itemList)));
+                    txtTotalBill.setText(String.valueOf(mDeliveryCharge + mAdapter.grandTotal(itemList)));
+                    if(mAdapter.grandTotal(itemList) == 0){
+                        txtTotalBill.setText("00");
+                        txtProductAmount.setText("00");
+                        recyclerView.setVisibility(View.GONE);
+                        empty_view.setVisibility(View.VISIBLE);
+                        btnPurchase.setEnabled(false);
+                    }
                 }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w(TAG, "Error deleting document", e);
-            }
-        });
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w(TAG, "Error deleting document", e);
+                }
+            });
+        } else {
+            progressBar.setVisibility(View.GONE);
+            Utility.displayDialog(ProductCartDetailsActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
 
@@ -300,9 +321,10 @@ public class ProductCartDetailsActivity extends AppCompatActivity {
                                 if(!TextUtils.isEmpty(adminItemList.get(i).getUserToken()) &&
                                         adminItemList.get(i).getUserToken() != null) {
 
-                                    /*FirebaseIDService idService = new FirebaseIDService();
-                                    idService.sendWithOtherThread(adminItemList.get(i).getUserToken(), String.valueOf(itemList.size()));
-                                    break;*/
+                                    FirebaseIDService idService = new FirebaseIDService();
+                                    idService.sendWithOtherThread(adminItemList.get(i).getUserToken(),
+                                            String.valueOf(itemList.size()), false);
+                                    //break;
                                 }
                             }
 
