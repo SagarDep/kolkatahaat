@@ -21,6 +21,10 @@
         android:visibility="gone"
         />
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -37,21 +41,21 @@
             android:orientation="vertical">
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="@dimen/_50sdp"
-                android:layout_height="@dimen/_50sdp"
+                android:id="@+id/imgHomeGrocery"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="@dimen/_5sdp"
-                android:src="@mipmap/ic_launcher_round"
-                app:civ_border_width="2dp" />
+                android:layout_marginRight="5dp"
+                android:src="@drawable/ic_grocery"
+                app:civ_border_width="1dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:orientation="vertical"
-                android:paddingLeft="72dp"
-                android:paddingRight="@dimen/_16sdp">
+                android:layout_toRightOf="@+id/imgHomeGrocery"
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -103,21 +107,21 @@
             android:orientation="vertical">
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="@dimen/_50sdp"
-                android:layout_height="@dimen/_50sdp"
+                android:id="@+id/imgHomePujaItem"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="@dimen/_5sdp"
-                android:src="@mipmap/ic_launcher_round"
-                app:civ_border_width="2dp" />
+                android:layout_marginRight="5dp"
+                android:src="@drawable/ic_puja_item"
+                app:civ_border_width="1dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:orientation="vertical"
-                android:paddingLeft="72dp"
-                android:paddingRight="@dimen/_16sdp">
+                android:layout_toRightOf="@+id/imgHomePujaItem"
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -169,21 +173,21 @@
             android:orientation="vertical">
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="@dimen/_50sdp"
-                android:layout_height="@dimen/_50sdp"
+                android:id="@+id/imgHomeClothes"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="@dimen/_5sdp"
-                android:src="@mipmap/ic_launcher_round"
-                app:civ_border_width="2dp" />
+                android:layout_marginRight="5dp"
+                android:src="@drawable/ic_clothes"
+                app:civ_border_width="1dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:orientation="vertical"
-                android:paddingLeft="72dp"
-                android:paddingRight="@dimen/_16sdp">
+                android:layout_toRightOf="@+id/imgHomeClothes"
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -235,21 +239,21 @@
             android:orientation="vertical">
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:layout_width="@dimen/_50sdp"
-                android:layout_height="@dimen/_50sdp"
+                android:id="@+id/imgHomeOthers"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
                 android:layout_alignParentLeft="true"
                 android:layout_centerVertical="true"
-                android:layout_marginRight="@dimen/_5sdp"
-                android:src="@mipmap/ic_launcher_round"
-                app:civ_border_width="2dp" />
+                android:layout_marginRight="5dp"
+                android:src="@drawable/ic_others"
+                app:civ_border_width="1dp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_centerVertical="true"
-                android:orientation="vertical"
-                android:paddingLeft="72dp"
-                android:paddingRight="@dimen/_16sdp">
+                android:layout_toRightOf="@+id/imgHomeOthers"
+                android:orientation="vertical">
 
                 <TextView
                     android:layout_width="match_parent"
@@ -294,4 +298,5 @@
 
     </LinearLayout>
 
+    </ScrollView>
 </LinearLayout>

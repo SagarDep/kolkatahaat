@@ -112,7 +112,7 @@ public class ClothingFragment extends Fragment {
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
 
         if (NetUtils.isNetworkAvailable(getActivity())) {
-            Query capitalCities = fireStore.collection("products").whereEqualTo("productCategory", "Clothing");
+            Query capitalCities = fireStore.collection("products").whereEqualTo("productCategory", getResources().getString(R.string.menu_str_clothing));
             capitalCities.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                 @Override
                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {

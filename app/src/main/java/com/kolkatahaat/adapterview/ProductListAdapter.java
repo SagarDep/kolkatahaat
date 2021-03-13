@@ -69,13 +69,14 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.imgProduct);
         holder.txtProductName.setText(message.getProductName());
+        holder.txtProductPacking.setText(message.getProductPacking());
         holder.txtProductCategory.setText(message.getProductCategory());
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public ImageView imgProduct;
         public LinearLayout llContainer;
-        public TextView txtProductName, txtProductCategory;
+        public TextView txtProductName,txtProductPacking, txtProductCategory;
         public ImageView imgProductDelete;
 
         private RecyclerViewRemoveClickListener mListener;
@@ -86,6 +87,7 @@ public class ProductListAdapter extends RecyclerView.Adapter<ProductListAdapter.
             imgProduct = view.findViewById(R.id.imgProduct);
             llContainer = view.findViewById(R.id.llContainer);
             txtProductName = view.findViewById(R.id.txtProductName);
+            txtProductPacking = view.findViewById(R.id.txtProductPacking);
             txtProductCategory = view.findViewById(R.id.txtProductCategory);
             imgProductDelete = view.findViewById(R.id.imgProductDelete);
             llContainer.setOnClickListener(this);

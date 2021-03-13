@@ -75,9 +75,9 @@ public class CustomerAddProductAdapter extends RecyclerView.Adapter<CustomerAddP
                 .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .into(holder.imgProduct);
         holder.txtProductName.setText(message.getProductName());
-        holder.txtProductCategory.setText(message.getProductCategory());
+        //holder.txtProductCategory.setText(message.getProductCategory());
         holder.txtProductPrice.setText(String.valueOf(message.getProductPrice()));
-        //holder.txtDeliveryCharges.setText(String.valueOf(message.getProductDeliveryChange()));
+        holder.txtProductPacking.setText(String.valueOf(message.getProductPacking()));
         holder.txtQuantitySize.setText(String.valueOf(message.getProductQuantity()));
 
     }
@@ -85,7 +85,7 @@ public class CustomerAddProductAdapter extends RecyclerView.Adapter<CustomerAddP
     public class ViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         public ImageView imgProduct;
         public LinearLayout llContainer;
-        public TextView txtProductName, txtProductCategory, txtProductPrice, txtQuantitySize;
+        public TextView txtProductName, txtProductPacking, txtProductPrice, txtQuantitySize;
         public Button btnDecrease, btnIncrease ;
 
         private RecyclerViewProductClickListener mListener;
@@ -96,9 +96,9 @@ public class CustomerAddProductAdapter extends RecyclerView.Adapter<CustomerAddP
             imgProduct = view.findViewById(R.id.imgProduct);
             llContainer = view.findViewById(R.id.llContainer);
             txtProductName = view.findViewById(R.id.txtProductName);
-            txtProductCategory = view.findViewById(R.id.txtProductCategory);
+            //txtProductCategory = view.findViewById(R.id.txtProductCategory);
             txtProductPrice = view.findViewById(R.id.txtProductPrice);
-            //txtDeliveryCharges = view.findViewById(R.id.txtDeliveryCharges);
+            txtProductPacking = view.findViewById(R.id.txtProductPacking);
 
 
             btnDecrease = view.findViewById(R.id.btnDecrease);

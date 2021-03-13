@@ -23,6 +23,8 @@ import com.kolkatahaat.utills.Utility;
 import java.util.Date;
 import java.util.List;
 
+import de.hdodenhof.circleimageview.CircleImageView;
+
 public class OrdersItemDetailsAdapter extends RecyclerView.Adapter<OrdersItemDetailsAdapter.ViewHolder> {
     private Context mContext;
     private List<OrdersItem> messages;
@@ -88,7 +90,7 @@ public class OrdersItemDetailsAdapter extends RecyclerView.Adapter<OrdersItemDet
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder{
-        public ImageView imgProduct;
+        public CircleImageView imgProduct;
         public TextView txtProductName, txtProductQuantity, txtProductTotal; //txtProductCharge, ;
 
         public ViewHolder(View view) {

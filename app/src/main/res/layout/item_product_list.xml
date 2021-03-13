@@ -12,7 +12,6 @@
         android:id="@+id/imgProduct"
         android:layout_width="@dimen/_50sdp"
         android:layout_height="@dimen/_50sdp"
-        android:layout_alignLeft="@+id/llContainer"
         android:layout_alignParentLeft="true"
         android:layout_marginRight="@dimen/_5sdp"
         android:src="@mipmap/ic_launcher"
@@ -22,11 +21,11 @@
         android:id="@+id/llContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/imgProduct"
+        android:layout_toLeftOf="@+id/imgProductDelete"
         android:layout_centerVertical="true"
         android:clickable="true"
-        android:orientation="vertical"
-        android:paddingLeft="72dp"
-        android:paddingRight="@dimen/_16sdp">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/txtProductName"
@@ -39,15 +38,62 @@
             android:textSize="@dimen/_12sdp"
             android:textStyle="bold" />
 
-        <TextView
-            android:id="@+id/txtProductCategory"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:lines="1"
-            android:text="sdfds ds"
-            android:textColor="#7a7a7a"
-            android:textSize="@dimen/_12sdp" />
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:lines="1"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:paddingRight="@dimen/_5sdp"
+                android:text="Packing:"
+                android:textSize="@dimen/_12sdp"
+                android:textColor="@color/colorBlack" />
+
+            <TextView
+                android:id="@+id/txtProductPacking"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:lines="1"
+                android:text="100"
+                android:textColor="#7a7a7a"
+                android:textSize="@dimen/_12sdp" />
+        </LinearLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:lines="1"
+                android:textAppearance="?attr/textAppearanceBody2"
+                android:paddingRight="@dimen/_5sdp"
+                android:text="Category: "
+                android:textSize="@dimen/_12sdp"
+                android:textColor="@color/colorBlack"/>
+
+            <TextView
+                android:id="@+id/txtProductCategory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:lines="1"
+                android:text="sdfds ds"
+                android:textColor="#7a7a7a"
+                android:textSize="@dimen/_12sdp" />
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -59,7 +105,7 @@
         android:layout_alignParentRight="true"
         android:layout_centerVertical="true"
         android:layout_marginTop="@dimen/_10sdp"
-        android:layout_marginRight="@dimen/_10sdp"
+        android:layout_marginRight="@dimen/_5sdp"
         android:contentDescription="@string/app_name"
         android:scaleType="centerCrop"
         android:src="@drawable/ic_delete" />

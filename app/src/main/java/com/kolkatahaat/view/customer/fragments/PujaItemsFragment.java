@@ -112,7 +112,7 @@ public class PujaItemsFragment extends Fragment {
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
 
         if (NetUtils.isNetworkAvailable(getActivity())) {
-            Query capitalCities = fireStore.collection("products").whereEqualTo("productCategory", "Puja Items");
+            Query capitalCities = fireStore.collection("products").whereEqualTo("productCategory", getResources().getString(R.string.menu_str_puja_items));
             capitalCities.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
                 @Override
                 public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
