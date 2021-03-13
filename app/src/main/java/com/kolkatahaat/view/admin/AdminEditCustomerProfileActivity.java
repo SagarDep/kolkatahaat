@@ -208,27 +208,31 @@ public class AdminEditCustomerProfileActivity extends AppCompatActivity {
 
     private void getUserData(String editUserId) {
         progressBar.setVisibility(View.VISIBLE);
-        if (fireAuth.getCurrentUser() != null) {
-            DocumentReference documentReference = fireStore.collection("users").document(editUserId);
-            documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        progressBar.setVisibility(View.GONE);
-                        DocumentSnapshot snapshot = task.getResult();
-                        usersInfo = snapshot.toObject(Users.class);
-                        assert snapshot != null;
-                        if (snapshot.exists()) {
+        if (NetUtils.isNetworkAvailable(AdminEditCustomerProfileActivity.this)) {
+            if (fireAuth.getCurrentUser() != null) {
+                DocumentReference documentReference = fireStore.collection("users").document(editUserId);
+                documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            progressBar.setVisibility(View.GONE);
+                            DocumentSnapshot snapshot = task.getResult();
+                            usersInfo = snapshot.toObject(Users.class);
+                            assert snapshot != null;
+                            if (snapshot.exists()) {
 
-                            editTextName.setText(usersInfo.getUserName());
-                            editTextEmail.setText(usersInfo.getUserEmail());
-                            editTextMobile.setText(usersInfo.getUserMobile());
-                            editTextAddress.setText(usersInfo.getUserAddress());
-                            Utility.hideSoftKeyboard(AdminEditCustomerProfileActivity.this);
+                                editTextName.setText(usersInfo.getUserName());
+                                editTextEmail.setText(usersInfo.getUserEmail());
+                                editTextMobile.setText(usersInfo.getUserMobile());
+                                editTextAddress.setText(usersInfo.getUserAddress());
+                                Utility.hideSoftKeyboard(AdminEditCustomerProfileActivity.this);
+                            }
                         }
                     }
-                }
-            });
+                });
+            } else {
+                Utility.displayDialog(AdminEditCustomerProfileActivity.this, getString(R.string.common_no_internet), false);
+            }
         } else {
             progressBar.setVisibility(View.GONE);
         }

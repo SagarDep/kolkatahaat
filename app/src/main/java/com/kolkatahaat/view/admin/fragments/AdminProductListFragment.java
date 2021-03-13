@@ -132,22 +132,21 @@ public class AdminProductListFragment extends Fragment {
                         RecyclerViewRemoveClickListener listener2 = new RecyclerViewRemoveClickListener() {
                             @Override
                             public void onClick(View view, int position) {
-                                //Toast.makeText(getContext(), "Position " + getEatableItem().get(position).getProductName(), Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent(getActivity(), AdminAddProductActivity.class);
-                                intent.putExtra("EXTRA_ADMIN_PRODUCT_ID", getEatableItem().get(position).getProductId());
+                                intent.putExtra("EXTRA_ADMIN_PRODUCT_ID", getGroceryItem().get(position).getProductId());
                                 intent.putExtra("EXTRA_ADMIN_PRODUCT_EDIT", true);
                                 startActivityForResult(intent, START_ADMIN_PRODUCT_LIST_RESULT);
                             }
                             @Override
                             public void onRemoveItem(View view, int position) {
-                                if (getEatableItem().get(position) != null && getEatableItem().get(position).getProductId() != null
-                                        && !TextUtils.isEmpty(getEatableItem().get(position).getProductId())) {
-                                    productRemove(getEatableItem().get(position).getProductId(),
-                                            getEatableItem().get(position).getProductImg());
+                                if (getGroceryItem().get(position) != null && getGroceryItem().get(position).getProductId() != null
+                                        && !TextUtils.isEmpty(getGroceryItem().get(position).getProductId())) {
+                                    productRemove(getGroceryItem().get(position).getProductId(),
+                                            getGroceryItem().get(position).getProductImg());
                                 }
                             }
                         };
-                        mAdapter = new ProductListAdapter(getActivity(), getEatableItem(), listener2);
+                        mAdapter = new ProductListAdapter(getActivity(), getGroceryItem(), listener2);
                         mRecyclerView.setAdapter(mAdapter);
                         break;
 
@@ -300,10 +299,10 @@ public class AdminProductListFragment extends Fragment {
     }
 
 
-    public List<Product> getEatableItem() {
+    public List<Product> getGroceryItem() {
         List<Product> productList = new ArrayList<>();
         for (Product pojoOfJsonArray : messages) {
-            if (pojoOfJsonArray.getProductCategory().equals("Eatable")) {
+            if (pojoOfJsonArray.getProductCategory().equals("Grocery")) {
                 productList.add(pojoOfJsonArray);
             }
         }
@@ -360,7 +359,7 @@ public class AdminProductListFragment extends Fragment {
                     mAdapter.updateDataVal(messages);
                     mAdapter.notifyDataSetChanged();
                 } else if (selectTab == 1) {
-                    List<Product> products1 = getEatableItem();
+                    List<Product> products1 = getGroceryItem();
                     Collections.sort(products1, new Comparator<Product>() {
                         @Override
                         public int compare(Product lhs, Product rhs) {

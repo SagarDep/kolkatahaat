@@ -174,24 +174,30 @@ public class PhoneVerificationActivity extends AppCompatActivity {
     }
 
     private void sendOtp(){
-        phoneNumber = editTextMobile.getText().toString().trim();
-        if(!TextUtils.isEmpty(phoneNumber) && phoneNumber != null) {
-            sendVerificationCode(phoneNumber);
-
+        if (NetUtils.isNetworkAvailable(PhoneVerificationActivity.this)) {
+            phoneNumber = editTextMobile.getText().toString().trim();
+            if(!TextUtils.isEmpty(phoneNumber) && phoneNumber != null) {
+                sendVerificationCode(phoneNumber);
+            }
+        } else {
+            Utility.displayDialog(PhoneVerificationActivity.this, getString(R.string.common_no_internet), false);
         }
     }
 
 
     private void sendVerificationCode(String number) {
-        llSendingCode.setVisibility(View.VISIBLE);
-        PhoneAuthOptions options = PhoneAuthOptions.newBuilder(fireAuth)
-                .setPhoneNumber("+91"+number)       // Phone number to verify
-                .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
-                .setActivity(this)                 // Activity (for callback binding)
-                .setCallbacks(mCallBack)          // OnVerificationStateChangedCallbacks
-                .build();
-        PhoneAuthProvider.verifyPhoneNumber(options);
-
+        if (NetUtils.isNetworkAvailable(PhoneVerificationActivity.this)) {
+            llSendingCode.setVisibility(View.VISIBLE);
+            PhoneAuthOptions options = PhoneAuthOptions.newBuilder(fireAuth)
+                    .setPhoneNumber("+91"+number)       // Phone number to verify
+                    .setTimeout(60L, TimeUnit.SECONDS) // Timeout and unit
+                    .setActivity(this)                 // Activity (for callback binding)
+                    .setCallbacks(mCallBack)          // OnVerificationStateChangedCallbacks
+                    .build();
+            PhoneAuthProvider.verifyPhoneNumber(options);
+        } else {
+            Utility.displayDialog(PhoneVerificationActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
     private PhoneAuthProvider.OnVerificationStateChangedCallbacks mCallBack = new PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
@@ -230,27 +236,35 @@ public class PhoneVerificationActivity extends AppCompatActivity {
     };
 
     private void verifyCode(String code) {
-        PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
-        signInWithCredential(credential);
+        if (NetUtils.isNetworkAvailable(PhoneVerificationActivity.this)) {
+            PhoneAuthCredential credential = PhoneAuthProvider.getCredential(verificationId, code);
+            signInWithCredential(credential);
+        } else {
+            Utility.displayDialog(PhoneVerificationActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
     private void signInWithCredential(PhoneAuthCredential credential) {
-        fireAuth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
-            @Override
-            public void onComplete(@NonNull Task<AuthResult> task) {
-                if (task.isSuccessful()) {
-                    Intent intent = new Intent(PhoneVerificationActivity.this, RegisterActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    intent.putExtra("EXTRA_USER_MOBILE", editTextMobile.getText().toString().trim());
-                    startActivity(intent);
-                    finish();
-                } else {
-                    Toast.makeText(PhoneVerificationActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
-                    llSendingCode.setVisibility(View.GONE);
-                    Log.e("Error==>", task.getException().getMessage());
+        if (NetUtils.isNetworkAvailable(PhoneVerificationActivity.this)) {
+            fireAuth.signInWithCredential(credential).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+                @Override
+                public void onComplete(@NonNull Task<AuthResult> task) {
+                    if (task.isSuccessful()) {
+                        Intent intent = new Intent(PhoneVerificationActivity.this, RegisterActivity.class);
+                        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        intent.putExtra("EXTRA_USER_MOBILE", editTextMobile.getText().toString().trim());
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Toast.makeText(PhoneVerificationActivity.this, task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        llSendingCode.setVisibility(View.GONE);
+                        Log.e("Error==>", task.getException().getMessage());
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            Utility.displayDialog(PhoneVerificationActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
     public void resendVisible(){

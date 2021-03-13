@@ -30,6 +30,8 @@ import com.kolkatahaat.R;
 import com.kolkatahaat.adapterview.OrdersItemDetailsAdapter;
 import com.kolkatahaat.model.BillItem;
 import com.kolkatahaat.model.OrdersItem;
+import com.kolkatahaat.utills.NetUtils;
+import com.kolkatahaat.utills.Utility;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -109,32 +111,36 @@ public class OrderDetailsActivity extends AppCompatActivity {
     }
 
     public void getAllOrders(String billItemId){
-        FirebaseUser user = fireAuth.getCurrentUser();
-        DocumentReference fireRefe = fireStore.collection("order_confirm").document(user.getUid());
-        //collectReference = fireStore.collection("orders").document(user.getUid()).collection(fireReference.getId());
-        DocumentReference firee = fireRefe.collection(fireRefe.getId()).document(billItemId);
+        if (NetUtils.isNetworkAvailable(OrderDetailsActivity.this)) {
+            FirebaseUser user = fireAuth.getCurrentUser();
+            DocumentReference fireRefe = fireStore.collection("order_confirm").document(user.getUid());
+            //collectReference = fireStore.collection("orders").document(user.getUid()).collection(fireReference.getId());
+            DocumentReference firee = fireRefe.collection(fireRefe.getId()).document(billItemId);
 
-        firee.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                DocumentSnapshot document = task.getResult();
-                if (document.exists()) {
-                    BillItem ordersItem = document.toObject(BillItem.class);
-                    billItems.addAll(ordersItem.getItemArrayList());
-                }
+            firee.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        BillItem ordersItem = document.toObject(BillItem.class);
+                        billItems.addAll(ordersItem.getItemArrayList());
+                    }
 
-                if (billItems.size() != 0 && billItems != null) {
-                    mAdapter = new OrdersItemDetailsAdapter(OrderDetailsActivity.this, billItems);
-                    recyclerView.setAdapter(mAdapter);
-                    recyclerView.setVisibility(View.VISIBLE);
-                    progressBar.setVisibility(View.GONE);
-                    empty_view.setVisibility(View.GONE);
-                } else {
-                    progressBar.setVisibility(View.GONE);
-                    recyclerView.setVisibility(View.GONE);
-                    empty_view.setVisibility(View.VISIBLE);
+                    if (billItems.size() != 0 && billItems != null) {
+                        mAdapter = new OrdersItemDetailsAdapter(OrderDetailsActivity.this, billItems);
+                        recyclerView.setAdapter(mAdapter);
+                        recyclerView.setVisibility(View.VISIBLE);
+                        progressBar.setVisibility(View.GONE);
+                        empty_view.setVisibility(View.GONE);
+                    } else {
+                        progressBar.setVisibility(View.GONE);
+                        recyclerView.setVisibility(View.GONE);
+                        empty_view.setVisibility(View.VISIBLE);
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            Utility.displayDialog(OrderDetailsActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 }

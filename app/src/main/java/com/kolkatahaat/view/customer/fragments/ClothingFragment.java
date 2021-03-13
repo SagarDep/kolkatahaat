@@ -111,104 +111,108 @@ public class ClothingFragment extends Fragment {
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), LinearLayoutManager.VERTICAL));
 
-        Query capitalCities = fireStore.collection("products").whereEqualTo("productCategory", "Clothing");
-        capitalCities.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                String data = "";
-                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    Product note = documentSnapshot.toObject(Product.class);
-                    messages.add(note);
-                }
+        if (NetUtils.isNetworkAvailable(getActivity())) {
+            Query capitalCities = fireStore.collection("products").whereEqualTo("productCategory", "Clothing");
+            capitalCities.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    String data = "";
+                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        Product note = documentSnapshot.toObject(Product.class);
+                        messages.add(note);
+                    }
 
-                FirebaseUser user = fireAuth.getCurrentUser();
-                DocumentReference fireRefe = fireStore.collection("orders").document(user.getUid());
-                CollectionReference firee = fireRefe.collection(fireRefe.getId());
-                firee.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            for (DocumentSnapshot document : task.getResult()) {
-                                Product cartProduct = document.toObject(Product.class);
+                    FirebaseUser user = fireAuth.getCurrentUser();
+                    DocumentReference fireRefe = fireStore.collection("orders").document(user.getUid());
+                    CollectionReference firee = fireRefe.collection(fireRefe.getId());
+                    firee.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            if (task.isSuccessful()) {
+                                for (DocumentSnapshot document : task.getResult()) {
+                                    Product cartProduct = document.toObject(Product.class);
 
-                                cartCount = cartCount + cartProduct.getProductQuantity();
+                                    cartCount = cartCount + cartProduct.getProductQuantity();
 
-                                for (final ListIterator<Product> i = messages.listIterator(); i.hasNext();) {
-                                    final Product element = i.next();
-                                    if(element.getProductId().equals(cartProduct.getProductId())) {
-                                        i.set(cartProduct);
+                                    for (final ListIterator<Product> i = messages.listIterator(); i.hasNext();) {
+                                        final Product element = i.next();
+                                        if(element.getProductId().equals(cartProduct.getProductId())) {
+                                            i.set(cartProduct);
+                                        }
                                     }
                                 }
-                            }
-                            rootView.setCount(cartCount);
-                        }
-
-                        RecyclerViewProductClickListener listener = new RecyclerViewProductClickListener() {
-                            @Override
-                            public void onClick(View view, int position) {
-                                //Toast.makeText(getContext(), "Position " + messages.get(position).getProductId(), Toast.LENGTH_SHORT).show();
-                                /*if(!TextUtils.isEmpty(messages.get(position).getProductId()) &&
-                                        messages.get(position).getProductId() != null) {
-                                    Intent intent = new Intent(getActivity(), ProductPurchaseActivity.class);
-                                    intent.putExtra("EXTRA_PRODUCT_ID", messages.get(position).getProductId());
-                                    startActivity(intent);
-                                }*/
+                                rootView.setCount(cartCount);
                             }
 
-                            @Override
-                            public void onClickDecrease(View view, int position) {
-                                //Toast.makeText(getContext(), "onClickDecrease " + messages.get(position).getProductId(), Toast.LENGTH_SHORT).show();
-                                if(messages.get(position).getProductQuantity() == 1) {
-                                    removeProduct(messages.get(position).getProductId(), position);
-                                    cartCountRemove();
-                                } else {
-                                    Product product = messages.get(position);
-                                    if(product.getProductQuantity() != 0) {
-                                        product.setProductQuantity(product.getProductQuantity() - 1);
+                            RecyclerViewProductClickListener listener = new RecyclerViewProductClickListener() {
+                                @Override
+                                public void onClick(View view, int position) {
+                                    //Toast.makeText(getContext(), "Position " + messages.get(position).getProductId(), Toast.LENGTH_SHORT).show();
+                                    /*if(!TextUtils.isEmpty(messages.get(position).getProductId()) &&
+                                            messages.get(position).getProductId() != null) {
+                                        Intent intent = new Intent(getActivity(), ProductPurchaseActivity.class);
+                                        intent.putExtra("EXTRA_PRODUCT_ID", messages.get(position).getProductId());
+                                        startActivity(intent);
+                                    }*/
+                                }
+
+                                @Override
+                                public void onClickDecrease(View view, int position) {
+                                    //Toast.makeText(getContext(), "onClickDecrease " + messages.get(position).getProductId(), Toast.LENGTH_SHORT).show();
+                                    if(messages.get(position).getProductQuantity() == 1) {
+                                        removeProduct(messages.get(position).getProductId(), position);
+                                        cartCountRemove();
+                                    } else {
+                                        Product product = messages.get(position);
+                                        if(product.getProductQuantity() != 0) {
+                                            product.setProductQuantity(product.getProductQuantity() - 1);
+                                            //product.setProductPrice(product.getProductQuantity() * product.getProductPrice());
+                                            UpdateCartProduct(product, position);
+
+                                            cartCountRemove();
+                                        }
+                                    }
+                                }
+
+                                @Override
+                                public void onClickIncrease(View view, int position) {
+                                    if(messages.get(position).getProductQuantity() == 0) {
+                                        Product product = messages.get(position);
+                                        product.setProductQuantity(1);
+                                        //product.setProductPrice(product.getProductQuantity() * product.getProductPrice());
+                                        AddCartProduct(product, position);
+
+                                        cartCountAdd();
+                                    } else {
+                                        //Toast.makeText(getContext(), "onClickIncrease " + messages.get(position).getProductQuantity(), Toast.LENGTH_SHORT).show();
+                                        Product product = messages.get(position);
+                                        product.setProductQuantity(1 + product.getProductQuantity());
                                         //product.setProductPrice(product.getProductQuantity() * product.getProductPrice());
                                         UpdateCartProduct(product, position);
 
-                                        cartCountRemove();
+                                        cartCountAdd();
                                     }
                                 }
+                            };
+
+                            if(messages.size() != 0 && messages != null) {
+                                mAdapter = new CustomerAddProductAdapter(getActivity(), messages, listener);
+                                recyclerView.setAdapter(mAdapter);
+                                recyclerView.setVisibility(View.VISIBLE);
+                                progressBar.setVisibility(View.GONE);
+                                empty_view.setVisibility(View.GONE);
+                            } else {
+                                recyclerView.setVisibility(View.GONE);
+                                progressBar.setVisibility(View.GONE);
+                                empty_view.setVisibility(View.VISIBLE);
                             }
-
-                            @Override
-                            public void onClickIncrease(View view, int position) {
-                                if(messages.get(position).getProductQuantity() == 0) {
-                                    Product product = messages.get(position);
-                                    product.setProductQuantity(1);
-                                    //product.setProductPrice(product.getProductQuantity() * product.getProductPrice());
-                                    AddCartProduct(product, position);
-
-                                    cartCountAdd();
-                                } else {
-                                    //Toast.makeText(getContext(), "onClickIncrease " + messages.get(position).getProductQuantity(), Toast.LENGTH_SHORT).show();
-                                    Product product = messages.get(position);
-                                    product.setProductQuantity(1 + product.getProductQuantity());
-                                    //product.setProductPrice(product.getProductQuantity() * product.getProductPrice());
-                                    UpdateCartProduct(product, position);
-
-                                    cartCountAdd();
-                                }
-                            }
-                        };
-
-                        if(messages.size() != 0 && messages != null) {
-                            mAdapter = new CustomerAddProductAdapter(getActivity(), messages, listener);
-                            recyclerView.setAdapter(mAdapter);
-                            recyclerView.setVisibility(View.VISIBLE);
-                            progressBar.setVisibility(View.GONE);
-                            empty_view.setVisibility(View.GONE);
-                        } else {
-                            recyclerView.setVisibility(View.GONE);
-                            progressBar.setVisibility(View.GONE);
-                            empty_view.setVisibility(View.VISIBLE);
                         }
-                    }
-                });
-            }
-        });
+                    });
+                }
+            });
+        } else {
+            Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
+        }
 
         checkStatus();
         return view;
@@ -216,26 +220,43 @@ public class ClothingFragment extends Fragment {
 
 
     public void checkStatus() {
-        FirebaseUser user = fireAuth.getCurrentUser();
-        DocumentReference fireRefe = fireStore.collection("orders").document(user.getUid());
-        CollectionReference firee = fireRefe.collection(fireRefe.getId());
-        firee.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w("TAG", "listen:error", e);
-                    return;
-                }
+        if (NetUtils.isNetworkAvailable(getActivity())) {
+            FirebaseUser user = fireAuth.getCurrentUser();
+            DocumentReference fireRefe = fireStore.collection("orders").document(user.getUid());
+            CollectionReference firee = fireRefe.collection(fireRefe.getId());
+            firee.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
+                    if (e != null) {
+                        Log.w("TAG", "listen:error", e);
+                        return;
+                    }
 
-                for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                    switch (dc.getType()) {
-                        /*case ADDED:
-                            Log.d("TAG", "Add New Msg: " + dc.getDocument().getId());
-                            break;*/
-                        case MODIFIED:
-                            if (dc.getDocument() != null) {
+                    for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                        switch (dc.getType()) {
+                            /*case ADDED:
+                                Log.d("TAG", "Add New Msg: " + dc.getDocument().getId());
+                                break;*/
+                            case MODIFIED:
+                                if (dc.getDocument() != null) {
+                                    if(messages.size() != 0) {
+                                        Product cartProduct = dc.getDocument().toObject(Product.class);
+                                        for (final ListIterator<Product> i = messages.listIterator(); i.hasNext(); ) {
+                                            final Product element = i.next();
+                                            if (element.getProductId().equals(cartProduct.getProductId())) {
+                                                i.set(cartProduct);
+                                            }
+                                        }
+                                        mAdapter.updateDataVal(messages);
+                                        mAdapter.notifyDataSetChanged();
+                                    }
+                                }
+                                break;
+
+                            case REMOVED:
                                 if(messages.size() != 0) {
                                     Product cartProduct = dc.getDocument().toObject(Product.class);
+                                    cartProduct.setProductQuantity(0);
                                     for (final ListIterator<Product> i = messages.listIterator(); i.hasNext(); ) {
                                         final Product element = i.next();
                                         if (element.getProductId().equals(cartProduct.getProductId())) {
@@ -245,27 +266,14 @@ public class ClothingFragment extends Fragment {
                                     mAdapter.updateDataVal(messages);
                                     mAdapter.notifyDataSetChanged();
                                 }
-                            }
-                            break;
-
-                        case REMOVED:
-                            if(messages.size() != 0) {
-                                Product cartProduct = dc.getDocument().toObject(Product.class);
-                                cartProduct.setProductQuantity(0);
-                                for (final ListIterator<Product> i = messages.listIterator(); i.hasNext(); ) {
-                                    final Product element = i.next();
-                                    if (element.getProductId().equals(cartProduct.getProductId())) {
-                                        i.set(cartProduct);
-                                    }
-                                }
-                                mAdapter.updateDataVal(messages);
-                                mAdapter.notifyDataSetChanged();
-                            }
-                            break;
+                                break;
+                        }
                     }
                 }
-            }
-        });
+            });
+        } else {
+            Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
+        }
     }
 
 
@@ -347,25 +355,29 @@ public class ClothingFragment extends Fragment {
     }
 
     private void removeProduct(String id, final int indPosition){
-        //Toast.makeText(getContext(), "delete " + id, Toast.LENGTH_SHORT).show();
-        FirebaseUser user = fireAuth.getCurrentUser();
-        DocumentReference fireRefe = fireStore.collection("orders").document(user.getUid());
-        DocumentReference firee = fireRefe.collection(fireRefe.getId()).document(id);
-        firee.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d("TAG", "DocumentSnapshot successfully deleted!");
-                Product product = messages.get(indPosition);
-                product.setProductQuantity(0);
-                messages.set(indPosition, product);
-                mAdapter.updatePositionData(0,indPosition);
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                Log.w("TAG", "Error deleting document", e);
-            }
-        });
+        if (NetUtils.isNetworkAvailable(getActivity())) {
+            //Toast.makeText(getContext(), "delete " + id, Toast.LENGTH_SHORT).show();
+            FirebaseUser user = fireAuth.getCurrentUser();
+            DocumentReference fireRefe = fireStore.collection("orders").document(user.getUid());
+            DocumentReference firee = fireRefe.collection(fireRefe.getId()).document(id);
+            firee.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d("TAG", "DocumentSnapshot successfully deleted!");
+                    Product product = messages.get(indPosition);
+                    product.setProductQuantity(0);
+                    messages.set(indPosition, product);
+                    mAdapter.updatePositionData(0,indPosition);
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    Log.w("TAG", "Error deleting document", e);
+                }
+            });
+        } else {
+            Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
+        }
     }
 
 

@@ -23,11 +23,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.tabs.TabLayout;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
@@ -36,23 +34,21 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
 import com.kolkatahaat.R;
 import com.kolkatahaat.adapterview.AdminOrdersAdapter;
 import com.kolkatahaat.interfaces.RecyclerViewClickListener;
 import com.kolkatahaat.model.BillItem;
-import com.kolkatahaat.model.OrdersItem;
 import com.kolkatahaat.model.Users;
+import com.kolkatahaat.utills.NetUtils;
+import com.kolkatahaat.utills.Utility;
 import com.kolkatahaat.view.admin.AdminOrdersDetailsActivity;
-import com.kolkatahaat.view.customer.fragments.EatableFragment;
-import com.kolkatahaat.view.customer.fragments.OrdersFragment;
+import com.kolkatahaat.view.customer.fragments.GroceryFragment;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.ListIterator;
 
 public class AdminOrdersFragment extends Fragment {
 
@@ -85,8 +81,8 @@ public class AdminOrdersFragment extends Fragment {
     }
 
 
-    public static EatableFragment newInstance(String param1, String param2) {
-        EatableFragment fragment = new EatableFragment();
+    public static GroceryFragment newInstance(String param1, String param2) {
+        GroceryFragment fragment = new GroceryFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -127,65 +123,69 @@ public class AdminOrdersFragment extends Fragment {
 
 
     public void getAllOrder() {
-        billItemsList.clear();
-        Query query = fireStore.collection("users");
-        query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    for (DocumentSnapshot userDocument : task.getResult()) {
-                        Log.d("LOG_TAG", userDocument.getId() + " => " + userDocument.getData());
+        if (NetUtils.isNetworkAvailable(getActivity())) {
+            billItemsList.clear();
+            Query query = fireStore.collection("users");
+            query.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        for (DocumentSnapshot userDocument : task.getResult()) {
+                            Log.d("LOG_TAG", userDocument.getId() + " => " + userDocument.getData());
 
-                        DocumentReference questionsRef = fireStore.collection("order_confirm").document(userDocument.getId());
-                        CollectionReference reference = questionsRef.collection(userDocument.getId());
+                            DocumentReference questionsRef = fireStore.collection("order_confirm").document(userDocument.getId());
+                            CollectionReference reference = questionsRef.collection(userDocument.getId());
 
-                        reference.orderBy("billCreatedDate", Query.Direction.DESCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                            @Override
-                            public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                            reference.orderBy("billCreatedDate", Query.Direction.DESCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                                @Override
+                                public void onComplete(@NonNull Task<QuerySnapshot> task) {
 
-                                for (DocumentSnapshot document : task.getResult()) {
-                                    BillItem billModel = document.toObject(BillItem.class);
+                                    for (DocumentSnapshot document : task.getResult()) {
+                                        BillItem billModel = document.toObject(BillItem.class);
 
-                                    Users usersInfo = userDocument.toObject(Users.class);
-                                    billModel.setItemUsers(usersInfo);
-                                    billItemsList.add(billModel);
+                                        Users usersInfo = userDocument.toObject(Users.class);
+                                        billModel.setItemUsers(usersInfo);
+                                        billItemsList.add(billModel);
 
-                                   /* DocumentReference documentReference = fireStore.collection("users").document(billModel.getUserId());
-                                    documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                                        @Override
-                                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                                            if (task.isSuccessful()) {
-                                                progressBar.setVisibility(View.GONE);
-                                                DocumentSnapshot snapshot = task.getResult();
-                                                Users usersInfo = snapshot.toObject(Users.class);
-                                                billModel.setItemUsers(usersInfo);
+                                       /* DocumentReference documentReference = fireStore.collection("users").document(billModel.getUserId());
+                                        documentReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                                            @Override
+                                            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                                                if (task.isSuccessful()) {
+                                                    progressBar.setVisibility(View.GONE);
+                                                    DocumentSnapshot snapshot = task.getResult();
+                                                    Users usersInfo = snapshot.toObject(Users.class);
+                                                    billModel.setItemUsers(usersInfo);
 
-                                                billItemsList.add(billModel);
+                                                    billItemsList.add(billModel);
+                                                }
                                             }
-                                        }
-                                    });*/
-                                }
+                                        });*/
+                                    }
 
 
-                                if(billItemsList.size() != 0 && billItemsList != null) {
-                                    mAdapter = new AdminOrdersAdapter(getActivity(), billItemsList, listener);
-                                    recyclerView.setAdapter(mAdapter);
-                                    mAdapter.notifyDataSetChanged();
-                                    recyclerView.setVisibility(View.VISIBLE);
-                                    progressBar.setVisibility(View.GONE);
-                                    empty_view.setVisibility(View.GONE);
-                                } else {
-                                    progressBar.setVisibility(View.GONE);
-                                    empty_view.setVisibility(View.VISIBLE);
+                                    if(billItemsList.size() != 0 && billItemsList != null) {
+                                        mAdapter = new AdminOrdersAdapter(getActivity(), billItemsList, listener);
+                                        recyclerView.setAdapter(mAdapter);
+                                        mAdapter.notifyDataSetChanged();
+                                        recyclerView.setVisibility(View.VISIBLE);
+                                        progressBar.setVisibility(View.GONE);
+                                        empty_view.setVisibility(View.GONE);
+                                    } else {
+                                        progressBar.setVisibility(View.GONE);
+                                        empty_view.setVisibility(View.VISIBLE);
+                                    }
                                 }
-                            }
-                        });
+                            });
+                        }
+                    } else {
+                        Toast.makeText(getActivity(), task.getException().getMessage(),Toast.LENGTH_SHORT).show();
                     }
-                } else {
-                    Toast.makeText(getActivity(), task.getException().getMessage(),Toast.LENGTH_SHORT).show();
                 }
-            }
-        });
+            });
+        } else {
+            Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
+        }
 
 
 

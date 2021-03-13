@@ -173,22 +173,26 @@ public class ProductPurchaseActivity extends AppCompatActivity {
 
 
     private void getProductDetails(String mProductIde) {
-        fireReference = fireStore.collection("products").document(mProductIde);
-        fireReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
-            @Override
-            public void onSuccess(DocumentSnapshot documentSnapshot) {
-                if (documentSnapshot != null && documentSnapshot.exists()) {
-                    selectProduct = documentSnapshot.toObject(Product.class);
-                    setProductData(selectProduct);
-                } else {
-                    Log.d(TAG, "onSuccess: LIST EMPTY");
+        if (NetUtils.isNetworkAvailable(ProductPurchaseActivity.this)) {
+            fireReference = fireStore.collection("products").document(mProductIde);
+            fireReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                @Override
+                public void onSuccess(DocumentSnapshot documentSnapshot) {
+                    if (documentSnapshot != null && documentSnapshot.exists()) {
+                        selectProduct = documentSnapshot.toObject(Product.class);
+                        setProductData(selectProduct);
+                    } else {
+                        Log.d(TAG, "onSuccess: LIST EMPTY");
+                    }
                 }
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-            }
-        });
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                }
+            });
+        } else {
+            Utility.displayDialog(ProductPurchaseActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
     @Override
@@ -314,16 +318,20 @@ public class ProductPurchaseActivity extends AppCompatActivity {
 
 
     private void getProductDetails() {
-        FirebaseUser user = fireAuth.getCurrentUser();
-        CollectionReference fireRefe = fireStore.collection("orders").document(user.getUid()).collection(user.getUid());
-        fireRefe.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                cartCount = 0;
-                cartCount = queryDocumentSnapshots.size();
-                CartCounterActionView.setCountStep(ProductPurchaseActivity.this, cartCount);
-                Log.i("inside if ", ""+cartCount);
-            }
-        });
+        if (NetUtils.isNetworkAvailable(ProductPurchaseActivity.this)) {
+            FirebaseUser user = fireAuth.getCurrentUser();
+            CollectionReference fireRefe = fireStore.collection("orders").document(user.getUid()).collection(user.getUid());
+            fireRefe.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    cartCount = 0;
+                    cartCount = queryDocumentSnapshots.size();
+                    CartCounterActionView.setCountStep(ProductPurchaseActivity.this, cartCount);
+                    Log.i("inside if ", ""+cartCount);
+                }
+            });
+        } else {
+            Utility.displayDialog(ProductPurchaseActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 }

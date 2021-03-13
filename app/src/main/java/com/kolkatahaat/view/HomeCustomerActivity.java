@@ -35,7 +35,9 @@ import com.kolkatahaat.fragments.EditProfileFragment;
 import com.kolkatahaat.model.Product;
 import com.kolkatahaat.model.Users;
 import com.kolkatahaat.utills.CartCounterActionView;
+import com.kolkatahaat.utills.NetUtils;
 import com.kolkatahaat.utills.SharedPrefsUtils;
+import com.kolkatahaat.utills.Utility;
 import com.kolkatahaat.view.customer.ProductCartDetailsActivity;
 import com.kolkatahaat.view.customer.fragments.CustomerProductCategoryFragment;
 import com.kolkatahaat.view.customer.fragments.OrdersFragment;
@@ -194,25 +196,29 @@ public class HomeCustomerActivity extends AppCompatActivity implements Navigatio
     }
 
     public void getCountProduct(){
-        try {
-            cartCount = 0;
-            FirebaseUser user = fireAuth.getCurrentUser();
-            DocumentReference fireRefe = fireStore.collection("orders").document(user.getUid());
-            CollectionReference firee = fireRefe.collection(fireRefe.getId());
-            firee.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                    if (task.isSuccessful()) {
-                        for (DocumentSnapshot document : task.getResult()) {
-                            Product cartProduct = document.toObject(Product.class);
-                            cartCount = cartCount + cartProduct.getProductQuantity();
+        if (NetUtils.isNetworkAvailable(HomeCustomerActivity.this)) {
+            try {
+                cartCount = 0;
+                FirebaseUser user = fireAuth.getCurrentUser();
+                DocumentReference fireRefe = fireStore.collection("orders").document(user.getUid());
+                CollectionReference firee = fireRefe.collection(fireRefe.getId());
+                firee.get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                        if (task.isSuccessful()) {
+                            for (DocumentSnapshot document : task.getResult()) {
+                                Product cartProduct = document.toObject(Product.class);
+                                cartCount = cartCount + cartProduct.getProductQuantity();
+                            }
+                            rootView.setCount(cartCount);
                         }
-                        rootView.setCount(cartCount);
                     }
-                }
-            });
-        } catch (Exception e){
-            e.printStackTrace();
+                });
+            } catch (Exception e){
+                e.printStackTrace();
+            }
+        } else {
+            Utility.displayDialog(HomeCustomerActivity.this, getString(R.string.common_no_internet), false);
         }
     }
 

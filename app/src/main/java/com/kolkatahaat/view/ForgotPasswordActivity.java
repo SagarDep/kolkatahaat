@@ -21,6 +21,8 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.kolkatahaat.R;
+import com.kolkatahaat.utills.NetUtils;
+import com.kolkatahaat.utills.Utility;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
 
@@ -49,8 +51,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
 
     private void init() {
         img_logo = findViewById(R.id.img_logo);
-
-
         textInputEmail = findViewById(R.id.textInputEmail);
         editTextEmail = findViewById(R.id.editTextEmail);
 
@@ -58,7 +58,6 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         state = findViewById(R.id.state);
         btnSendEmail = findViewById(R.id.btnSendEmail);
-
 
         btnSendEmail.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -98,18 +97,22 @@ public class ForgotPasswordActivity extends AppCompatActivity {
     }
 
     private void sendEmailVerify(String email){
-        fAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                if (task.isSuccessful()) {
-                    progressBar.setVisibility(View.GONE);
-                    state.setText("Please check your email");
-                    Toast.makeText(ForgotPasswordActivity.this, "Check email to reset your password!", Toast.LENGTH_SHORT).show();
-                } else {
-                    progressBar.setVisibility(View.GONE);
-                    Toast.makeText(ForgotPasswordActivity.this, "Fail to send reset password email!", Toast.LENGTH_SHORT).show();
+        if (NetUtils.isNetworkAvailable(ForgotPasswordActivity.this)) {
+            fAuth.sendPasswordResetEmail(email).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        progressBar.setVisibility(View.GONE);
+                        state.setText("Please check your email");
+                        Toast.makeText(ForgotPasswordActivity.this, "Check email to reset your password!", Toast.LENGTH_SHORT).show();
+                    } else {
+                        progressBar.setVisibility(View.GONE);
+                        Toast.makeText(ForgotPasswordActivity.this, "Fail to send reset password email!", Toast.LENGTH_SHORT).show();
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            Utility.displayDialog(ForgotPasswordActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 }

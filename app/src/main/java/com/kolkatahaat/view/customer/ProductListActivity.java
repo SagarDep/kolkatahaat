@@ -2,8 +2,6 @@ package com.kolkatahaat.view.customer;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 
 import androidx.annotation.Nullable;
@@ -14,9 +12,8 @@ import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.material.tabs.TabLayout;
 import com.kolkatahaat.R;
-import com.kolkatahaat.utills.CartCounterActionView;
 import com.kolkatahaat.view.customer.fragments.ClothingFragment;
-import com.kolkatahaat.view.customer.fragments.EatableFragment;
+import com.kolkatahaat.view.customer.fragments.GroceryFragment;
 import com.kolkatahaat.view.customer.fragments.OthersFragment;
 import com.kolkatahaat.view.customer.fragments.PujaItemsFragment;
 
@@ -25,7 +22,7 @@ public class ProductListActivity extends AppCompatActivity {
     private Toolbar toolbar;
     private TabLayout tabLayout;
 
-    private EatableFragment eatableFragment;
+    private GroceryFragment groceryFragment;
     private PujaItemsFragment pujaItemsFragment;
     private ClothingFragment clothingFragment;
     private OthersFragment othersFragment;
@@ -53,8 +50,8 @@ public class ProductListActivity extends AppCompatActivity {
         tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
         if(selectTab == 0) {
-            eatableFragment = new EatableFragment();
-            loadFragment(eatableFragment);
+            groceryFragment = new GroceryFragment();
+            loadFragment(groceryFragment);
             tabLayout.getTabAt(selectTab).select();
         } else if(selectTab == 1) {
             pujaItemsFragment = new PujaItemsFragment();
@@ -77,7 +74,7 @@ public class ProductListActivity extends AppCompatActivity {
 
                 switch (tab.getPosition()) {
                     case 0:
-                        fragment = new EatableFragment();
+                        fragment = new GroceryFragment();
                         break;
 
                     case 1:

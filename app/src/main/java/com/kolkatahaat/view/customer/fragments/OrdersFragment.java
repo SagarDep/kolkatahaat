@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -18,7 +17,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -30,21 +28,18 @@ import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.gson.Gson;
 import com.kolkatahaat.R;
 
 import com.kolkatahaat.adapterview.OrdersItemListAdapter;
 import com.kolkatahaat.interfaces.RecyclerViewClickListener;
 import com.kolkatahaat.model.BillItem;
-import com.kolkatahaat.model.OrdersItem;
+import com.kolkatahaat.utills.NetUtils;
+import com.kolkatahaat.utills.Utility;
 import com.kolkatahaat.view.customer.OrderDetailsActivity;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class OrdersFragment extends Fragment {
 
@@ -74,8 +69,8 @@ public class OrdersFragment extends Fragment {
     }
 
 
-    public static EatableFragment newInstance(String param1, String param2) {
-        EatableFragment fragment = new EatableFragment();
+    public static GroceryFragment newInstance(String param1, String param2) {
+        GroceryFragment fragment = new GroceryFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -110,90 +105,96 @@ public class OrdersFragment extends Fragment {
     }
 
     public void getAllOrders(){
+        if (NetUtils.isNetworkAvailable(getActivity())) {
+            FirebaseUser user = fireAuth.getCurrentUser();
+            DocumentReference fireRefe = fireStore.collection("order_confirm").document(user.getUid());
+            //collectReference = fireStore.collection("orders").document(user.getUid()).collection(fireReference.getId());
+            CollectionReference firee = fireRefe.collection(fireRefe.getId());
 
-        FirebaseUser user = fireAuth.getCurrentUser();
-        DocumentReference fireRefe = fireStore.collection("order_confirm").document(user.getUid());
-        //collectReference = fireStore.collection("orders").document(user.getUid()).collection(fireReference.getId());
-        CollectionReference firee = fireRefe.collection(fireRefe.getId());
 
+            firee.orderBy("billCreatedDate", Query.Direction.DESCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    for (DocumentSnapshot document : task.getResult()) {
+                        //messages = (ArrayList<BillItem>) document.get("order");
 
-        firee.orderBy("billCreatedDate", Query.Direction.DESCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                for (DocumentSnapshot document : task.getResult()) {
-                    //messages = (ArrayList<BillItem>) document.get("order");
+                        BillItem ordersItem = document.toObject(BillItem.class);
 
-                    BillItem ordersItem = document.toObject(BillItem.class);
+                        /*for (OrdersItem item : list) {
+                            Log.d("TAG", item.getProductName());
+                        }*/
+                        //messages.addAll(ordersItem.getItemArrayList());
+                        billItems.add(ordersItem);
 
-                    /*for (OrdersItem item : list) {
-                        Log.d("TAG", item.getProductName());
-                    }*/
-                    //messages.addAll(ordersItem.getItemArrayList());
-                    billItems.add(ordersItem);
-
-                }
-
-                RecyclerViewClickListener listener = new RecyclerViewClickListener() {
-                    @Override
-                    public void onClick(View view, int position) {
-                        //Toast.makeText(getContext(), "Position " + billItems.get(position).getOrderStatus(), Toast.LENGTH_SHORT).show();
-                        Intent intent = new Intent(getActivity(), OrderDetailsActivity.class);
-                        intent.putExtra("EXTRA_BILL_ITEM_ID", billItems.get(position).getDocId());
-                        if(billItems.get(position).getRejectionStatus()){
-                            intent.putExtra("EXTRA_REJECT_STATUS", billItems.get(position).getRejectionStatus());
-                            intent.putExtra("EXTRA_REJECT_NOTE", billItems.get(position).getRejectionNote());
-                        }
-                        getActivity().startActivity(intent);
                     }
-                };
-                mAdapter = new OrdersItemListAdapter(getActivity(),billItems, listener);
-                recyclerView.setAdapter(mAdapter);
-            }
-        });
 
+                    RecyclerViewClickListener listener = new RecyclerViewClickListener() {
+                        @Override
+                        public void onClick(View view, int position) {
+                            //Toast.makeText(getContext(), "Position " + billItems.get(position).getOrderStatus(), Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(getActivity(), OrderDetailsActivity.class);
+                            intent.putExtra("EXTRA_BILL_ITEM_ID", billItems.get(position).getDocId());
+                            if(billItems.get(position).getRejectionStatus()){
+                                intent.putExtra("EXTRA_REJECT_STATUS", billItems.get(position).getRejectionStatus());
+                                intent.putExtra("EXTRA_REJECT_NOTE", billItems.get(position).getRejectionNote());
+                            }
+                            getActivity().startActivity(intent);
+                        }
+                    };
+                    mAdapter = new OrdersItemListAdapter(getActivity(),billItems, listener);
+                    recyclerView.setAdapter(mAdapter);
+                }
+            });
+        } else {
+            Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
+        }
         checkStatus();
 
     }
 
 
     public void checkStatus() {
-        FirebaseUser user = fireAuth.getCurrentUser();
-        DocumentReference fireRefe = fireStore.collection("order_confirm").document(user.getUid());
-        //collectReference = fireStore.collection("orders").document(user.getUid()).collection(fireReference.getId());
-        CollectionReference firee = fireRefe.collection(fireRefe.getId());
-        firee.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w("TAG", "listen:error", e);
-                    return;
-                }
+        if (NetUtils.isNetworkAvailable(getActivity())) {
+            FirebaseUser user = fireAuth.getCurrentUser();
+            DocumentReference fireRefe = fireStore.collection("order_confirm").document(user.getUid());
+            //collectReference = fireStore.collection("orders").document(user.getUid()).collection(fireReference.getId());
+            CollectionReference firee = fireRefe.collection(fireRefe.getId());
+            firee.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
+                    if (e != null) {
+                        Log.w("TAG", "listen:error", e);
+                        return;
+                    }
 
-                for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                    switch (dc.getType()) {
-                        /*case ADDED:
-                            Log.d("TAG", "New Msg: " + dc.getDocument().toObject(BillModel.class));
-                            break;*/
-                        case MODIFIED:
+                    for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                        switch (dc.getType()) {
+                            /*case ADDED:
+                                Log.d("TAG", "New Msg: " + dc.getDocument().toObject(BillModel.class));
+                                break;*/
+                            case MODIFIED:
 
-                            if (billItems.size() != 0) {
-                                for (int i = 0; i < billItems.size(); i++) {
-                                    if (billItems.get(i).getDocId().equals(dc.getDocument().getId())) {
-                                        BillItem billModel = dc.getDocument().toObject(BillItem.class);
-                                        billItems.set(i, billModel);
-                                        mAdapter.notifyDataSetChanged();
-                                        break;
+                                if (billItems.size() != 0) {
+                                    for (int i = 0; i < billItems.size(); i++) {
+                                        if (billItems.get(i).getDocId().equals(dc.getDocument().getId())) {
+                                            BillItem billModel = dc.getDocument().toObject(BillItem.class);
+                                            billItems.set(i, billModel);
+                                            mAdapter.notifyDataSetChanged();
+                                            break;
+                                        }
                                     }
                                 }
-                            }
-                            break;
+                                break;
 
-                        case REMOVED:
-                            //Log.d("TAG", "Removed Msg: " + dc.getDocument().toObject(BillModel.class));
-                            break;
+                            case REMOVED:
+                                //Log.d("TAG", "Removed Msg: " + dc.getDocument().toObject(BillModel.class));
+                                break;
+                        }
                     }
                 }
-            }
-        });
+            });
+        } else {
+            Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
+        }
     }
 }

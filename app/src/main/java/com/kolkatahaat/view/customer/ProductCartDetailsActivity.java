@@ -2,8 +2,6 @@ package com.kolkatahaat.view.customer;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
@@ -36,8 +34,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.gson.Gson;
-import com.kolkatahaat.BuildConfig;
 import com.kolkatahaat.R;
 import com.kolkatahaat.adapterview.ProductCartAdapter;
 import com.kolkatahaat.interfaces.RecyclerViewRemoveClickListener;
@@ -46,21 +42,10 @@ import com.kolkatahaat.model.OrdersItem;
 import com.kolkatahaat.model.Users;
 import com.kolkatahaat.service.FirebaseIDService;
 import com.kolkatahaat.utills.NetUtils;
-import com.kolkatahaat.utills.SharedPrefsUtils;
 import com.kolkatahaat.utills.Utility;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 public class ProductCartDetailsActivity extends AppCompatActivity {
 
@@ -160,32 +145,36 @@ public class ProductCartDetailsActivity extends AppCompatActivity {
     }
 
     private void getDeliveryChrarge(){
-        collectionReferenceDelivery.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        mDeliveryCharge = Integer.valueOf(document.getData().get("deliveryCharges").toString());
-                        txtDeliveryCharges.setText(""+mDeliveryCharge);
-                        if(itemList.size() != 0 && itemList != null) {
-                            llDeliveryCharge.setVisibility(View.VISIBLE);
-                            txtProductAmount.setText(String.valueOf(mAdapter.grandTotal(itemList)));
-                            txtTotalBill.setText(String.valueOf(mDeliveryCharge + mAdapter.grandTotal(itemList)));
+        if (NetUtils.isNetworkAvailable(ProductCartDetailsActivity.this)) {
+            collectionReferenceDelivery.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                            mDeliveryCharge = Integer.valueOf(document.getData().get("deliveryCharges").toString());
+                            txtDeliveryCharges.setText(""+mDeliveryCharge);
+                            if(itemList.size() != 0 && itemList != null) {
+                                llDeliveryCharge.setVisibility(View.VISIBLE);
+                                txtProductAmount.setText(String.valueOf(mAdapter.grandTotal(itemList)));
+                                txtTotalBill.setText(String.valueOf(mDeliveryCharge + mAdapter.grandTotal(itemList)));
+                            } else {
+                                txtProductAmount.setText("00");
+                                txtTotalBill.setText("00");
+                                llDeliveryCharge.setVisibility(View.GONE);
+                            }
                         } else {
-                            txtProductAmount.setText("00");
-                            txtTotalBill.setText("00");
-                            llDeliveryCharge.setVisibility(View.GONE);
+                            Log.d(TAG, "No such document");
                         }
                     } else {
-                        Log.d(TAG, "No such document");
+                        Log.d(TAG, "get failed with ", task.getException());
                     }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
                 }
-            }
-        });
+            });
+        } else {
+            Utility.displayDialog(ProductCartDetailsActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
     private void getProductDetails() {
@@ -280,86 +269,94 @@ public class ProductCartDetailsActivity extends AppCompatActivity {
 
 
     public void setPlaceYourOrder() {
-        //enable this comment for order purchase ---------------->
-        ArrayList<OrdersItem> allItemList = new ArrayList<>();
-        FirebaseUser user = fireAuth.getCurrentUser();
-        CollectionReference fireRefe = fireStore.collection("orders").document(user.getUid()).collection(user.getUid());
-        fireRefe.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    OrdersItem note = documentSnapshot.toObject(OrdersItem.class);
-                    note.setDocId(documentSnapshot.getId());
+        if (NetUtils.isNetworkAvailable(ProductCartDetailsActivity.this)) {
+            //enable this comment for order purchase ---------------->
+            ArrayList<OrdersItem> allItemList = new ArrayList<>();
+            FirebaseUser user = fireAuth.getCurrentUser();
+            CollectionReference fireRefe = fireStore.collection("orders").document(user.getUid()).collection(user.getUid());
+            fireRefe.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        OrdersItem note = documentSnapshot.toObject(OrdersItem.class);
+                        note.setDocId(documentSnapshot.getId());
 
-                    allItemList.add(note);
-                }
+                        allItemList.add(note);
+                    }
 
 
-                if (allItemList.size() == queryDocumentSnapshots.size()) {
-                    final FieldValue billDate = FieldValue.serverTimestamp();
-                    FirebaseUser user = fireAuth.getCurrentUser();
-                    DocumentReference fireRefe = fireStore.collection("order_confirm").document(user.getUid());
-                    //collectReference = fireStore.collection("orders").document(user.getUid()).collection(fireReference.getId());
-                    //CollectionReference firee = fireRefe.collection(fireRefe.getId());
-                    DocumentReference firee = fireRefe.collection(fireRefe.getId()).document();
+                    if (allItemList.size() == queryDocumentSnapshots.size()) {
+                        final FieldValue billDate = FieldValue.serverTimestamp();
+                        FirebaseUser user = fireAuth.getCurrentUser();
+                        DocumentReference fireRefe = fireStore.collection("order_confirm").document(user.getUid());
+                        //collectReference = fireStore.collection("orders").document(user.getUid()).collection(fireReference.getId());
+                        //CollectionReference firee = fireRefe.collection(fireRefe.getId());
+                        DocumentReference firee = fireRefe.collection(fireRefe.getId()).document();
 
-                    BillItem billItem = new BillItem();
-                    billItem.setDocId(firee.getId());
-                    billItem.setUserId(user.getUid());
-                    billItem.setUuId(user.getUid());
-                    billItem.setOrderStatus(getResources().getString(R.string.order_type1));  //Pending , Accept, Dispatch, Delivered
-                    billItem.setBillCreatedDate(billDate);
-                    billItem.setProductDeliveryChange(mDeliveryCharge);
-                    billItem.setItemArrayList(allItemList);
+                        BillItem billItem = new BillItem();
+                        billItem.setDocId(firee.getId());
+                        billItem.setUserId(user.getUid());
+                        billItem.setUuId(user.getUid());
+                        billItem.setOrderStatus(getResources().getString(R.string.order_type1));  //Pending , Accept, Dispatch, Delivered
+                        billItem.setBillCreatedDate(billDate);
+                        billItem.setProductDeliveryChange(mDeliveryCharge);
+                        billItem.setItemArrayList(allItemList);
 
-                    firee.set(billItem).addOnCompleteListener(new OnCompleteListener<Void>() {
-                        @Override
-                        public void onComplete(@NonNull Task<Void> task) {
+                        firee.set(billItem).addOnCompleteListener(new OnCompleteListener<Void>() {
+                            @Override
+                            public void onComplete(@NonNull Task<Void> task) {
 
-                            for (int i = 0; i < adminItemList.size(); i++) {
-                                Log.e("send notification","of all admin user");
-                                if(!TextUtils.isEmpty(adminItemList.get(i).getUserToken()) &&
-                                        adminItemList.get(i).getUserToken() != null) {
+                                for (int i = 0; i < adminItemList.size(); i++) {
+                                    Log.e("send notification","of all admin user");
+                                    if(!TextUtils.isEmpty(adminItemList.get(i).getUserToken()) &&
+                                            adminItemList.get(i).getUserToken() != null) {
 
-                                    FirebaseIDService idService = new FirebaseIDService();
-                                    idService.sendWithOtherThread(adminItemList.get(i).getUserToken(),
-                                            String.valueOf(itemList.size()), false);
-                                    //break;
-                                }
-                            }
-
-                            CollectionReference fireRefe = fireStore.collection("orders").document(user.getUid()).collection(user.getUid());
-                            fireRefe.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-                                @Override
-                                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                                        documentSnapshot.getReference().delete();
+                                        FirebaseIDService idService = new FirebaseIDService();
+                                        idService.sendWithOtherThread(adminItemList.get(i).getUserToken(),
+                                                String.valueOf(itemList.size()), false);
+                                        //break;
                                     }
-                                    Intent intent = new Intent();
-                                    intent.putExtra("purchase", "success");
-                                    setResult(RESULT_OK, intent);
-                                    finish();
                                 }
-                            });
-                        }
-                    });
+
+                                CollectionReference fireRefe = fireStore.collection("orders").document(user.getUid()).collection(user.getUid());
+                                fireRefe.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                                    @Override
+                                    public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                                        for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                                            documentSnapshot.getReference().delete();
+                                        }
+                                        Intent intent = new Intent();
+                                        intent.putExtra("purchase", "success");
+                                        setResult(RESULT_OK, intent);
+                                        finish();
+                                    }
+                                });
+                            }
+                        });
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            Utility.displayDialog(ProductCartDetailsActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
 
     public void getAllAdminUser() {
-        Query capitalCities = fireStore.collection("users").whereEqualTo("userType", 1);
-        capitalCities.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
-            @Override
-            public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
-                for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
-                    Users note = documentSnapshot.toObject(Users.class);
-                    adminItemList.add(note);
+        if (NetUtils.isNetworkAvailable(ProductCartDetailsActivity.this)) {
+            Query capitalCities = fireStore.collection("users").whereEqualTo("userType", 1);
+            capitalCities.get().addOnSuccessListener(new OnSuccessListener<QuerySnapshot>() {
+                @Override
+                public void onSuccess(QuerySnapshot queryDocumentSnapshots) {
+                    for (QueryDocumentSnapshot documentSnapshot : queryDocumentSnapshots) {
+                        Users note = documentSnapshot.toObject(Users.class);
+                        adminItemList.add(note);
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            Utility.displayDialog(ProductCartDetailsActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
 

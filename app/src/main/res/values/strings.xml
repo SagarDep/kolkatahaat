@@ -22,15 +22,15 @@
 
     <string-array name="product_category">
         <item>Select</item>
-        <item>Eatable</item>
+        <item>Grocery</item>
         <item>Puja Items</item>
         <item>Clothing</item>
         <item>Others</item>
     </string-array>
 
     <string name="menu_str_all">All</string>
-    <string name="menu_str_eatable">Eatable</string>
-    <string name="menu_str_eatable_instead">Grocery</string>
+
+    <string name="menu_str_grocery">Grocery</string>
     <string name="menu_str_puja_items">Puja Items</string>
     <string name="menu_str_clothing">Clothing</string>
     <string name="menu_str_others">Others</string>

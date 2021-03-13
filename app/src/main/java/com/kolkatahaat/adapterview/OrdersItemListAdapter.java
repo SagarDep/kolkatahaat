@@ -75,7 +75,7 @@ public class OrdersItemListAdapter extends RecyclerView.Adapter<OrdersItemListAd
             BillItem message = messages.get(position);
 
             // displaying text view data
-            Glide.with(mContext).load(mContext.getResources().getDrawable(R.drawable.app_logo))
+            Glide.with(mContext).load(mContext.getResources().getDrawable(R.mipmap.ic_launcher_round))
                     .thumbnail(0.5f)
                     .diskCacheStrategy(DiskCacheStrategy.ALL)
                     .into(holder.thumbnail);

@@ -137,14 +137,12 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
         if(mAdminProductEdit){
             updateProduct = new Product();
             llAddProduct.setVisibility(View.GONE);
-            progressBar.setVisibility(View.VISIBLE);
 
             btnUpdateProduct.setVisibility(View.VISIBLE);
             btnAppProduct.setVisibility(View.GONE);
             getProductDetials();
         } else {
             llAddProduct.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.GONE);
 
             btnUpdateProduct.setVisibility(View.GONE);
             btnAppProduct.setVisibility(View.VISIBLE);
@@ -319,10 +317,14 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
 
 
     private void chooseImage() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+        if (NetUtils.isNetworkAvailable(AdminAddProductActivity.this)) {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+        } else {
+            Utility.displayDialog(AdminAddProductActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
     // Override onActivityResult method
@@ -343,51 +345,57 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
 
     // UploadImage method
     private void uploadImage() {
-        if (filePath != null) {
-            final ProgressDialog progressDialog = new ProgressDialog(this);
-            progressDialog.setTitle("Uploading...");
-            progressDialog.show();
+        if (NetUtils.isNetworkAvailable(AdminAddProductActivity.this)) {
+            if (filePath != null) {
+                final ProgressDialog progressDialog = new ProgressDialog(this);
+                progressDialog.setTitle("Uploading...");
+                progressDialog.show();
 
-            StorageReference ref = storageReference.child("products/" + UUID.randomUUID().toString());
-            ref.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    progressDialog.dismiss();
-                    final Task<Uri> result = taskSnapshot.getMetadata().getReference().getDownloadUrl();
-                    result.addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            Log.e(TAG, "onSuccess: uri= " + uri.toString());
-                            if(mAdminProductEdit) {
-                                if(filePath != null && !filePath.equals("")){
-                                    updateProduct(uri.toString());
+                StorageReference ref = storageReference.child("products/" + UUID.randomUUID().toString());
+                ref.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        progressDialog.dismiss();
+                        final Task<Uri> result = taskSnapshot.getMetadata().getReference().getDownloadUrl();
+                        result.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                Log.e(TAG, "onSuccess: uri= " + uri.toString());
+                                if(mAdminProductEdit) {
+                                    if(filePath != null && !filePath.equals("")){
+                                        updateProduct(uri.toString());
+                                    } else {
+                                        updateProduct(uploadedUrl);
+                                    }
+                                    /*if(uploadedUrl == "" && uploadedUrl == null && TextUtils.isEmpty(uploadedUrl)){
+
+                                    } else {
+
+                                    }*/
                                 } else {
-                                    updateProduct(uploadedUrl);
+                                    addProduct(uri.toString());
                                 }
-                                /*if(uploadedUrl == "" && uploadedUrl == null && TextUtils.isEmpty(uploadedUrl)){
-
-                                } else {
-
-                                }*/
-                            } else {
-                                addProduct(uri.toString());
                             }
-                        }
-                    });
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    progressDialog.dismiss();
-                    Toast.makeText(AdminAddProductActivity.this, "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                    double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                    progressDialog.setMessage("Uploaded " + (int) progress + "%");
-                }
-            });
+                        });
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        progressDialog.dismiss();
+                        Toast.makeText(AdminAddProductActivity.this, "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                        double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                        progressDialog.setMessage("Uploaded " + (int) progress + "%");
+                    }
+                });
+            } else {
+                Utility.displayDialog(AdminAddProductActivity.this, "File is not available", false);
+            }
+        } else {
+            Utility.displayDialog(AdminAddProductActivity.this, getString(R.string.common_no_internet), false);
         }
     }
 
@@ -495,11 +503,8 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
         }
     }
 
-
     private void addProduct(String UploadUrl) {
-
         if (NetUtils.isNetworkAvailable(AdminAddProductActivity.this)) {
-
             if(UploadUrl != null && !UploadUrl.isEmpty() && UploadUrl != "") {
                 final String productId = fireReference.getId();
                 //final String productImg = UploadUrl;
@@ -542,7 +547,6 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
             } else {
                 Utility.displayDialog(AdminAddProductActivity.this, "Please try again", false);
             }
-
         } else {
             Utility.displayDialog(AdminAddProductActivity.this, getString(R.string.common_no_internet), false);
         }
@@ -550,18 +554,14 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
 
 
     private void updateProduct(String UploadUrl) {
-
         if (NetUtils.isNetworkAvailable(AdminAddProductActivity.this)) {
-
             strCategoryName = spinnerCategory.getSelectedItem().toString();
-
             if(!spinnerCategory.getSelectedItem().equals("Select") && strCategoryName != null && !strCategoryName.isEmpty()) {
 
                 if (UploadUrl != null && !UploadUrl.isEmpty() && UploadUrl != "") {
                     //final String productId = fireReference.getId();
                     //final String productImg = UploadUrl;
                     final String productName = editTextItemName.getText().toString().trim();
-
                     final String productPacking = editTextItemQuantity.getText().toString().trim();
                     final String productPrice = editTextItemPrice.getText().toString().trim();
 
@@ -629,59 +629,67 @@ public class AdminAddProductActivity extends AppCompatActivity {// implements Ad
 
 
     private void getProductDetials() {
-        fireReference = fireStore.collection("products").document(mAdminProductId);
-        fireReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Product product = document.toObject(Product.class);
+        progressBar.setVisibility(View.VISIBLE);
+        if (NetUtils.isNetworkAvailable(AdminAddProductActivity.this)) {
+            fireReference = fireStore.collection("products").document(mAdminProductId);
+            fireReference.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            Product product = document.toObject(Product.class);
 
-                        updateProduct = product;
+                            updateProduct = product;
 
-                        llAddProduct.setVisibility(View.VISIBLE);
-                        progressBar.setVisibility(View.GONE);
+                            llAddProduct.setVisibility(View.VISIBLE);
+                            progressBar.setVisibility(View.GONE);
 
+                            editTextItemName.setText(product.getProductName());
+                            editTextItemQuantity.setText(String.valueOf(product.getProductPacking()));
+                            editTextItemPrice.setText(String.valueOf(product.getProductPrice()));
+                            //editTextItemDeliveryChrg.setText(String.valueOf(product.getProductDeliveryChange()));
+                            uploadedUrl = product.getProductImg();
 
-                        editTextItemName.setText(product.getProductName());
-                        editTextItemQuantity.setText(String.valueOf(product.getProductPacking()));
-                        editTextItemPrice.setText(String.valueOf(product.getProductPrice()));
-                        //editTextItemDeliveryChrg.setText(String.valueOf(product.getProductDeliveryChange()));
-                        uploadedUrl = product.getProductImg();
+                            RequestOptions options = new RequestOptions()
+                                    .centerCrop()
+                                    .placeholder(R.mipmap.ic_launcher_round)
+                                    .error(R.mipmap.ic_launcher_round);
+                            Glide.with(AdminAddProductActivity.this).asBitmap().load(product.getProductImg()).apply(options).into(imgProduct);
 
-                        RequestOptions options = new RequestOptions()
-                                .centerCrop()
-                                .placeholder(R.mipmap.ic_launcher_round)
-                                .error(R.mipmap.ic_launcher_round);
-                        Glide.with(AdminAddProductActivity.this).asBitmap().load(product.getProductImg()).apply(options).into(imgProduct);
+                            Bitmap bitmapm = getBitmapFromURL(product.getProductImg());
+                            bitmap = bitmapm;
 
-                        Bitmap bitmapm = getBitmapFromURL(product.getProductImg());
-                        bitmap = bitmapm;
+                           /* Bitmap bitmapm = getBitmapFromURL(product.getProductImg());
+                            imgProduct.setImageBitmap(bitmapm);
+                            bitmap = bitmapm;
+                            editBitmap = bitmapm;*/
 
-                       /* Bitmap bitmapm = getBitmapFromURL(product.getProductImg());
-                        imgProduct.setImageBitmap(bitmapm);
-                        bitmap = bitmapm;
-                        editBitmap = bitmapm;*/
-
-                        //String compareValue = product.getProductCategory();
-                        strCategoryName = product.getProductCategory();
-                        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(AdminAddProductActivity.this, R.array.product_category, R.layout.list_item);
-                        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-                        spinnerCategory.setAdapter(adapter);
-                        if (strCategoryName != null) {
-                            int spinnerPosition = adapter.getPosition(strCategoryName);
-                            spinnerCategory.setSelection(spinnerPosition);
+                            //String compareValue = product.getProductCategory();
+                            strCategoryName = product.getProductCategory();
+                            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(AdminAddProductActivity.this, R.array.product_category, R.layout.list_item);
+                            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                            spinnerCategory.setAdapter(adapter);
+                            if (strCategoryName != null) {
+                                int spinnerPosition = adapter.getPosition(strCategoryName);
+                                spinnerCategory.setSelection(spinnerPosition);
+                            }
+                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                        } else {
+                            Log.d(TAG, "No such document");
+                            progressBar.setVisibility(View.GONE);
+                            Utility.displayDialog(AdminAddProductActivity.this, "Data not available", false);
                         }
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
                     } else {
-                        Log.d(TAG, "No such document");
+                        progressBar.setVisibility(View.GONE);
+                        Utility.displayDialog(AdminAddProductActivity.this, task.getException().getMessage(), false);
                     }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
                 }
-            }
-        });
+            });
+        } else {
+            progressBar.setVisibility(View.GONE);
+            Utility.displayDialog(AdminAddProductActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
     public static Bitmap getBitmapFromURL(String src) {

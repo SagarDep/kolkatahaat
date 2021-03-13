@@ -40,6 +40,8 @@ import com.kolkatahaat.model.BillItem;
 import com.kolkatahaat.model.OrderCompleteModel;
 import com.kolkatahaat.model.Users;
 import com.kolkatahaat.service.FirebaseIDService;
+import com.kolkatahaat.utills.NetUtils;
+import com.kolkatahaat.utills.Utility;
 import com.kolkatahaat.view.admin.fragments.OrderRejectOrderNoteDialog;
 
 import java.util.ArrayList;
@@ -174,120 +176,145 @@ public class AdminOrdersDetailsActivity extends AppCompatActivity implements Adm
     }
 
     public void getAllOrderData() {
-        DocumentReference questionsRef = fireStore.collection("order_confirm").document(selectedUserId);
-        DocumentReference reference = questionsRef.collection(selectedUserId).document(productId);
+        if (NetUtils.isNetworkAvailable(AdminOrdersDetailsActivity.this)) {
 
+            DocumentReference questionsRef = fireStore.collection("order_confirm").document(selectedUserId);
+            DocumentReference reference = questionsRef.collection(selectedUserId).document(productId);
 
-        reference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
-            @Override
-            public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
+            reference.addSnapshotListener(new EventListener<DocumentSnapshot>() {
+                @Override
+                public void onEvent(@Nullable DocumentSnapshot value, @Nullable FirebaseFirestoreException error) {
 
-                billItemModel = value.toObject(BillItem.class);
-                productsList.add(billItemModel);
+                    billItemModel = value.toObject(BillItem.class);
+                    productsList.add(billItemModel);
 
-                txtDeliveryCharges.setText(String.valueOf(billItemModel.getProductDeliveryChange()));
-                mDeliveryCharge = billItemModel.getProductDeliveryChange();
+                    txtDeliveryCharges.setText(String.valueOf(billItemModel.getProductDeliveryChange()));
+                    mDeliveryCharge = billItemModel.getProductDeliveryChange();
 
-                RecyclerViewClickListener listener = new RecyclerViewClickListener() {
-                    @Override
-                    public void onClick(View view, int position) {
-                        //Toast.makeText(getContext(), "Position " + messages.get(position).getProductName(), Toast.LENGTH_SHORT).show();
-                    }
-                };
-                detailsAdapter = new AdminOrdersDetailsAdapter(AdminOrdersDetailsActivity.this, productsList.get(0).getItemArrayList(),listener);
-                recyclerView.setAdapter(detailsAdapter);
+                    RecyclerViewClickListener listener = new RecyclerViewClickListener() {
+                        @Override
+                        public void onClick(View view, int position) {
+                            //Toast.makeText(getContext(), "Position " + messages.get(position).getProductName(), Toast.LENGTH_SHORT).show();
+                        }
+                    };
+                    detailsAdapter = new AdminOrdersDetailsAdapter(AdminOrdersDetailsActivity.this, productsList.get(0).getItemArrayList(),listener);
+                    recyclerView.setAdapter(detailsAdapter);
 
-                txtProductAmount.setText(String.valueOf(detailsAdapter.grandTotal(productsList.get(0).getItemArrayList())));
-                txtTotalBill.setText(String.valueOf(mDeliveryCharge + detailsAdapter.grandTotal(productsList.get(0).getItemArrayList())));
+                    txtProductAmount.setText(String.valueOf(detailsAdapter.grandTotal(productsList.get(0).getItemArrayList())));
+                    txtTotalBill.setText(String.valueOf(mDeliveryCharge + detailsAdapter.grandTotal(productsList.get(0).getItemArrayList())));
 
-                if(billItemModel != null) {
-                    if (billItemModel.getOrderStatus().equals(getResources().getString(R.string.order_type1))) {
-                        btnOrderStatus.setText(getResources().getString(R.string.order_type2));
-                    } else if (billItemModel.getOrderStatus().equals(getResources().getString(R.string.order_type2))) {
-                        btnOrderStatus.setText(getResources().getString(R.string.order_type3));
-                    } else if (billItemModel.getOrderStatus().equals(getResources().getString(R.string.order_type3))) {
-                        btnOrderStatus.setText(getResources().getString(R.string.order_type4));
-                    } else if (billItemModel.getOrderStatus().equals(getResources().getString(R.string.order_type4))) {
-                        btnOrderStatus.setText(getResources().getString(R.string.order_type5));
-                    } else if (billItemModel.getOrderStatus().equals(getResources().getString(R.string.order_type5))) {
-                        btnOrderStatus.setText(getResources().getString(R.string.order_type5));
+                    if(billItemModel != null) {
+                        if (billItemModel.getOrderStatus().equals(getResources().getString(R.string.order_type1))) {
+                            btnOrderStatus.setText(getResources().getString(R.string.order_type2));
+                        } else if (billItemModel.getOrderStatus().equals(getResources().getString(R.string.order_type2))) {
+                            btnOrderStatus.setText(getResources().getString(R.string.order_type3));
+                        } else if (billItemModel.getOrderStatus().equals(getResources().getString(R.string.order_type3))) {
+                            btnOrderStatus.setText(getResources().getString(R.string.order_type4));
+                        } else if (billItemModel.getOrderStatus().equals(getResources().getString(R.string.order_type4))) {
+                            btnOrderStatus.setText(getResources().getString(R.string.order_type5));
+                        } else if (billItemModel.getOrderStatus().equals(getResources().getString(R.string.order_type5))) {
+                            btnOrderStatus.setText(getResources().getString(R.string.order_type5));
+                        }
                     }
                 }
-            }
-        });
+            });
+        } else {
+            progressBar.setVisibility(View.GONE);
+            Utility.displayDialog(AdminOrdersDetailsActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
     public void ordersAccept(){
-        DocumentReference questionsRef = fireStore.collection("order_confirm").document(selectedUserId);
-        DocumentReference reference = questionsRef.collection(selectedUserId).document(productId);
-        reference.update("orderStatus",getResources().getString(R.string.order_type2)).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                sendNotify("Your order is "+getResources().getString(R.string.order_type2));
-            }
-        });
+        if (NetUtils.isNetworkAvailable(AdminOrdersDetailsActivity.this)) {
+            DocumentReference questionsRef = fireStore.collection("order_confirm").document(selectedUserId);
+            DocumentReference reference = questionsRef.collection(selectedUserId).document(productId);
+            reference.update("orderStatus", getResources().getString(R.string.order_type2)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    sendNotify("Your order is " + getResources().getString(R.string.order_type2));
+                }
+            });
+        } else {
+            Utility.displayDialog(AdminOrdersDetailsActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
     public void ordersPacking(){
-        DocumentReference questionsRef = fireStore.collection("order_confirm").document(selectedUserId);
-        DocumentReference reference = questionsRef.collection(selectedUserId).document(productId);
-        reference.update("orderStatus",getResources().getString(R.string.order_type3)).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                sendNotify("Your order is "+getResources().getString(R.string.order_type3));
-            }
-        });
+        if (NetUtils.isNetworkAvailable(AdminOrdersDetailsActivity.this)) {
+            DocumentReference questionsRef = fireStore.collection("order_confirm").document(selectedUserId);
+            DocumentReference reference = questionsRef.collection(selectedUserId).document(productId);
+            reference.update("orderStatus",getResources().getString(R.string.order_type3)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    sendNotify("Your order is "+getResources().getString(R.string.order_type3));
+                }
+            });
+        } else {
+            Utility.displayDialog(AdminOrdersDetailsActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
     public void ordersDelivered(){
-        DocumentReference questionsRef = fireStore.collection("order_confirm").document(selectedUserId);
-        DocumentReference reference = questionsRef.collection(selectedUserId).document(productId);
-        reference.update("orderStatus",getResources().getString(R.string.order_type4)).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                sendNotify("Your order is "+getResources().getString(R.string.order_type4));
-            }
-        });
+        if (NetUtils.isNetworkAvailable(AdminOrdersDetailsActivity.this)) {
+            DocumentReference questionsRef = fireStore.collection("order_confirm").document(selectedUserId);
+            DocumentReference reference = questionsRef.collection(selectedUserId).document(productId);
+            reference.update("orderStatus",getResources().getString(R.string.order_type4)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    sendNotify("Your order is "+getResources().getString(R.string.order_type4));
+                }
+            });
+        } else {
+            Utility.displayDialog(AdminOrdersDetailsActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
     public void ordersReceived(BillItem billModel){
-        DocumentReference questionsRef = fireStore.collection("order_confirm").document(selectedUserId);
-        DocumentReference receivedReference = questionsRef.collection(selectedUserId).document(productId);
-        receivedReference.update("orderStatus",getResources().getString(R.string.order_type5)).addOnCompleteListener(new OnCompleteListener<Void>() {
-            @Override
-            public void onComplete(@NonNull Task<Void> task) {
-                sendNotify("Your order is "+getResources().getString(R.string.order_type5));
+        if (NetUtils.isNetworkAvailable(AdminOrdersDetailsActivity.this)) {
+            DocumentReference questionsRef = fireStore.collection("order_confirm").document(selectedUserId);
+            DocumentReference receivedReference = questionsRef.collection(selectedUserId).document(productId);
+            receivedReference.update("orderStatus",getResources().getString(R.string.order_type5)).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    sendNotify("Your order is "+getResources().getString(R.string.order_type5));
 
-                final FieldValue productCreatedDate = FieldValue.serverTimestamp();
+                    final FieldValue productCreatedDate = FieldValue.serverTimestamp();
 
-                OrderCompleteModel completeModel = new OrderCompleteModel();
+                    OrderCompleteModel completeModel = new OrderCompleteModel();
 
-                completeModel.setBillCreatedDate(productCreatedDate);
-                completeModel.setBillItem(billModel);
+                    completeModel.setBillCreatedDate(productCreatedDate);
+                    completeModel.setBillItem(billModel);
 
-                DocumentReference questionsRef = fireStore.collection("ordered_completed").document(selectedUserId);
-                DocumentReference receivedReference = questionsRef.collection(productId).document();
+                    DocumentReference questionsRef = fireStore.collection("ordered_completed").document(selectedUserId);
+                    DocumentReference receivedReference = questionsRef.collection(productId).document();
 
-                completeModel.setUserId(selectedUserId);
-                completeModel.setDocId(receivedReference.getId());
-                receivedReference.set(completeModel);
-            }
-        });
+                    completeModel.setUserId(selectedUserId);
+                    completeModel.setDocId(receivedReference.getId());
+                    receivedReference.set(completeModel);
+                }
+            });
+        } else {
+            Utility.displayDialog(AdminOrdersDetailsActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
     @Override
     public void onDialogPositive(String mRejectOrder) {
-        if (!TextUtils.isEmpty(mRejectOrder) && mRejectOrder != null) {
-            DocumentReference questionsRef = fireStore.collection("order_confirm").document(selectedUserId);
-            DocumentReference reference = questionsRef.collection(selectedUserId).document(productId);
-            reference.update("orderStatus", getResources().getString(R.string.order_type6),
-                    "rejectionNote",mRejectOrder,
-                    "rejectionStatus",true).addOnCompleteListener(new OnCompleteListener<Void>() {
-                @Override
-                public void onComplete(@NonNull Task<Void> task) {
+        if (NetUtils.isNetworkAvailable(AdminOrdersDetailsActivity.this)) {
+            if (!TextUtils.isEmpty(mRejectOrder) && mRejectOrder != null) {
+                DocumentReference questionsRef = fireStore.collection("order_confirm").document(selectedUserId);
+                DocumentReference reference = questionsRef.collection(selectedUserId).document(productId);
+                reference.update("orderStatus", getResources().getString(R.string.order_type6),
+                        "rejectionNote",mRejectOrder,
+                        "rejectionStatus",true).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
 
-                }
-            });
+                    }
+                });
+            }
+        } else {
+            Utility.displayDialog(AdminOrdersDetailsActivity.this, getString(R.string.common_no_internet), false);
         }
     }
 
@@ -300,19 +327,23 @@ public class AdminOrdersDetailsActivity extends AppCompatActivity implements Adm
 
 
     public void sendNotify(String nMessage){
-        DocumentReference query = fireStore.collection("users").document(selectedUserId);
-        query.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    progressBar.setVisibility(View.GONE);
-                    Users usersInfo = task.getResult().toObject(Users.class);
+        if (NetUtils.isNetworkAvailable(AdminOrdersDetailsActivity.this)) {
+            DocumentReference query = fireStore.collection("users").document(selectedUserId);
+            query.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        progressBar.setVisibility(View.GONE);
+                        Users usersInfo = task.getResult().toObject(Users.class);
 
-                    FirebaseIDService idService = new FirebaseIDService();
-                    idService.sendWithOtherThreadOrderStatus(usersInfo.getUserToken(), nMessage, false);
+                        FirebaseIDService idService = new FirebaseIDService();
+                        idService.sendWithOtherThreadOrderStatus(usersInfo.getUserToken(), nMessage, false);
+                    }
                 }
-            }
-        });
+            });
+        } else {
+            Utility.displayDialog(AdminOrdersDetailsActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 }
 

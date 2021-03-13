@@ -182,7 +182,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void userLogin(String email, String password) {
-
+        if (NetUtils.isNetworkAvailable(LoginActivity.this)) {
         fireAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
@@ -254,6 +254,9 @@ public class LoginActivity extends AppCompatActivity {
 
                     }
                 });
+        } else {
+            Utility.displayDialog(LoginActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
 }

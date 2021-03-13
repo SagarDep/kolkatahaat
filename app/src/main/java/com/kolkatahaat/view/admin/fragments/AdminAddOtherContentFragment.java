@@ -148,48 +148,52 @@ public class AdminAddOtherContentFragment extends Fragment {
 
             @Override
             public void onClickDelete(View view, int position) {
-                //Toast.makeText(getContext(), "Position delete" + messages.get(position).getDocId(), Toast.LENGTH_SHORT).show();
-                StorageReference imageRef = storage.getReferenceFromUrl(messages.get(position).getImgUrl());
-                imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        Log.d(TAG, "onSuccess: deleted file");
+                if (NetUtils.isNetworkAvailable(getActivity())) {
+                    //Toast.makeText(getContext(), "Position delete" + messages.get(position).getDocId(), Toast.LENGTH_SHORT).show();
+                    StorageReference imageRef = storage.getReferenceFromUrl(messages.get(position).getImgUrl());
+                    imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            Log.d(TAG, "onSuccess: deleted file");
 
-                        if (!TextUtils.isEmpty(messages.get(position).getDocId()) && messages.get(position).getDocId() != null) {
-                            collectionReference.document(messages.get(position).getDocId()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    messages.remove(position);
-                                    imageAdapter.notifyDataSetChanged();
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                }
-                            });
+                            if (!TextUtils.isEmpty(messages.get(position).getDocId()) && messages.get(position).getDocId() != null) {
+                                collectionReference.document(messages.get(position).getDocId()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        messages.remove(position);
+                                        imageAdapter.notifyDataSetChanged();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                    }
+                                });
+                            }
                         }
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception exception) {
-                        // Uh-oh, an error occurred!
-                        Log.d(TAG, "onFailure: did not delete file");
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            // Uh-oh, an error occurred!
+                            Log.d(TAG, "onFailure: did not delete file");
 
-                        if (!TextUtils.isEmpty(messages.get(position).getDocId()) && messages.get(position).getDocId() != null) {
-                            collectionReference.document(messages.get(position).getDocId()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                                @Override
-                                public void onSuccess(Void aVoid) {
-                                    messages.remove(position);
-                                    imageAdapter.notifyDataSetChanged();
-                                }
-                            }).addOnFailureListener(new OnFailureListener() {
-                                @Override
-                                public void onFailure(@NonNull Exception e) {
-                                }
-                            });
+                            if (!TextUtils.isEmpty(messages.get(position).getDocId()) && messages.get(position).getDocId() != null) {
+                                collectionReference.document(messages.get(position).getDocId()).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void aVoid) {
+                                        messages.remove(position);
+                                        imageAdapter.notifyDataSetChanged();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                    }
+                                });
+                            }
                         }
-                    }
-                });
+                    });
+                } else {
+                    Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
+                }
             }
         };
 
@@ -262,10 +266,14 @@ public class AdminAddOtherContentFragment extends Fragment {
     }
 
     private void chooseImage() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+        if (NetUtils.isNetworkAvailable(getActivity())) {
+            Intent intent = new Intent();
+            intent.setType("image/*");
+            intent.setAction(Intent.ACTION_GET_CONTENT);
+            startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+        } else {
+            Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
+        }
     }
 
     @Override
@@ -283,38 +291,44 @@ public class AdminAddOtherContentFragment extends Fragment {
     }
 
     private void addImage() {
-        if (filePath != null) {
-            final ProgressDialog progressDialog = new ProgressDialog(getActivity());
-            progressDialog.setTitle("Uploading...");
-            progressDialog.show();
+        if (NetUtils.isNetworkAvailable(getActivity())) {
+            if (filePath != null) {
+                final ProgressDialog progressDialog = new ProgressDialog(getActivity());
+                progressDialog.setTitle("Uploading...");
+                progressDialog.show();
 
-            StorageReference ref = storageReference.child("slider/" + UUID.randomUUID().toString());
-            ref.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    progressDialog.dismiss();
-                    final Task<Uri> result = taskSnapshot.getMetadata().getReference().getDownloadUrl();
-                    result.addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            Log.e(TAG, "onSuccess: uri= " + uri.toString());
-                            uploadProduct(uri.toString());
-                        }
-                    });
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    progressDialog.dismiss();
-                    Toast.makeText(getActivity(), "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                    double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                    progressDialog.setMessage("Uploaded " + (int) progress + "%");
-                }
-            });
+                StorageReference ref = storageReference.child("slider/" + UUID.randomUUID().toString());
+                ref.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        progressDialog.dismiss();
+                        final Task<Uri> result = taskSnapshot.getMetadata().getReference().getDownloadUrl();
+                        result.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                Log.e(TAG, "onSuccess: uri= " + uri.toString());
+                                uploadProduct(uri.toString());
+                            }
+                        });
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        progressDialog.dismiss();
+                        Toast.makeText(getActivity(), "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                        double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                        progressDialog.setMessage("Uploaded " + (int) progress + "%");
+                    }
+                });
+            } else {
+                Utility.displayDialog(getActivity(), "File is not available", false);
+            }
+        } else {
+            Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
         }
     }
 
@@ -358,85 +372,89 @@ public class AdminAddOtherContentFragment extends Fragment {
 
 
     private void getAllImage() {
-        collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
-            @Override
-            public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
-                if (e != null) {
-                    Log.w("TAG", "listen:error", e);
-                    return;
-                }
-                for (DocumentChange dc : snapshots.getDocumentChanges()) {
-                    switch (dc.getType()) {
-                        case ADDED:
-                            Log.d("TAG", "New Msg: " + dc.getDocument().toObject(SliderImgItem.class));
-                            SliderImgItem note = dc.getDocument().toObject(SliderImgItem.class);
-                            messages.add(note);
-                            imageAdapter.notifyDataSetChanged();
+        if (NetUtils.isNetworkAvailable(getActivity())) {
+            collectionReference.addSnapshotListener(new EventListener<QuerySnapshot>() {
+                @Override
+                public void onEvent(@Nullable QuerySnapshot snapshots, @Nullable FirebaseFirestoreException e) {
+                    if (e != null) {
+                        Log.w("TAG", "listen:error", e);
+                        return;
+                    }
+                    for (DocumentChange dc : snapshots.getDocumentChanges()) {
+                        switch (dc.getType()) {
+                            case ADDED:
+                                Log.d("TAG", "New Msg: " + dc.getDocument().toObject(SliderImgItem.class));
+                                SliderImgItem note = dc.getDocument().toObject(SliderImgItem.class);
+                                messages.add(note);
+                                imageAdapter.notifyDataSetChanged();
 
-                            if (messages.size() != 0 && messages != null) {
-                                mRecyclerView.setVisibility(View.VISIBLE);
-                                progressBar.setVisibility(View.GONE);
-                                empty_view.setVisibility(View.GONE);
-                            } else {
-                                mRecyclerView.setVisibility(View.GONE);
-                                progressBar.setVisibility(View.GONE);
-                                empty_view.setVisibility(View.VISIBLE);
-                            }
-                            break;
-                        case MODIFIED:
-                            String key = dc.getDocument().getId();
-                            Log.d("TAG", "Modified Msg: " + key);
+                                if (messages.size() != 0 && messages != null) {
+                                    mRecyclerView.setVisibility(View.VISIBLE);
+                                    progressBar.setVisibility(View.GONE);
+                                    empty_view.setVisibility(View.GONE);
+                                } else {
+                                    mRecyclerView.setVisibility(View.GONE);
+                                    progressBar.setVisibility(View.GONE);
+                                    empty_view.setVisibility(View.VISIBLE);
+                                }
+                                break;
+                            case MODIFIED:
+                                String key = dc.getDocument().getId();
+                                Log.d("TAG", "Modified Msg: " + key);
 
-                            if (messages.size() != 0) {
-                                for (int i = 0; i < messages.size(); i++) {
-                                    if (messages.get(i).getDocId().equals(dc.getDocument().getId())) {
+                                if (messages.size() != 0) {
+                                    for (int i = 0; i < messages.size(); i++) {
+                                        if (messages.get(i).getDocId().equals(dc.getDocument().getId())) {
 
-                                        SliderImgItem billModel = dc.getDocument().toObject(SliderImgItem.class);
-                                        messages.set(i, billModel);
-                                        imageAdapter.notifyDataSetChanged();
-                                        break;
+                                            SliderImgItem billModel = dc.getDocument().toObject(SliderImgItem.class);
+                                            messages.set(i, billModel);
+                                            imageAdapter.notifyDataSetChanged();
+                                            break;
+                                        }
                                     }
                                 }
-                            }
-                            if (messages.size() != 0 && messages != null) {
-                                mRecyclerView.setVisibility(View.VISIBLE);
-                                progressBar.setVisibility(View.GONE);
-                                empty_view.setVisibility(View.GONE);
-                            } else {
-                                mRecyclerView.setVisibility(View.GONE);
-                                progressBar.setVisibility(View.GONE);
-                                empty_view.setVisibility(View.VISIBLE);
-                            }
-                            break;
+                                if (messages.size() != 0 && messages != null) {
+                                    mRecyclerView.setVisibility(View.VISIBLE);
+                                    progressBar.setVisibility(View.GONE);
+                                    empty_view.setVisibility(View.GONE);
+                                } else {
+                                    mRecyclerView.setVisibility(View.GONE);
+                                    progressBar.setVisibility(View.GONE);
+                                    empty_view.setVisibility(View.VISIBLE);
+                                }
+                                break;
 
-                        case REMOVED:
-                            Log.d("TAG", "Removed Msg: " + dc.getDocument().toObject(SliderImgItem.class));
+                            case REMOVED:
+                                Log.d("TAG", "Removed Msg: " + dc.getDocument().toObject(SliderImgItem.class));
 
-                            if (messages.size() != 0) {
-                                for (int i = 0; i < messages.size(); i++) {
-                                    if (messages.get(i).getDocId().equals(dc.getDocument().getId())) {
+                                if (messages.size() != 0) {
+                                    for (int i = 0; i < messages.size(); i++) {
+                                        if (messages.get(i).getDocId().equals(dc.getDocument().getId())) {
 
-                                        //BillModel billModel = dc.getDocument().toObject(BillModel.class);
-                                        messages.remove(i);
-                                        imageAdapter.notifyDataSetChanged();
-                                        break;
+                                            //BillModel billModel = dc.getDocument().toObject(BillModel.class);
+                                            messages.remove(i);
+                                            imageAdapter.notifyDataSetChanged();
+                                            break;
+                                        }
                                     }
                                 }
-                            }
-                            if (messages.size() != 0 && messages != null) {
-                                mRecyclerView.setVisibility(View.VISIBLE);
-                                progressBar.setVisibility(View.GONE);
-                                empty_view.setVisibility(View.GONE);
-                            } else {
-                                mRecyclerView.setVisibility(View.GONE);
-                                progressBar.setVisibility(View.GONE);
-                                empty_view.setVisibility(View.VISIBLE);
-                            }
-                            break;
+                                if (messages.size() != 0 && messages != null) {
+                                    mRecyclerView.setVisibility(View.VISIBLE);
+                                    progressBar.setVisibility(View.GONE);
+                                    empty_view.setVisibility(View.GONE);
+                                } else {
+                                    mRecyclerView.setVisibility(View.GONE);
+                                    progressBar.setVisibility(View.GONE);
+                                    empty_view.setVisibility(View.VISIBLE);
+                                }
+                                break;
+                        }
                     }
                 }
-            }
-        });
+            });
+        } else {
+            Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
+        }
     }
 
 
@@ -447,22 +465,26 @@ public class AdminAddOtherContentFragment extends Fragment {
     }
 
     private void getDeliveryChrarge(){
-        collectionReferenceDelivery.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        Log.d(TAG, "DocumentSnapshot data: " + document.getData());
-                        int data = Integer.valueOf(document.getData().get("deliveryCharges").toString());
-                        editTextItemDeliveryChrg.setText(""+data);
+        if (NetUtils.isNetworkAvailable(getActivity())) {
+            collectionReferenceDelivery.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                    if (task.isSuccessful()) {
+                        DocumentSnapshot document = task.getResult();
+                        if (document.exists()) {
+                            Log.d(TAG, "DocumentSnapshot data: " + document.getData());
+                            int data = Integer.valueOf(document.getData().get("deliveryCharges").toString());
+                            editTextItemDeliveryChrg.setText(""+data);
+                        } else {
+                            Log.d(TAG, "No such document");
+                        }
                     } else {
-                        Log.d(TAG, "No such document");
+                        Log.d(TAG, "get failed with ", task.getException());
                     }
-                } else {
-                    Log.d(TAG, "get failed with ", task.getException());
                 }
-            }
-        });
+            });
+        } else {
+            Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
+        }
     }
 }

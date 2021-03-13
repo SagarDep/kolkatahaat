@@ -166,10 +166,14 @@ public class AdminUpdateSliderImageActivity extends AppCompatActivity {
     }
 
     private void chooseImage() {
+        if (NetUtils.isNetworkAvailable(AdminUpdateSliderImageActivity.this)) {
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
         startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
+        } else {
+            Utility.displayDialog(AdminUpdateSliderImageActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 
     @Override
@@ -188,38 +192,44 @@ public class AdminUpdateSliderImageActivity extends AppCompatActivity {
 
 
     private void addImage() {
-        if (filePath != null) {
-            final ProgressDialog progressDialog = new ProgressDialog(AdminUpdateSliderImageActivity.this);
-            progressDialog.setTitle("Uploading...");
-            progressDialog.show();
+        if (NetUtils.isNetworkAvailable(AdminUpdateSliderImageActivity.this)) {
+            if (filePath != null) {
+                final ProgressDialog progressDialog = new ProgressDialog(AdminUpdateSliderImageActivity.this);
+                progressDialog.setTitle("Uploading...");
+                progressDialog.show();
 
-            StorageReference ref = storageReference.child("slider/" + UUID.randomUUID().toString());
-            ref.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
-                    progressDialog.dismiss();
-                    final Task<Uri> result = taskSnapshot.getMetadata().getReference().getDownloadUrl();
-                    result.addOnSuccessListener(new OnSuccessListener<Uri>() {
-                        @Override
-                        public void onSuccess(Uri uri) {
-                            Log.e(TAG, "onSuccess: uri= " + uri.toString());
-                            uploadProduct(uri.toString());
-                        }
-                    });
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    progressDialog.dismiss();
-                    Toast.makeText(AdminUpdateSliderImageActivity.this, "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
-            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
-                    double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
-                    progressDialog.setMessage("Uploaded " + (int) progress + "%");
-                }
-            });
+                StorageReference ref = storageReference.child("slider/" + UUID.randomUUID().toString());
+                ref.putFile(filePath).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                        progressDialog.dismiss();
+                        final Task<Uri> result = taskSnapshot.getMetadata().getReference().getDownloadUrl();
+                        result.addOnSuccessListener(new OnSuccessListener<Uri>() {
+                            @Override
+                            public void onSuccess(Uri uri) {
+                                Log.e(TAG, "onSuccess: uri= " + uri.toString());
+                                uploadProduct(uri.toString());
+                            }
+                        });
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        progressDialog.dismiss();
+                        Toast.makeText(AdminUpdateSliderImageActivity.this, "Failed " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                    @Override
+                    public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                        double progress = (100.0 * taskSnapshot.getBytesTransferred() / taskSnapshot.getTotalByteCount());
+                        progressDialog.setMessage("Uploaded " + (int) progress + "%");
+                    }
+                });
+            } else {
+                Utility.displayDialog(AdminUpdateSliderImageActivity.this, "File is not available", false);
+            }
+        } else {
+            Utility.displayDialog(AdminUpdateSliderImageActivity.this, getString(R.string.common_no_internet), false);
         }
     }
 
@@ -263,40 +273,45 @@ public class AdminUpdateSliderImageActivity extends AppCompatActivity {
     }
 
     public void onClickDelete(String positionId) {
-        StorageReference imageRef = storage.getReferenceFromUrl(mSliderImgURL);
-        imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-            @Override
-            public void onSuccess(Void aVoid) {
-                Log.d(TAG, "onSuccess: deleted file");
-                collectionReference.document(positionId).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        onBackPressed();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        onBackPressed();
-                    }
-                });
-            }
-        }).addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception exception) {
-                // Uh-oh, an error occurred!
-                Log.d(TAG, "onFailure: did not delete file");
-                collectionReference.document(positionId).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void aVoid) {
-                        onBackPressed();
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        onBackPressed();
-                    }
-                });
-            }
-        });
+        if (NetUtils.isNetworkAvailable(AdminUpdateSliderImageActivity.this)) {
+            StorageReference imageRef = storage.getReferenceFromUrl(mSliderImgURL);
+            imageRef.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                @Override
+                public void onSuccess(Void aVoid) {
+                    Log.d(TAG, "onSuccess: deleted file");
+                    collectionReference.document(positionId).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            onBackPressed();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            onBackPressed();
+                        }
+                    });
+                }
+            }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    // Uh-oh, an error occurred!
+                    Log.d(TAG, "onFailure: did not delete file");
+                    collectionReference.document(positionId).delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void aVoid) {
+                            onBackPressed();
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            onBackPressed();
+                        }
+                    });
+                }
+            });
+        } else {
+            progressBar.setVisibility(View.GONE);
+            Utility.displayDialog(AdminUpdateSliderImageActivity.this, getString(R.string.common_no_internet), false);
+        }
     }
 }

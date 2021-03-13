@@ -29,6 +29,8 @@ import com.google.firebase.firestore.QuerySnapshot;
 import com.kolkatahaat.R;
 
 import com.kolkatahaat.model.SliderImgItem;
+import com.kolkatahaat.utills.NetUtils;
+import com.kolkatahaat.utills.Utility;
 import com.kolkatahaat.view.customer.ProductListActivity;
 
 import java.util.ArrayList;
@@ -42,7 +44,7 @@ public class CustomerProductCategoryFragment extends Fragment implements View.On
     SliderLayout mDemoSlider ;
     ArrayList<SliderImgItem> listUrl = new ArrayList<>();
 
-    RelativeLayout llEatable;
+    RelativeLayout llGrocery;
     RelativeLayout llPujaItem;
     RelativeLayout llClothing;
     RelativeLayout llOther;
@@ -60,87 +62,74 @@ public class CustomerProductCategoryFragment extends Fragment implements View.On
 
         init(view);
 
-
-
         /*RequestOptions requestOptions = new RequestOptions();
         requestOptions.centerCrop();
-
         for (int i = 0; i < listUrl.size(); i++) {
             TextSliderView sliderView = new TextSliderView(getActivity());
-
             sliderView
                     .image(listUrl.get(i).getImgUrl())
                     .setRequestOption(requestOptions)
                     .setProgressBarVisible(true);
-
             mDemoSlider.addSlider(sliderView);
         }
-
         mDemoSlider.setPresetTransformer(SliderLayout.Transformer.Accordion);
-
         mDemoSlider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
         mDemoSlider.setCustomAnimation(new DescriptionAnimation());
         mDemoSlider.setDuration(5000);
         mDemoSlider.stopCyclingWhenTouch(false);*/
-
         return view;
     }
 
     private void init(View view) {
         mDemoSlider = view.findViewById(R.id.slider);
-        llEatable = view.findViewById(R.id.llEatable);
+        llGrocery = view.findViewById(R.id.llGrocery);
         llPujaItem = view.findViewById(R.id.llPujaItem);
         llClothing = view.findViewById(R.id.llClothing);
         llOther = view.findViewById(R.id.llOther);
-        llEatable.setOnClickListener(this);
+        llGrocery.setOnClickListener(this);
         llPujaItem.setOnClickListener(this);
         llClothing.setOnClickListener(this);
         llOther.setOnClickListener(this);
 
-
        /* listUrl.add("https://www.revive-adserver.com/media/GitHub.jpg");
-
-
         listUrl.add("https://tctechcrunch2011.files.wordpress.com/2017/02/android-studio-logo.png");
-
-
         listUrl.add("http://static.tumblr.com/7650edd3fb8f7f2287d79a67b5fec211/3mg2skq/3bdn278j2/tumblr_static_idk_what.gif");
-
-
         listUrl.add("http://www.gstatic.com/webp/gallery/1.webp");*/
 
-        collectionReference.orderBy("currentDate", Query.Direction.DESCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                if (task.isSuccessful()) {
-                    RequestOptions requestOptions = new RequestOptions();
-                    requestOptions.centerCrop();
+        if (NetUtils.isNetworkAvailable(getActivity())) {
+            collectionReference.orderBy("currentDate", Query.Direction.DESCENDING).get().addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
+                @Override
+                public void onComplete(@NonNull Task<QuerySnapshot> task) {
+                    if (task.isSuccessful()) {
+                        RequestOptions requestOptions = new RequestOptions();
+                        requestOptions.centerCrop();
 
-                    for (DocumentSnapshot document : task.getResult()) {
-                        SliderImgItem sliderImgItem = document.toObject(SliderImgItem.class);
-                        listUrl.add(sliderImgItem);
+                        for (DocumentSnapshot document : task.getResult()) {
+                            SliderImgItem sliderImgItem = document.toObject(SliderImgItem.class);
+                            listUrl.add(sliderImgItem);
 
-                        TextSliderView sliderView = new TextSliderView(getActivity());
+                            TextSliderView sliderView = new TextSliderView(getActivity());
 
-                        sliderView
-                                .image(sliderImgItem.getImgUrl())
-                                .setRequestOption(requestOptions)
-                                .setProgressBarVisible(true);
+                            sliderView
+                                    .image(sliderImgItem.getImgUrl())
+                                    .setRequestOption(requestOptions)
+                                    .setProgressBarVisible(true);
 
-                        mDemoSlider.addSlider(sliderView);
+                            mDemoSlider.addSlider(sliderView);
+                        }
+
+                        mDemoSlider.setPresetTransformer(SliderLayout.Transformer.Accordion);
+
+                        mDemoSlider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
+                        mDemoSlider.setCustomAnimation(new DescriptionAnimation());
+                        mDemoSlider.setDuration(5000);
+                        mDemoSlider.stopCyclingWhenTouch(false);
                     }
-
-                    mDemoSlider.setPresetTransformer(SliderLayout.Transformer.Accordion);
-
-                    mDemoSlider.setPresetIndicator(SliderLayout.PresetIndicators.Center_Bottom);
-                    mDemoSlider.setCustomAnimation(new DescriptionAnimation());
-                    mDemoSlider.setDuration(5000);
-                    mDemoSlider.stopCyclingWhenTouch(false);
                 }
-            }
-        });
-
-
+            });
+        } else {
+            Utility.displayDialog(getActivity(), getString(R.string.common_no_internet), false);
+        }
     }
 
     @Override
@@ -154,11 +143,9 @@ public class CustomerProductCategoryFragment extends Fragment implements View.On
     public void onClick(View v) {
         Intent intent = null;
         switch(v.getId()){
-
-            case R.id.llEatable:
+            case R.id.llGrocery:
                 intent = new Intent(getActivity(), ProductListActivity.class);
                 intent.putExtra("EXTRA_TAB_POSITION", 0);
-
                 startActivity(intent);
                 break;
 
@@ -181,6 +168,4 @@ public class CustomerProductCategoryFragment extends Fragment implements View.On
                 break;
         }
     }
-
-
 }
